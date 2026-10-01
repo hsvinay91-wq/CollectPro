@@ -39,7 +39,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;colo
 <button onclick="openAdd()"><span>＋</span> <i>Add Customer</i></button>
 <button onclick="exportCSV()">⇩ <i>Export Data</i></button>
 </div>
-<div class="side-foot">Weekly Collections · v4.0</div></aside>
+<div class="side-foot">Weekly Collections · v6.0</div></aside>
 
 <main class="main">
 <div id="homeView">
@@ -212,7 +212,7 @@ function openPayment(id){
   currentCustomerId=id;const x=data.find(a=>a.id===id);if(!x)return;
   const suggested=Number(selectedScheduleWeek[id]||Math.min(actualPaidWeeks(x)+1,Math.max(x.total,1)));
   document.getElementById("paymentTitle").textContent=isCompleted(x)?(detailLang==="te"?"కొత్త వారం చెల్లింపు":"Add New Week Payment"):(detailLang==="te"?"చెల్లింపు — వారం ":"Add Payment — Week ")+suggested;
-  document.getElementById("pDate").value=nextWeekDate(x.loanDate,suggested)||new Date().toISOString().slice(0,10);
+  document.getElementById("pDate").value=nextWeekDate(x.loanDate,suggested,selectedWeekday[x.id]===undefined?4:selectedWeekday[x.id])||new Date().toISOString().slice(0,10);
   document.getElementById("pAmount").value=document.getElementById("quickAmount")?.value||x.amount;
   document.getElementById("pWeek").value=suggested;
   document.getElementById("pType").value="paid";
@@ -238,14 +238,20 @@ function addNewWeek(id){
 
 let detailLang="en";
 let selectedScheduleWeek={};
+let selectedWeekday={};
 
-function nextWeekDate(loanDate, weekNo){
+function nextWeekDate(loanDate, weekNo, weekday){
   if(!loanDate) return "";
   const d=new Date(loanDate+"T00:00:00");
   if(Number.isNaN(d.getTime())) return "";
-  d.setDate(d.getDate()+7*Number(weekNo));
+  const target=weekday===undefined||weekday===null?d.getDay():Number(weekday);
+  let delta=(target-d.getDay()+7)%7;
+  if(delta===0) delta=7; // always the next occurrence after loan date
+  d.setDate(d.getDate()+delta+7*(Number(weekNo)-1));
   return d.toISOString().slice(0,10);
 }
+function weekdayName(n){return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][Number(n)]}
+function weekdayOptions(){return [0,1,2,3,4,5,6]}
 function formatDate(d){
   if(!d) return "-";
   const parts=d.split("-");
@@ -259,11 +265,17 @@ function scheduleStatus(x,weekNo){
   return "unpaid";
 }
 function selectedWeekDate(x){
-  const w=Number(selectedScheduleWeek[x.id]||actualPaidWeeks(x)+1);
-  return nextWeekDate(x.loanDate,w);
+  const w=Number(selectedScheduleWeek[x.id]||Math.max(actualPaidWeeks(x)+1,1));
+  const day=selectedWeekday[x.id]===undefined?4:Number(selectedWeekday[x.id]);
+  return nextWeekDate(x.loanDate,w,day);
 }
 function setScheduleWeek(id,w){
   selectedScheduleWeek[id]=Number(w);
+  renderDetail(id);
+}
+function setWeekday(id,day){
+  selectedWeekday[id]=Number(day);
+  selectedScheduleWeek[id]=Math.max(1,Number(selectedScheduleWeek[id]||actualPaidWeeks(data.find(a=>a.id===id))+1));
   renderDetail(id);
 }
 function toggleLanguage(){
@@ -280,7 +292,7 @@ function renderDetail(id){
   const total=totalPayable(x), paid=actualPaidAmount(x), rem=remainingAmount(x), pw=actualPaidWeeks(x), rw=remainingWeeks(x);
   const pct=x.total?Math.min(100,Math.round(pw/x.total*100)):0;
   const hist=x.paymentHistory||[];
-  const selected=Number(selectedScheduleWeek[x.id]||Math.min(Math.max(pw+1,1),Math.max(x.total,1)));
+  const selected=Number(selectedScheduleWeek[x.id]||Math.min(Math.max(pw+1,1),Math.max(x.total,1)));\n  const weekday=selectedWeekday[x.id]===undefined?4:Number(selectedWeekday[x.id]);
   const rows=hist.length?hist.map((p,i)=>{
     const before=Number(x.historicalPaidAmount||0)+hist.slice(0,i+1).reduce((s,a)=>s+Number(a.amount||0),0);
     const r=Math.max(total-before,0);
@@ -289,7 +301,7 @@ function renderDetail(id){
 
   const completed=isCompleted(x);
   const scheduleRows=Array.from({length:Number(x.total||0)},(_,i)=>{
-    const w=i+1, d=nextWeekDate(x.loanDate,w), st=scheduleStatus(x,w);
+    const w=i+1, d=nextWeekDate(x.loanDate,w,selectedWeekday[x.id]===undefined?4:selectedWeekday[x.id]), st=scheduleStatus(x,w);
     return `<tr class="${st==="paid"?"paid-row":"unpaid-row"}">
       <td>Week ${w}</td><td>${formatDate(d)}</td><td>${st==="paid"?langText("Paid","Paid"):langText("Unpaid / Pending","చెల్లించలేదు / Pending")}</td>
       <td><button class="btn" style="padding:6px 9px" onclick="setScheduleWeek(${x.id},${w})">${langText("Select","Select")}</button></td>
@@ -302,7 +314,7 @@ function renderDetail(id){
     paymentHistory:"చెల్లింపు వివరాలు",recorded:"చెల్లింపులు",sno:"క్రమ సంఖ్య",date:"తేదీ",week:"వారం",amount:"చెల్లించిన మొత్తం",mode:"Cash/Online",remain:"మిగిలిన మొత్తం",
     status:"ఖాతా స్థితి",completed:"పూర్తయింది",pending:"పెండింగ్",allPaid:"అన్ని చెల్లించాల్సిన వారాలు పూర్తయ్యాయి. కొత్త వారం ఆటోమేటిక్‌గా జోడించబడదు.",
     next:"తదుపరి వారం",progress:"వారాల పూర్తి స్థాయి",actual:"నిజంగా చెల్లించిన మొత్తం",paidWeeks:"చెల్లించిన వారాలు",remainingWeeks:"మిగిలిన వారాలు",
-    schedule:"వారాల షెడ్యూల్",selectWeek:"వారం ఎంచుకోండి",selectedDate:"ఎంచుకున్న వారం తేదీ",weekFrom:"లోన్ తేదీ తర్వాతి వారం నుండి లెక్కింపు",
+    schedule:"వారాల షెడ్యూల్",selectWeek:"వారం ఎంచుకోండి",selectedDate:"ఎంచుకున్న వారం తేదీ",weekFrom:"ఎంచుకున్న వారపు రోజును బట్టి తేదీలు లెక్కించబడతాయి",
     addPayment:"చెల్లింపు జోడించండి",addAmount:"మొత్తం జోడించండి",language:"భాష: తెలుగు",home:"హోమ్",addNewWeek:"కొత్త వారం జోడించండి",
     completedBecause:"ఖాతా పూర్తయింది. మొత్తం payable weeks చెల్లించబడ్డాయి.",noAuto:"కొత్త వారం ఆటోమేటిక్‌గా జోడించబడదు."
   }:{
@@ -311,7 +323,7 @@ function renderDetail(id){
     paymentHistory:"Payment History",recorded:"recorded payments",sno:"S.NO",date:"Date",week:"Week",amount:"Amount Paid",mode:"Cash/Online",remain:"Remaining Pay",
     status:"ACCOUNT STATUS",completed:"COMPLETED",pending:"PENDING",allPaid:"All payable weeks are paid. No next week is added automatically.",
     next:"NEXT COLLECTION",progress:"Week completion",actual:"Actual amount paid",paidWeeks:"Paid weeks",remainingWeeks:"Remaining weeks",
-    schedule:"WEEK SCHEDULE",selectWeek:"Select Week",selectedDate:"Selected Week Date",weekFrom:"Calculated from the week after the loan date",
+    schedule:"WEEK SCHEDULE",selectWeek:"Select Week",selectedDate:"Selected Week Date",weekFrom:"Dates are based on the selected weekly collection day",
     addPayment:"Add Payment",addAmount:"Add Amount",language:"Language: తెలుగు",home:"Home",addNewWeek:"Add New Week",
     completedBecause:"This account is completed because all payable weeks are paid.",noAuto:"No new week is added automatically."
   };
@@ -342,15 +354,21 @@ function renderDetail(id){
     <section class="schedule-box">
       <div class="panel-head"><h2>📅 ${labels.schedule}</h2><span class="small-tag">${labels.weekFrom}</span></div>
       <div class="schedule-controls">
+        <label>Collection Day / ${detailLang==="te"?"వారపు రోజు":"Select Week Day"}
+          <select onchange="setWeekday(${x.id},this.value)">
+            ${weekdayOptions().map(d=>`<option value="${d}" ${weekday===d?"selected":""}>${weekdayName(d)}</option>`).join("")}
+          </select>
+          <div class="hint">${detailLang==="te"?"కస్టమర్ ప్రతి వారం చెల్లించే రోజు ఎంచుకోండి.":"Choose the weekday on which the customer normally pays every week."}</div>
+        </label>
         <label>${labels.selectWeek}
           <select onchange="setScheduleWeek(${x.id},this.value)">
-            ${Array.from({length:Number(x.total||0)},(_,i)=>`<option value="${i+1}" ${selected===i+1?"selected":""}>Week ${i+1} — ${formatDate(nextWeekDate(x.loanDate,i+1))}</option>`).join("")}
+            ${Array.from({length:Number(x.total||0)},(_,i)=>`<option value="${i+1}" ${selected===i+1?"selected":""}>Week ${i+1}</option>`).join("")}
           </select>
         </label>
         <div>
           <div class="label">${labels.selectedDate}</div>
-          <div class="week-date">Week ${selected} — ${formatDate(nextWeekDate(x.loanDate,selected))}</div>
-          <div class="week-meta">${scheduleStatus(x,selected)==="paid"?langText("Already paid","ఇప్పటికే చెల్లించారు"):langText("Unpaid / available for collection","చెల్లించలేదు / collection కోసం available")}</div>
+          <div class="week-date">Week ${selected} — ${formatDate(nextWeekDate(x.loanDate,selected,weekday))}</div>
+          <div class="week-meta">${weekdayName(weekday)} · ${scheduleStatus(x,selected)==="paid"?langText("Already paid","ఇప్పటికే చెల్లించారు"):langText("Unpaid / available for collection","చెల్లించలేదు / collection కోసం available")}</div>
         </div>
       </div>
       <div class="schedule-table"><table><thead><tr><th>${labels.week}</th><th>${labels.date}</th><th>${detailLang==="te"?"స్థితి":"Status"}</th><th></th></tr></thead><tbody>${scheduleRows}</tbody></table></div>
@@ -363,7 +381,7 @@ function renderDetail(id){
 
       <section class="panel">
         <div class="remaining-box"><div class="label">${labels.status}</div><div class="big">${completed?labels.completed:labels.pending}</div>
-        <div style="color:var(--muted);font-size:12px">${completed?labels.allPaid:`${labels.next}: Week ${pw+1} — ${formatDate(nextWeekDate(x.loanDate,Math.min(pw+1,x.total)))}`}</div>
+        <div style="color:var(--muted);font-size:12px">${completed?labels.allPaid:`${labels.next}: Week ${pw+1} — ${formatDate(nextWeekDate(x.loanDate,Math.min(pw+1,x.total),weekday))}`}</div>
         <div class="bar-label"><span>${labels.progress}</span><b>${pct}%</b></div>
         <div class="progress"><div style="width:${pct}%"></div></div>
         <div class="metric"><span>${labels.totalPayable}</span><b>${money(total)}</b></div>

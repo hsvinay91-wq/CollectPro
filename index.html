@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CollectPro — Weekly Collections</title>
+<style>
+:root{--bg:#080b14;--panel:#111624;--panel2:#171c2c;--text:#f4f7fb;--muted:#8f9bb3;--line:#273047;--accent:#7c5cff;--green:#28d7a3;--orange:#ffb454;--red:#ff6577;--blue:#53a8ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0%,#252044 0,#080b14 42%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+.app{display:flex;min-height:100vh}.side{width:245px;background:rgba(10,13,23,.92);border-right:1px solid var(--line);padding:24px 16px;position:sticky;top:0;height:100vh}
+.logo{font-size:21px;font-weight:800;margin:0 8px 30px}.logo span{color:var(--accent)}.nav button{width:100%;background:none;border:0;color:var(--muted);padding:13px 12px;text-align:left;border-radius:12px;font-size:14px;cursor:pointer;margin:3px 0}.nav button.active,.nav button:hover{background:var(--panel2);color:#fff}.nav i{font-style:normal;margin-right:10px}.side-foot{position:absolute;bottom:22px;color:var(--muted);font-size:12px;padding:0 8px}
+.main{flex:1;padding:28px;max-width:1500px;margin:auto;width:100%}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}.title h1{margin:0;font-size:27px}.title p{margin:5px 0 0;color:var(--muted);font-size:13px}.actions{display:flex;gap:9px}.btn{border:1px solid var(--line);background:var(--panel);color:#fff;padding:11px 15px;border-radius:11px;cursor:pointer}.btn.primary{background:linear-gradient(135deg,#8b67ff,#6045e8);border:0}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.card{background:linear-gradient(145deg,rgba(20,25,40,.95),rgba(14,18,29,.95));border:1px solid var(--line);border-radius:17px;padding:18px}.label{color:var(--muted);font-size:12px}.value{font-size:25px;font-weight:800;margin-top:8px}.sub{font-size:11px;color:var(--muted);margin-top:6px}.green{color:var(--green)}.orange{color:var(--orange)}.red{color:var(--red)}.blue{color:var(--blue)}
+.grid{display:grid;grid-template-columns:1.45fr .75fr;gap:16px}.panel{background:rgba(15,19,31,.9);border:1px solid var(--line);border-radius:17px;padding:18px}.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.panel-head h2{font-size:16px;margin:0}.search{background:#0c101b;border:1px solid var(--line);border-radius:10px;color:#fff;padding:10px 12px;width:220px}
+table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:var(--muted);font-weight:500;border-bottom:1px solid var(--line);padding:10px}td{padding:12px 10px;border-bottom:1px solid rgba(39,48,71,.55)}tr:last-child td{border-bottom:0}.status{padding:5px 8px;border-radius:99px;font-size:11px;font-weight:700}.paid{background:rgba(40,215,163,.12);color:var(--green)}.pending{background:rgba(255,180,84,.12);color:var(--orange)}.late{background:rgba(255,101,119,.12);color:var(--red)}
+.progress{height:7px;background:#20273a;border-radius:99px;overflow:hidden}.progress div{height:100%;background:linear-gradient(90deg,#7c5cff,#29d7a3);border-radius:99px}.metric{display:flex;justify-content:space-between;margin:13px 0 7px;font-size:12px}.empty{padding:35px;text-align:center;color:var(--muted)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(7px);align-items:center;justify-content:center;padding:20px;z-index:10}.modal.show{display:flex}.box{width:min(560px,100%);background:#111624;border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 25px 80px #000}.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form label{font-size:12px;color:var(--muted)}.form input,.form select{width:100%;margin-top:6px;background:#0b0f19;color:#fff;border:1px solid var(--line);border-radius:10px;padding:11px}.full{grid-column:1/-1}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+@media(max-width:900px){.side{display:none}.main{padding:18px}.cards{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}@media(max-width:560px){.cards{grid-template-columns:1fr}.form{grid-template-columns:1fr}.top{align-items:flex-start;gap:12px;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side"><div class="logo">Collect<span>Pro</span></div>
+<div class="nav"><button class="active" onclick="showTab('dashboard',this)">▦ <i>Dashboard</i></button><button onclick="showTab('customers',this)">◉ <i>Customers</i></button><button onclick="openAdd()">＋ <i>Add Customer</i></button><button onclick="exportCSV()">⇩ <i>Export Data</i></button></div>
+<div class="side-foot">Weekly Collections · v1.0</div></aside>
+<main class="main">
+<div class="top"><div class="title"><h1 id="heading">Collection Dashboard</h1><p>Track customers, weekly payments and outstanding weeks in one place.</p></div><div class="actions"><button class="btn" onclick="resetDemo()">Reset Demo</button><button class="btn primary" onclick="openAdd()">＋ Add Customer</button></div></div>
+<section class="cards">
+<div class="card"><div class="label">TOTAL CUSTOMERS</div><div class="value" id="customers">0</div><div class="sub">Active collection accounts</div></div>
+<div class="card"><div class="label">THIS WEEK COLLECTED</div><div class="value green" id="collected">₹0</div><div class="sub">Recorded payments</div></div>
+<div class="card"><div class="label">PENDING AMOUNT</div><div class="value orange" id="pending">₹0</div><div class="sub">Across outstanding weeks</div></div>
+<div class="card"><div class="label">PENDING WEEKS</div><div class="value red" id="weeks">0</div><div class="sub">Needs follow-up</div></div>
+</section>
+<div class="grid">
+<section class="panel"><div class="panel-head"><h2>Customer Accounts</h2><input class="search" id="search" placeholder="Search customer..." oninput="render()"></div>
+<div id="table"></div></section>
+<section class="panel"><div class="panel-head"><h2>Collection Health</h2></div>
+<div class="metric"><span>Payment completion</span><b id="rate">0%</b></div><div class="progress"><div id="bar" style="width:0%"></div></div>
+<div class="metric"><span>Customers fully paid</span><b id="fullpaid">0</b></div><div class="metric"><span>Customers with pending</span><b id="withpending">0</b></div>
+<hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+<div class="label">How it works</div><p style="font-size:13px;line-height:1.7;color:var(--muted)">Add each customer with weekly amount and total payable weeks. <b style="color:#fff">Total Payable = Weekly Amount × Total Weeks</b>. <b style="color:#fff">Paid Amount = Weekly Amount × Paid Weeks</b>, and <b style="color:#fff">Remaining = Total Payable − Paid Amount</b>. Use <b style="color:#fff">Pay</b> to record the next week or <b style="color:#fff">Miss</b> when a week is unpaid. Everything is saved locally in this browser.</p>
+</section></div>
+</main></div>
+
+<div class="modal" id="modal"><div class="box"><div class="panel-head"><h2 id="modalTitle">Add Customer</h2><button class="btn" onclick="closeModal()">✕</button></div>
+<div class="form"><label>Customer Name<input id="name"></label><label>Phone<input id="phone"></label><label>Weekly Amount (₹)<input id="amount" type="number"></label><label>Total Weeks<input id="total" type="number" value="20"></label><label>Starting Week<input id="start" type="date"></label><label>Initial Paid Weeks<input id="initialPaid" type="number" value="0" min="0"></label><label class="full">Notes<input id="notes"></label></div>
+<div class="modal-actions"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveCustomer()">Save Customer</button></div></div></div>
+<script>
+const demo=[
+{id:1,name:"Arun Kumar",phone:"9876543210",amount:1500,total:20,paid:14,missed:1},
+{id:2,name:"Suresh Reddy",phone:"9123456780",amount:2000,total:25,paid:18,missed:2},
+{id:3,name:"Mahesh",phone:"9988776655",amount:1000,total:15,paid:15,missed:0},
+{id:4,name:"Ravi Teja",phone:"9000011111",amount:2500,total:30,paid:10,missed:4}
+];
+let data=JSON.parse(localStorage.getItem("collectpro")||"null")||demo;
+function money(n){return "₹"+Number(n).toLocaleString("en-IN")}
+function save(){localStorage.setItem("collectpro",JSON.stringify(data))}
+function render(){
+document.getElementById("customers").textContent=data.length;
+let totalPayable=data.reduce((s,x)=>s+x.amount*x.total,0);
+let collected=data.reduce((s,x)=>s+x.amount*x.paid,0);
+let pending=Math.max(totalPayable-collected,0);
+let weeks=data.reduce((s,x)=>s+Math.max(x.total-x.paid,0),0);
+document.getElementById("collected").textContent=money(collected);document.getElementById("pending").textContent=money(pending);document.getElementById("weeks").textContent=weeks;
+let total=data.reduce((s,x)=>s+x.total,0), paid=data.reduce((s,x)=>s+x.paid,0), rate=total?Math.round(paid/total*100):0;
+document.getElementById("rate").textContent=rate+"%";document.getElementById("bar").style.width=rate+"%";
+document.getElementById("fullpaid").textContent=data.filter(x=>x.paid>=x.total).length;document.getElementById("withpending").textContent=data.filter(x=>x.paid<x.total).length;
+let q=document.getElementById("search").value.toLowerCase(), rows=data.filter(x=>(x.name+" "+x.phone).toLowerCase().includes(q));
+document.getElementById("table").innerHTML=rows.length?`<table><thead><tr><th>Customer</th><th>Weekly</th><th>Total Payable</th><th>Paid</th><th>Remaining</th><th>Status</th><th>Action</th></tr></thead><tbody>${rows.map(x=>{
+let totalPayable=x.amount*x.total;
+let paidAmount=x.amount*x.paid;
+let rem=Math.max(x.total-x.paid,0);
+let remainingAmount=Math.max(totalPayable-paidAmount,0);
+let st=rem===0?'<span class="status paid">Completed</span>':x.missed?'<span class="status late">Missed</span>':'<span class="status pending">Pending</span>';
+return `<tr><td><b>${esc(x.name)}</b><br><span style="color:var(--muted);font-size:11px">${esc(x.phone)}</span></td><td>${money(x.amount)}</td><td><b>${money(totalPayable)}</b><br><span style="color:var(--muted);font-size:11px">${x.total} weeks</span></td><td><b>${money(paidAmount)}</b><br><span style="color:var(--muted);font-size:11px">${x.paid}/${x.total} weeks</span></td><td><b>${money(remainingAmount)}</b><br><span style="color:var(--muted);font-size:11px">${rem} weeks</span></td><td>${st}</td><td><button class="btn" onclick="pay(${x.id})">Pay</button> <button class="btn" onclick="miss(${x.id})">Miss</button> <button class="btn" style="color:var(--red);border-color:rgba(255,101,119,.3)" onclick="deleteCustomer(${x.id})">Delete</button></td></tr>`}).join("")}</tbody></table>`:'<div class="empty">No customers found. Add your first customer.</div>';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function openAdd(){document.getElementById("modal").classList.add("show");document.getElementById("name").focus()}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+function saveCustomer(){
+let name=document.getElementById("name").value.trim();
+let amount=+document.getElementById("amount").value;
+let total=+document.getElementById("total").value;
+let initialPaid=Math.max(0,Math.min(+document.getElementById("initialPaid").value||0,total));
+if(!name||!amount||!total)return alert("Please enter customer name, weekly amount and total weeks.");
+data.push({id:Date.now(),name,phone:document.getElementById("phone").value.trim(),amount,total,paid:initialPaid,missed:0});
+save();closeModal();
+document.querySelectorAll(".form input").forEach(x=>x.value="");
+document.getElementById("total").value=20;
+document.getElementById("initialPaid").value=0;
+render();
+}
+function pay(id){let x=data.find(a=>a.id===id);if(x&&x.paid<x.total){x.paid++;save();render()}}
+function miss(id){let x=data.find(a=>a.id===id);if(x&&x.paid<x.total){x.missed++;save();render()}}
+function deleteCustomer(id){
+let x=data.find(a=>a.id===id);
+if(!x)return;
+if(confirm(`Delete ${x.name}?\nThis will remove the customer and their collection data.`)){
+data=data.filter(a=>a.id!==id);
+save();
+render();
+}
+}
+function resetDemo(){if(confirm("Reset all data to demo records?")){data=demo.map(x=>({...x}));save();render()}}
+function exportCSV(){let csv="Customer,Phone,Weekly Amount,Total Weeks,Paid Weeks,Remaining Weeks,Pending Amount,Missed Weeks\n"+data.map(x=>[x.name,x.phone,x.amount,x.total,x.paid,x.total-x.paid,(x.total-x.paid)*x.amount,x.missed].map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="weekly-collections.csv";a.click()}
+function showTab(tab,btn){document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");document.getElementById("heading").textContent=tab==="customers"?"Customer Accounts":"Collection Dashboard"}
+render();
+</script></body></html>

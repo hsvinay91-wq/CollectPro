@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CollectPro — Admin & Customer</title>
+<title>CollectPro</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#F5F3EE;--card:#fff;--ink:#14182E;--ink2:#1D2342;--text:#1A1E33;--muted:#6B7088;--line:#E4E1D8;--gold:#C9A45A;--paid:#2E9F7A;--miss:#D4604C;--pend:#D9D6CC;--onink:#F4EFE3;--in:#FAF9F5;
@@ -62,51 +63,31 @@ a.btn{text-decoration:none;display:inline-block}
 .chip.on{background:var(--gold);border-color:var(--gold);color:#1A1608}
 .ring{width:48px;height:48px;border-radius:50%;background:conic-gradient(var(--gold) var(--p),var(--pend) 0);display:grid;place-items:center;flex:none}
 .ring .av{width:40px;height:40px;border:3px solid var(--card)}
-
-/* CollectPro Mobile/Admin/Customer enhancements */
-.role-pill{font-size:11px;font-weight:700;padding:5px 9px;border-radius:99px;background:rgba(201,164,90,.16);color:var(--gold);border:1px solid rgba(201,164,90,.35)}
-.portal-note{font-size:12.5px;color:var(--muted);background:var(--in);border-radius:11px;padding:10px;margin-top:12px}
-.mobile-nav{display:none}.portal-login{min-height:calc(100vh - 130px);display:grid;place-items:center}
-.portal-card{width:100%;max-width:430px;padding:24px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
-.portal-card .icon{width:56px;height:56px;border-radius:16px;background:var(--gold);color:#1A1608;display:grid;place-items:center;font-weight:800;margin-bottom:14px}
-.portal-card h1{font-size:30px}
-@media(max-width:700px){
- .wrap{padding:10px 10px 82px}.top{position:sticky;top:0;z-index:8;background:var(--bg);padding:8px 0 10px;margin-bottom:10px}
- .brand{font-size:24px}.top .row{justify-content:flex-end}.top .row .btn{padding:8px 9px;font-size:11px}.top .role-pill{display:none}
- .grid{grid-template-columns:1fr 1fr;gap:9px}.stat{padding:13px;border-radius:14px}.stat .v{font-size:23px}
- .sec{padding:15px;border-radius:15px}.hero{padding:20px 16px;border-radius:18px}.hero h1{font-size:27px}
- .big{gap:18px 26px}.big .n{font-size:38px}.cust{padding:13px 2px;min-height:68px}
- .cust .m{min-width:0}.cust .m b,.cust .m small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
- .ring{width:40px;height:40px}.ring .av{width:34px;height:34px}.amt{font-size:12px}
- .mobile-nav{display:flex;position:fixed;left:10px;right:10px;bottom:10px;z-index:20;background:rgba(21,26,51,.96);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:16px;padding:6px;gap:5px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
- .mobile-nav button{flex:1;border:0;background:transparent;color:var(--muted);padding:8px 4px;border-radius:11px;font:700 10.5px Manrope}
- .mobile-nav button.on{background:var(--gold);color:#1A1608}.portal-login{min-height:calc(100vh - 170px);align-items:start;padding-top:18px}.portal-card{padding:20px}.portal-card h1{font-size:27px}
- .tw table{min-width:560px}
-}
-@media(max-width:430px){.top .row .btn:first-of-type{display:none}.grid{gap:8px}.stat{padding:11px}.stat .l{font-size:11px}.stat .v{font-size:21px}.sec h2{font-size:20px}}
-@media(min-width:701px){.mobile-nav{display:none!important}}
-
-@media print{.btn,.mobile-nav{display:none}}
+@media print{.btn{display:none}}
 </style></head><body>
 <div class="wrap">
  <div class="top"><div class="brand" onclick="go('')">Collect<i>Pro</i></div>
-  <div class="row"><span class="role-pill" id="rolePill">ADMIN</span>
-   <button class="btn" onclick="goPortal()">Customer Portal</button>
-   <button class="btn pri" onclick="custForm()">+ Add customer</button>
-  </div>
-</div>
+  <div class="row" id="topActions"></div></div>
  <div id="app"></div>
-</div>
-<div class="mobile-nav" id="mobileNav">
- <button id="mnAdmin" onclick="go('')">⌂<br>Admin</button>
- <button id="mnCustomers" onclick="go('')">👥<br>Customers</button>
- <button id="mnPortal" onclick="goPortal()">🔐<br>Customer</button>
 </div>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <script>
-var KEY="collectpro_v7",DB=[],view="",portalMode=false;
+var KEY="collectpro_v10",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="";
+var SUPABASE_URL="YOUR_SUPABASE_PROJECT_URL";
+var SUPABASE_PUBLISHABLE_KEY="YOUR_SUPABASE_PUBLISHABLE_KEY";
+var sb=null;
 try{DB=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){DB=[]}
 var save=function(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}};
+function cloudConfigured(){return SUPABASE_URL.indexOf("YOUR_")!==0&&SUPABASE_PUBLISHABLE_KEY.indexOf("YOUR_")!==0}
+function mapRow(r){return{id:r.id,customerId:r.customer_id,name:r.name,phone:r.phone||"",loan:+r.loan_amount||0,perWeek:+r.per_week||0,weeks:+r.weeks||0,date:r.loan_date||"",hPaid:+r.h_paid||0,hMiss:+r.h_miss||0,hAmt:r.h_amt==null?"":+r.h_amt,pays:Array.isArray(r.pays)?r.pays:[]}}
+async function cloudLoad(){if(!sb)return;var q=await sb.from("collectpro_customers").select("*").order("name");if(q.error){alert("Cloud database error: "+q.error.message);return}DB=(q.data||[]).map(mapRow);save();render()}
+async function cloudSaveCustomer(c,pin){if(!sb) return true;var a=await sb.rpc("collectpro_admin_save",{p_id:c.id||null,p_customer_id:c.customerId,p_pin:pin==null?null:pin,p_name:c.name,p_phone:c.phone||"",p_loan_amount:+c.loan||0,p_per_week:+c.perWeek||0,p_weeks:+c.weeks||0,p_loan_date:c.date||null,p_h_paid:+c.hPaid||0,p_h_miss:+c.hMiss||0,p_h_amt:c.hAmt===""?0:+c.hAmt||0,p_pays:c.pays||[]});if(a.error){alert("Cloud save failed: "+a.error.message);return false}return true}
+async function cloudDelete(id){if(!sb)return true;var q=await sb.from("collectpro_customers").delete().eq("id",id);if(q.error){alert("Cloud delete failed: "+q.error.message);return false}return true}
+async function initCloud(){if(!cloudConfigured()){route();return}sb=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);cloudReady=true;var g=await sb.auth.getSession();adminSession=g.data.session;if(adminSession)await cloudLoad();else render();sb.auth.onAuthStateChange(function(_e,session){adminSession=session;if(session)cloudLoad();else render()})}
+function adminLogin(){open_('<h2>Admin Login</h2><p style="color:var(--muted);font-size:13px">Sign in with the Admin email/password created in Supabase Authentication.</p><div class="fg">'+F("a_email","Admin email","email","")+F("a_pass","Password","password","")+'</div><div class="row"><button class="btn pri sp" onclick="doAdminLogin()">Login</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
+async function doAdminLogin(){var e=$("a_email").value.trim(),p=$("a_pass").value;if(!e||!p){$("err").textContent="Enter email and password.";return}var r=await sb.auth.signInWithPassword({email:e,password:p});if(r.error)$("err").textContent=r.error.message;else close_()}
+async function adminLogout(){if(sb)await sb.auth.signOut();}
+
 var $=function(i){return document.getElementById(i)};
 var inr=function(n){return "₹"+Math.round(n||0).toLocaleString("en-IN")};
 var fmt=function(s){return s?new Date(s).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}):"-"};
@@ -132,17 +113,16 @@ function strip(c){
  for(i=0;i<c.weeks;i++){if(!s[i]&&m>0){s[i]="m";m--}}
  return s;
 }
-function route(){
- var pm=location.hash.match(/^#portal(?:\/(.+))?$/);portalMode=!!pm;
- var m=location.hash.match(/^#customer\/(.+)$/);view=m?m[1]:"";
- armed=null;render();window.scrollTo(0,0)
+function portal(){location.hash="#portal"}
+function portalAdmin(){location.hash="#"}
+async function portalLogin(){var cid=$("portal_cid").value.trim(),pin=$("portal_pin").value.trim();if(!cid||!pin){$("perr").textContent="Enter Customer ID and PIN.";return}if(!sb){$("perr").textContent="Cloud connection is not configured yet.";return}var r=await sb.rpc("collectpro_customer_login",{p_customer_id:cid,p_pin:pin});if(r.error){$("perr").textContent=r.error.message;return}if(!r.data||!r.data.length){$("perr").textContent="Invalid Customer ID or PIN.";return}portalData=mapRow(r.data[0]);portalError="";render()}
+function portalLogout(){portalData=null;portalError="";render()}
+function portalView(){
+ if(portalData){var c=portalData,k=calc(c),st=strip(c),ps=c.pays.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))});return '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>Customer ID: '+esc(c.customerId||"")+'</small></div><span class="badge sp'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div><div class="big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">Remaining balance</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">Paid amount</div></div></div><div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div><div class="grid">'+[["Loan amount",inr(c.loan),"Original loan"],["Weekly amount",inr(c.perWeek),"Each week"],["Total payable",inr(k.payable),"Per week × weeks"],["Weeks remaining",k.pendW,"Remaining" ]].map(function(x){return '<div class="stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div><div class="sec"><h2>Weekly tracker</h2><p>Your collection progress.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div><div class="sec"><h2>Payment history</h2><p>View-only. Payments can only be added or changed by Admin.</p>'+(ps.length?'<div class="tw"><table><thead><tr><th>Date</th><th>Week</th><th>Status</th><th>Amount</th></tr></thead><tbody>'+ps.map(function(p){return '<tr><td>'+fmt(p.date)+'</td><td>Week '+p.week+'</td><td>'+(p.type==="unpaid"?'<b style="color:var(--miss)">Unpaid</b>':p.type==="hist"?"Historical":"Paid")+'</td><td>'+inr(p.amt||0)+'</td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">No payments recorded yet.</div>')+'</div><div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">Logout</button></div>'}
+ return '<div class="sec" style="max-width:520px;margin:30px auto"><div class="av" style="width:64px;height:64px;font-size:20px;margin-bottom:18px">CP</div><h1 style="font-size:34px">Customer Portal</h1><p style="font-size:15px;margin-top:10px">View your weekly collection, payment progress and remaining balance.</p><div class="fg" style="margin-top:24px">'+F("portal_cid","Customer ID","text","")+F("portal_pin","PIN","password","")+'</div><div class="row"><button class="btn pri sp" onclick="portalLogin()">Login</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">Customer access is <b>view-only</b>. Customers cannot add, edit or delete payments.</div></div>'
 }
+function route(){var m=location.hash.match(/^#customer\/(.+)$/);view=m?m[1]:"";armed=null;if(location.hash==="#portal"){view="";render();return}render();window.scrollTo(0,0)}
 function go(v){var h=v?"#customer/"+v:"";if(location.hash===h||(!v&&(location.hash===""||location.hash==="#")))route();else location.hash=h||"#"}
-function goPortal(){location.hash="#portal"}
-function portalAuthId(){try{return sessionStorage.getItem("collectpro_portal_auth")||""}catch(e){return""}}
-function setPortalAuth(id){try{sessionStorage.setItem("collectpro_portal_auth",id)}catch(e){}}
-function clearPortalAuth(){try{sessionStorage.removeItem("collectpro_portal_auth")}catch(e){}}
-function customerCode(c){return c.code||("CP-"+String(c.id).slice(-6).toUpperCase())}
 window.addEventListener("hashchange",route);
 var q="",flt="all";
 function wa(c,k){var d=(c.phone||"").replace(/\D/g,"");if(d.length===10)d="91"+d;return "https://wa.me/"+d+"?text="+encodeURIComponent("Hi "+c.name+", reminder for your weekly collection of "+inr(c.perWeek)+". Pending balance: "+inr(k.pend)+". Thank you!")}
@@ -153,18 +133,33 @@ function list(){
 }
 function chips(){$("chips").innerHTML=[["all","All"],["act","Active"],["over","Overdue"],["done","Completed"]].map(function(x){return '<button class="chip'+(flt===x[0]?" on":"")+'" onclick="setF(\''+x[0]+'\')">'+x[1]+'</button>'}).join("")}
 function setF(f){flt=f;chips();list()}
+function topActions(){
+ var t=$("topActions");
+ if(!t)return;
+ if(location.hash==="#portal"){
+   t.innerHTML='';
+   return;
+ }
+ if(cloudReady && adminSession){
+   t.innerHTML='<button class="btn" onclick="portal()">Customer Portal</button><button class="btn" onclick="adminLogout()">Logout</button><button class="btn pri" onclick="custForm()">+ Add customer</button>';
+ }else if(cloudReady){
+   t.innerHTML='<button class="btn" onclick="portal()">Customer Portal</button><button class="btn" onclick="adminLogin()">Admin Login</button>';
+ }else{
+   t.innerHTML='<button class="btn" onclick="portal()">Customer Portal</button>';
+ }
+}
 function render(){
+ topActions();
  var a=$("app");
- if(portalMode){renderPortal(a);return}
+ if(location.hash==="#portal"){a.innerHTML=portalView();return}
+ if(cloudReady && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><div class="av" style="width:64px;height:64px;margin:0 auto 16px">CP</div><h1 style="font-size:34px">CollectPro Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
  if(!view){
-  $("rolePill").textContent="ADMIN";mobileNav("admin");
   var T=DB.reduce(function(t,c){var k=calc(c);t.paid+=k.paid;t.pend+=k.pend;t.pw+=k.pendW;return t},{paid:0,pend:0,pw:0});
   a.innerHTML='<div class="grid">'+[["Total customers",DB.length,"Active collection accounts"],["Total collected",inr(T.paid),"Recorded payments"],["Total pending",inr(T.pend),"Outstanding amount"],["Pending weeks",T.pw,"Across all customers"]].map(function(s){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
   '<div class="sec"><h2>Customers ('+DB.length+')</h2><p>Tap a customer to open their collection account.</p><input id="srch" placeholder="Search by name or phone" value="'+esc(q)+'" oninput="q=this.value.toLowerCase();list()"><div class="row" id="chips" style="margin:12px 0 6px"></div><div id="lst"></div></div>'+
   '<div class="row" style="margin-top:14px"><button class="btn sm" onclick="backup()">Backup &amp; restore</button></div>';
   chips();list();return;
  }
- $("rolePill").textContent="ADMIN";mobileNav("admin");
  var c=DB.filter(function(x){return x.id===view})[0];if(!c){go("");return}
  var k=calc(c),st=strip(c);
  var asc=c.pays.map(function(p,i){return{p:p,i:i}}).sort(function(x,y){return x.p.date<y.p.date?-1:x.p.date>y.p.date?1:x.i-y.i});
@@ -175,59 +170,13 @@ function render(){
  '<div class="big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">Pending balance</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">Collected so far</div></div></div>'+
  '<div class="l" style="margin-top:12px;font-size:12.5px;color:#B9B6C8">'+inr(k.payable)+' total payable − '+inr(k.paid)+' paid = '+inr(k.pend)+'</div>'+
  '<div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;font-size:13px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div>'+
- '<div class="row" style="margin-top:14px"><button class="btn pri" onclick="payForm(\''+c.id+'\')">+ Add payment</button><button class="btn" onclick="custForm(\''+c.id+'\')">Edit customer</button><button class="btn" onclick="shareCustomer(\''+c.id+'\')">Share customer access</button>'+(c.phone?'<a class="btn" href="tel:'+esc(c.phone)+'">Call</a><a class="btn" target="_blank" rel="noopener" href="'+wa(c,k)+'">WhatsApp reminder</a>':'')+'<button class="btn del sp" onclick="delC(\''+c.id+'\',this)">Delete customer</button></div>'+
+ '<div class="row" style="margin-top:14px"><button class="btn pri" onclick="payForm(\''+c.id+'\')">+ Add payment</button><button class="btn" onclick="custForm(\''+c.id+'\')">Edit customer</button>'+(c.phone?'<a class="btn" href="tel:'+esc(c.phone)+'">Call</a><a class="btn" target="_blank" rel="noopener" href="'+wa(c,k)+'">WhatsApp reminder</a>':'')+'<button class="btn del sp" onclick="delC(\''+c.id+'\',this)">Delete customer</button></div>'+
  '<div class="grid">'+[["Loan amount",inr(c.loan),"Original principal"],["Total payable",inr(k.payable),inr(c.perWeek)+" × "+c.weeks+" weeks"],["Missed weeks",k.miss,inr(k.miss*c.perWeek)+" overdue"],["Weeks remaining",k.pendW,"Until account closes"]].map(function(s,i){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v"'+(i===2&&k.miss?' '+R:'')+'>'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
  '<div class="sec"><h2>Week-by-week tracker</h2><p>Every payable week of this loan at a glance.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
  '<div class="sec"><h2>Payment history</h2><p>Pending balance reduces with every paid entry. Edit or remove any entry.</p>'+
  (ps.length?'<div class="tw"><table><thead><tr><th>Date</th><th>Week</th><th>Mode</th><th>Status</th><th>Amount</th><th>Balance</th><th></th></tr></thead><tbody>'+ps.map(function(p){var u=p.type==="unpaid";return '<tr><td>'+fmt(p.date)+'</td><td><span class="tag" '+(u?'style="background:rgba(212,96,76,.18);color:var(--miss)"':'')+'>Week '+p.week+'</span></td><td>'+(u?'-':esc(p.mode))+'</td><td>'+(u?'<b '+R+'>Unpaid</b>':p.type==="hist"?"Historical":"Paid")+'</td><td>'+(u?'<b '+R+'>₹0</b>':'<b>'+inr(p.amt)+'</b>')+'</td><td>'+(p.type==="paid"?inr(B[p.id]):'-')+'</td><td style="white-space:nowrap"><button class="btn sm" onclick="payForm(\''+c.id+'\',\''+p.id+'\')">Edit</button> <button class="btn sm del" onclick="delP(\''+c.id+'\',\''+p.id+'\',this)">Delete</button></td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">No payment rows yet.</div>')+'</div>'+
  ((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
 }
-
-function mobileNav(active){
- ["mnAdmin","mnCustomers","mnPortal"].forEach(function(id){var e=$(id);if(e)e.classList.remove("on")});
- var e=active==="portal"?$("mnPortal"):$("mnAdmin");if(e)e.classList.add("on")
-}
-function renderPortal(a){
- $("rolePill").textContent="CUSTOMER";
- var auth=portalAuthId(),c=auth?DB.filter(function(x){return x.id===auth})[0]:null;
- if(!c){
-  a.innerHTML='<div class="portal-login"><div class="portal-card"><div class="icon">CP</div><h1>Customer Portal</h1><p style="color:var(--muted)">View your weekly collection, payment progress and remaining balance.</p><div class="fg" style="grid-template-columns:1fr">'+
-   F("portal_code","Customer ID","text","","autocomplete=\"username\" placeholder=\"Example: CP-ABC123\"")+
-   F("portal_pin","PIN","password","","autocomplete=\"current-password\" inputmode=\"numeric\" maxlength=\"6\" placeholder=\"Enter your PIN\"")+
-   '</div><div class="row"><button class="btn" onclick="go(\'\')">← Admin</button><button class="btn pri sp" onclick="portalLogin()">Login</button></div><div id="portalErr" style="color:var(--miss);margin-top:10px"></div><div class="portal-note">Customer access is <b>view-only</b>. Customers cannot add, edit or delete payments.</div></div></div>';
-  mobileNav("portal");return
- }
- var k=calc(c),st=strip(c),ps=c.pays.slice().sort(function(x,y){return x.date<y.date?1:x.date>y.date?-1:0});
- a.innerHTML='<div class="row" style="margin-bottom:12px"><button class="btn sm" onclick="portalLogout()">← Logout</button><span class="role-pill sp">CUSTOMER VIEW</span></div>'+
- '<div class="hero"><div class="row"><div><h1>Hi, '+esc(c.name)+' 👋</h1><small>Customer ID: '+esc(customerCode(c))+' · '+esc(c.phone||"")+'</small></div><span class="badge sp'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div>'+
- '<div class="big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">Remaining balance</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">Paid amount</div></div></div>'+
- '<div class="l" style="margin-top:12px;font-size:12.5px;color:#B9B6C8">Total payable '+inr(k.payable)+' · '+k.paidW+' of '+c.weeks+' weeks paid</div>'+
- '<div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;font-size:13px;color:#C9C6D6"><span>Collection progress</span><span class="sp">'+k.pct+'%</span></div></div>'+
- '<div class="grid">'+[["Weekly amount",inr(c.perWeek),"Scheduled collection"],["Total payable",inr(k.payable),c.weeks+" weeks"],["Paid weeks",k.paidW,"Completed weeks"],["Remaining weeks",k.pendW,"Pending weeks"]].map(function(s){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
- '<div class="sec"><h2>Weekly tracker</h2><p>Your collection progress.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
- '<div class="sec"><h2>Payment history</h2><p>Read-only records maintained by the administrator.</p>'+
- (ps.length?'<div class="tw"><table><thead><tr><th>Date</th><th>Week</th><th>Status</th><th>Amount</th></tr></thead><tbody>'+ps.map(function(p){return '<tr><td>'+fmt(p.date)+'</td><td>Week '+p.week+'</td><td>'+(p.type==="unpaid"?'<b style="color:var(--miss)">Unpaid</b>':p.type==="hist"?"Historical":"Paid")+'</td><td><b>'+inr(p.type==="unpaid"?0:p.amt)+'</b></td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">No payment history yet.</div>')+
- '</div><div class="portal-note">Need a correction? Contact the collection administrator. This page is view-only.</div>';
- mobileNav("portal")
-}
-function portalLogin(){
- var code=($("portal_code").value||"").trim().toUpperCase(),pin=($("portal_pin").value||"").trim();
- var c=DB.filter(function(x){return customerCode(x).toUpperCase()===code&&String(x.pin||"")===pin})[0];
- if(!c){$("portalErr").textContent="Invalid Customer ID or PIN.";return}
- setPortalAuth(c.id);location.hash="#portal/"+c.id
-}
-function portalLogout(){clearPortalAuth();location.hash="#portal"}
-
-
-function shareCustomer(id){
- var c=DB.filter(function(x){return x.id===id})[0];if(!c)return;
- var url=location.href.split("#")[0]+"#portal";
- var msg="CollectPro Customer Portal\n\nPortal: "+url+"\nCustomer ID: "+customerCode(c)+"\nPIN: "+(c.pin||"Not set");
- if(navigator.share){navigator.share({title:"CollectPro Customer Access",text:msg}).catch(function(){})}
- else if(navigator.clipboard){navigator.clipboard.writeText(msg);open_('<h2>Customer access</h2><p style="color:var(--muted)">Customer portal details copied.</p><div class="note"><b>Customer ID:</b> '+esc(customerCode(c))+'</div><div class="note"><b>PIN:</b> '+esc(c.pin||"Not set")+'</div><div class="note"><b>Portal:</b> '+esc(url)+'</div><div class="row"><button class="btn pri sp" onclick="close_()">Close</button></div>')}
- else open_('<h2>Customer access</h2><div class="note"><b>Portal:</b> '+esc(url)+'</div><div class="note"><b>Customer ID:</b> '+esc(customerCode(c))+'</div><div class="note"><b>PIN:</b> '+esc(c.pin||"Not set")+'</div><div class="row"><button class="btn pri sp" onclick="close_()">Close</button></div>')
-}
-
 function backup(){open_('<h2>Backup &amp; restore</h2><p style="color:var(--muted);font-size:13px;margin:6px 0 12px">Copy this text and keep it safe (Notes, WhatsApp to yourself). To move data to another device, paste it here and tap Restore. Restore replaces current data.</p><textarea id="bk" rows="7" onfocus="this.select()">'+esc(JSON.stringify(DB))+'</textarea><div class="row" style="margin-top:12px"><button class="btn" onclick="close_()">Close</button><button class="btn pri sp" onclick="restore()">Restore from text</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
 function restore(){try{var d=JSON.parse($("bk").value);if(!Array.isArray(d)||d.some(function(c){return !c.id||!c.name||!Array.isArray(c.pays)}))throw 0;DB=d;save();close_();go("")}catch(e){$("err").textContent="This text is not a valid CollectPro backup."}}
 
@@ -237,31 +186,27 @@ $("ov").addEventListener("mousedown",function(e){if(e.target===this)close_()});
 function F(id,l,t,v,ex){return '<div><label>'+l+'<input id="'+id+'" type="'+(t||"text")+'" value="'+esc(v)+'" '+(ex||"")+'></label></div>'}
 
 function custForm(id){
- var c=id?DB.filter(function(x){return x.id===id})[0]:{name:"",phone:"",loan:"",perWeek:"",weeks:"",date:new Date().toISOString().slice(0,10),hPaid:0,hMiss:0,hAmt:""};
+ var c=id?DB.filter(function(x){return x.id===id})[0]:{name:"",customerId:"",phone:"",loan:"",perWeek:"",weeks:"",date:new Date().toISOString().slice(0,10),hPaid:0,hMiss:0,hAmt:""};
  open_('<h2>'+(id?"Edit customer":"Add customer / existing customer")+'</h2><div class="fg">'+
- F("f_name","Customer name","text",c.name)+F("f_phone","Contact no","tel",c.phone)+
+ F("f_name","Customer name","text",c.name)+F("f_cid","Customer ID","text",c.customerId||"")+F("f_pin","PIN","password","")+F("f_phone","Contact no","tel",c.phone)+
  F("f_loan","Loan amount (₹)","number",c.loan,'min="0"')+F("f_pw","Per week (₹)","number",c.perWeek,'min="1"')+
  F("f_wk","Total payable weeks","number",c.weeks,'min="1"')+F("f_date","Date loan taken","date",c.date)+
- '<div class="hd">Customer portal access</div>'+
- F("f_code","Customer Login ID","text",c.code||"",'placeholder="Auto-generated if blank"')+
- F("f_pin","Customer PIN","password",c.pin||"",'inputmode="numeric" maxlength="6" placeholder="4-6 digit PIN"')+
- '<div class="note full">Give this Customer ID + PIN to the customer. Customer portal is view-only.</div>'+
  '<div class="hd">Old customer? Enter what was already paid</div>'+
  F("f_hp","Historical paid weeks","number",c.hPaid,'min="0"')+F("f_hm","Historical missed weeks","number",c.hMiss,'min="0"')+
  '<div class="full">'+F("f_ha","Historical paid amount (optional)","number",c.hAmt,'min="0"')+'</div>'+
  '<div class="note full">Old weeks count toward completion without fake dates. Leave amount empty to use paid weeks × per week. Add dated old payments later from the customer page.</div></div>'+
  '<div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="saveC(\''+(id||"")+'\')">Save customer</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
 }
-function saveC(id){
+async function saveC(id){
  var g=function(i){return $(i).value.trim()};
- var o={name:g("f_name"),phone:g("f_phone"),loan:+g("f_loan"),perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),code:g("f_code"),pin:g("f_pin"),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
- if(!o.code)o.code="CP-"+Date.now().toString(36).slice(-6).toUpperCase();
- if(o.pin&&!/^\d{4,6}$/.test(o.pin)){$("err").textContent="Customer PIN must be 4 to 6 digits.";return}
- var e=!o.name?"Enter the customer name.":!(o.perWeek>0)?"Enter the per week amount.":!(o.weeks>0)?"Enter the total payable weeks.":(o.hPaid+o.hMiss>o.weeks)?"Paid + missed weeks cannot exceed total weeks.":"";
+ var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
+ var pin=g("f_pin");
+ var e=!o.name?"Enter the customer name.":!o.customerId?"Enter a Customer ID.":(!id&&!pin)?"Set a PIN for this customer.":!(o.perWeek>0)?"Enter the per week amount.":!(o.weeks>0)?"Enter the total payable weeks.":(o.hPaid+o.hMiss>o.weeks)?"Paid + missed weeks cannot exceed total weeks.":"";
  if(e){$("err").textContent=e;return}
- if(id){var c=DB.filter(function(x){return x.id===id})[0];for(var k in o)c[k]=o[k]}
- else{o.id=uid();o.pays=[];DB.push(o);id=o.id}
- save();close_();go(id);
+ if(id){var c=DB.filter(function(x){return x.id===id})[0];for(var k in o)c[k]=o[k];if(pin)c._newPin=pin}
+ else{o.id=null;o.pays=[];o._newPin=pin;DB.push(o)}
+ if(sb){var c2=id?DB.filter(function(x){return x.id===id})[0]:DB[DB.length-1];var ok=await cloudSaveCustomer(c2,pin||null);if(!ok)return;await cloudLoad();var match=DB.filter(function(x){return x.customerId.toLowerCase()===o.customerId.toLowerCase()})[0];if(match)id=match.id}
+ save();close_();go(id||"");
 }
 function payForm(cid,pid){
  var c=DB.filter(function(x){return x.id===cid})[0],p=pid?c.pays.filter(function(x){return x.id===pid})[0]:null;
@@ -276,16 +221,16 @@ function payForm(cid,pid){
  '<div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="saveP(\''+cid+'\',\''+(pid||"")+'\')">Save payment</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
  var tp=function(){var u=$("p_type").value==="unpaid";$("p_amt").disabled=u;if(u)$("p_amt").value=0;else if(+$("p_amt").value===0)$("p_amt").value=c.perWeek};$("p_type").onchange=tp;tp();
 }
-function saveP(cid,pid){
+async function saveP(cid,pid){
  var c=DB.filter(function(x){return x.id===cid})[0];
  var o={date:$("p_date").value,amt:+$("p_amt").value,mode:$("p_mode").value,week:+$("p_wk").value,type:$("p_type").value};
  if(!o.date||!(o.amt>=0)||!(o.week>=1&&o.week<=c.weeks)){$("err").textContent="Enter a date, amount and a week between 1 and "+c.weeks+".";return}
  if(pid){var p=c.pays.filter(function(x){return x.id===pid})[0];for(var k in o)p[k]=o[k]}else{o.id=uid();c.pays.push(o)}
- save();close_();render();
+ if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await cloudLoad()}else save();close_();render();
 }
 function arm(key,b){if(armed===key)return true;armed=key;var t=b.textContent;b.textContent="Tap again";setTimeout(function(){if(armed===key){armed=null;b.textContent=t}},3000);return false}
 function delP(cid,pid,b){if(!arm(pid,b))return;var c=DB.filter(function(x){return x.id===cid})[0];c.pays=c.pays.filter(function(x){return x.id!==pid});save();armed=null;render()}
-function delC(cid,b){if(!arm(cid,b))return;DB=DB.filter(function(x){return x.id!==cid});save();go("")}
+async function delC(cid,b){if(!arm(cid,b))return;if(sb){var ok=await cloudDelete(cid);if(!ok)return}DB=DB.filter(function(x){return x.id!==cid});save();go("")}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")close_()});
-route();
+initCloud();
 </script></body></html>

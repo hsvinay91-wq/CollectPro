@@ -494,9 +494,7 @@ function exportCSV(){
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="collectpro-customers.csv";a.click();
 }
 renderRoute();
-</script>
-</body>
-</htmlfunction setWeekday(id,day){
+function setWeekday(id,day){
   const x=data.find(a=>a.id===id);
   if(!x) return;
   x.collectionWeekday=Number(day);
@@ -508,4 +506,6 @@ function selectScheduleWeek(id,w){
   selectedScheduleWeek[id]=Number(w);
   renderDetail(id);
 }
->
+</script>
+</body>
+</html>

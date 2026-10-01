@@ -22,6 +22,8 @@ table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;colo
 .info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.info-card{background:rgba(15,19,31,.9);border:1px solid var(--line);border-radius:15px;padding:15px}.info-card .v{font-size:20px;font-weight:800;margin-top:7px}.info-card .k{font-size:11px;color:var(--muted)}
 .detail-grid{display:grid;grid-template-columns:1fr .72fr;gap:16px}.remaining-box{background:linear-gradient(145deg,rgba(124,92,255,.16),rgba(15,19,31,.95));border:1px solid rgba(124,92,255,.35);border-radius:17px;padding:20px}.remaining-box .big{font-size:30px;font-weight:900;margin:6px 0}.bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin:17px 0 7px}
 @media(max-width:1000px){.info-grid{grid-template-columns:1fr 1fr}.detail-grid{grid-template-columns:1fr}}@media(max-width:560px){.info-grid{grid-template-columns:1fr}}
+
+.next-box{margin-top:14px;padding:16px;border:1px solid rgba(83,168,255,.25);background:rgba(83,168,255,.07);border-radius:14px}.next-box h3{margin:0 0 6px;font-size:14px}.next-box p{margin:4px 0;color:var(--muted);font-size:12px}.complete-box{margin-top:14px;padding:16px;border:1px solid rgba(40,215,163,.28);background:rgba(40,215,163,.07);border-radius:14px}.complete-box h3{margin:0 0 6px;color:var(--green);font-size:14px}.home-btn{min-width:92px}.detail-actions{display:flex;gap:8px;align-items:center;margin-left:auto}.small-note{font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -44,122 +46,171 @@ table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;colo
 <div class="metric"><span>Payment completion</span><b id="rate">0%</b></div><div class="progress"><div id="bar" style="width:0%"></div></div>
 <div class="metric"><span>Customers fully paid</span><b id="fullpaid">0</b></div><div class="metric"><span>Customers with pending</span><b id="withpending">0</b></div>
 <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
-<div class="label">How it works</div><p style="font-size:13px;line-height:1.7;color:var(--muted)">Add each customer with weekly amount and total payable weeks. <b style="color:#fff">Total Payable = Weekly Amount × Total Weeks</b>. <b style="color:#fff">Paid Amount = Weekly Amount × Paid Weeks</b>, and <b style="color:#fff">Remaining = Total Payable − Paid Amount</b>. Use <b style="color:#fff">Pay</b> to record the next week or <b style="color:#fff">Miss</b> when a week is unpaid. Everything is saved locally in this browser.</p>
+<div class="label">How it works</div><p style="font-size:13px;line-height:1.7;color:var(--muted)">Add each customer with loan amount, weekly amount and total payable weeks. <b style="color:#fff">Total Payable = Per Week × Total Weeks</b>. <b style="color:#fff">Paid Amount = Sum of actual payments</b>, and <b style="color:#fff">Remaining = Total Payable − Paid Amount</b>. After every payment, the next week is shown automatically. When all payable weeks are paid, the account becomes <b style="color:#fff">Completed</b> and no extra week is added until you use <b style="color:#fff">Add Week</b>. Data is saved locally in this browser.</p>
 </section></div>
 </main></div>
 
 
 <div id="detailView" style="display:none"></div>
+<div class="modal" id="paymentModal"><div class="box"><div class="panel-head"><h2>Add Payment</h2><button class="btn" onclick="closePaymentModal()">✕</button></div><input type="hidden" id="paymentCustomerId"><div class="form"><label>Week<input id="paymentWeek" type="number" readonly></label><label>Payment Date<input id="paymentDate" type="date"></label><label>Amount Paid (₹)<input id="paymentAmount" type="number" min="1"></label><label>Cash / Online<select id="paymentMode"><option>Cash</option><option>Online</option></select></label></div><div class="modal-actions"><button class="btn" onclick="closePaymentModal()">Cancel</button><button class="btn primary" onclick="savePayment()">Save Payment</button></div></div></div>
+
 <div class="modal" id="modal"><div class="box"><div class="panel-head"><h2 id="modalTitle">Add Customer</h2><button class="btn" onclick="closeModal()">✕</button></div>
-<div class="form"><label>Customer Name<input id="name"></label><label>Phone<input id="phone"></label><label>Weekly Amount (₹)<input id="amount" type="number"></label><label>Total Weeks<input id="total" type="number" value="20"></label><label>Starting Week<input id="start" type="date"></label><label>Date Loan Taken<input id="loanDate" type="date"></label><label>Initial Paid Weeks<input id="initialPaid" type="number" value="0" min="0"></label><label class="full">Notes<input id="notes"></label></div>
+<div class="form"><label>Customer Name<input id="name"></label><label>Phone<input id="phone"></label><label>Total / Loan Amount (₹)<input id="loanAmount" type="number"></label><label>Per Week (₹)<input id="amount" type="number"></label><label>Total Payable Weeks<input id="total" type="number" value="12" min="1"></label><label>Date Loan Taken<input id="loanDate" type="date"></label><label>Initial Paid Weeks<input id="initialPaid" type="number" value="0" min="0"></label><label class="full">Notes<input id="notes"></label></div>
 <div class="modal-actions"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveCustomer()">Save Customer</button></div></div></div>
 <script>
 const demo=[
-{id:1,name:"Arun Kumar",phone:"9876543210",amount:1500,total:20,paid:14,missed:1},
-{id:2,name:"Suresh Reddy",phone:"9123456780",amount:2000,total:25,paid:18,missed:2},
-{id:3,name:"Mahesh",phone:"9988776655",amount:1000,total:15,paid:15,missed:0},
-{id:4,name:"Ravi Teja",phone:"9000011111",amount:2500,total:30,paid:10,missed:4}
+{id:1,name:"Arun Kumar",phone:"9876543210",loanAmount:10000,amount:1500,total:20,paid:14,missed:1,loanDate:"2026-06-27",paymentHistory:[]},
+{id:2,name:"Suresh Reddy",phone:"9123456780",loanAmount:20000,amount:2000,total:25,paid:18,missed:2,loanDate:"2026-07-05",paymentHistory:[]},
+{id:3,name:"Mahesh",phone:"9988776655",loanAmount:10000,amount:1000,total:15,paid:15,missed:0,loanDate:"2026-05-10",paymentHistory:[]},
+{id:4,name:"Ravi Teja",phone:"9000011111",loanAmount:25000,amount:2500,total:30,paid:10,missed:4,loanDate:"2026-06-01",paymentHistory:[]}
 ];
 let data=JSON.parse(localStorage.getItem("collectpro")||"null")||demo;
-function money(n){return "₹"+Number(n).toLocaleString("en-IN")}
-function save(){localStorage.setItem("collectpro",JSON.stringify(data))}
-function render(){
-document.getElementById("customers").textContent=data.length;
-let totalPayable=data.reduce((s,x)=>s+x.amount*x.total,0);
-let collected=data.reduce((s,x)=>s+x.amount*x.paid,0);
-let pending=Math.max(totalPayable-collected,0);
-let weeks=data.reduce((s,x)=>s+Math.max(x.total-x.paid,0),0);
-document.getElementById("collected").textContent=money(collected);document.getElementById("pending").textContent=money(pending);document.getElementById("weeks").textContent=weeks;
-let total=data.reduce((s,x)=>s+x.total,0), paid=data.reduce((s,x)=>s+x.paid,0), rate=total?Math.round(paid/total*100):0;
-document.getElementById("rate").textContent=rate+"%";document.getElementById("bar").style.width=rate+"%";
-document.getElementById("fullpaid").textContent=data.filter(x=>x.paid>=x.total).length;document.getElementById("withpending").textContent=data.filter(x=>x.paid<x.total).length;
-let q=document.getElementById("search").value.toLowerCase(), rows=data.filter(x=>(x.name+" "+x.phone).toLowerCase().includes(q));
-document.getElementById("table").innerHTML=rows.length?`<table><thead><tr><th>Customer</th><th>Weekly</th><th>Total Payable</th><th>Paid</th><th>Remaining Pay</th><th>Status</th><th>Action</th></tr></thead><tbody>${rows.map(x=>{
-let totalPayable=x.amount*x.total;
-let paidAmount=x.amount*x.paid;
-let rem=Math.max(x.total-x.paid,0);
-let remainingAmount=Math.max(totalPayable-paidAmount,0);
-let st=rem===0?'<span class="status paid">Completed</span>':x.missed?'<span class="status late">Missed</span>':'<span class="status pending">Pending</span>';
-return `<tr><td><span class="customer-link" onclick="openCustomer(${x.id})">${esc(x.name)}</span><br><span style="color:var(--muted);font-size:11px">${esc(x.phone)}</span></td><td>${money(x.amount)}</td><td><b>${money(totalPayable)}</b><br><span style="color:var(--muted);font-size:11px">${x.total} weeks</span></td><td><b>${money(paidAmount)}</b><br><span style="color:var(--muted);font-size:11px">${x.paid}/${x.total} weeks</span></td><td><b>${money(remainingAmount)}</b><br><span style="color:var(--muted);font-size:11px">${rem} weeks</span></td><td>${st}</td><td><button class="btn" onclick="openCustomer(${x.id})">Open</button> <button class="btn" style="color:var(--red);border-color:rgba(255,101,119,.3)" onclick="deleteCustomer(${x.id})">Delete</button></td></tr>`}).join("")}</tbody></table>`:'<div class="empty">No customers found. Add your first customer.</div>';
+function money(n){return "₹"+Number(n||0).toLocaleString("en-IN")}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function normalizeCustomer(x){
+  x.amount=Number(x.amount||x.weeklyAmount||0);
+  x.total=Number(x.total||x.totalWeeks||0);
+  x.loanAmount=Number(x.loanAmount||x.totalLoan||x.originalAmount||x.amount*10||0);
+  x.missed=Number(x.missed||0);
+  x.paymentHistory=Array.isArray(x.paymentHistory)?x.paymentHistory:[];
+  let oldPaid=Number(x.paid||0);
+  if(x.paymentHistory.length<oldPaid){
+    for(let i=x.paymentHistory.length;i<oldPaid;i++) x.paymentHistory.push({date:"",amount:x.amount,mode:"Cash",week:i+1,legacy:true});
+  }
+  x.paid=x.paymentHistory.length;
+  return x;
 }
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+data=data.map(normalizeCustomer);
+function save(){localStorage.setItem("collectpro",JSON.stringify(data))}
+function paidAmount(x){return (x.paymentHistory||[]).reduce((s,p)=>s+Number(p.amount||0),0)}
+function paidWeeks(x){return Math.min(Number(x.paid||0),Number(x.total||0))}
+function totalPayable(x){return Number(x.amount||0)*Number(x.total||0)}
+function remainingPay(x){return Math.max(totalPayable(x)-paidAmount(x),0)}
+function remainingWeeks(x){return Math.max(Number(x.total||0)-paidWeeks(x),0)}
+function isCompleted(x){return remainingWeeks(x)===0 && Number(x.total||0)>0}
+function nextWeek(x){return paidWeeks(x)+1}
+function formatDateInput(v){return v||new Date().toISOString().slice(0,10)}
+function prettyDate(v){
+  if(!v)return "—";
+  if(/^\d{4}-\d{2}-\d{2}$/.test(v)){const [y,m,d]=v.split('-');return `${d}-${m}-${y}`}
+  return v;
+}
+function addDays(dateString,days){
+  const d=new Date(dateString); if(isNaN(d)) return ""; d.setDate(d.getDate()+days); return d.toISOString().slice(0,10);
+}
+function render(){
+  data=data.map(normalizeCustomer);
+  save();
+  document.getElementById("customers").textContent=data.length;
+  const totalPayableAll=data.reduce((s,x)=>s+totalPayable(x),0);
+  const collected=data.reduce((s,x)=>s+paidAmount(x),0);
+  const pending=data.reduce((s,x)=>s+remainingPay(x),0);
+  const weeks=data.reduce((s,x)=>s+remainingWeeks(x),0);
+  document.getElementById("collected").textContent=money(collected);
+  document.getElementById("pending").textContent=money(pending);
+  document.getElementById("weeks").textContent=weeks;
+  const totalWeeks=data.reduce((s,x)=>s+Number(x.total||0),0), doneWeeks=data.reduce((s,x)=>s+paidWeeks(x),0);
+  const rate=totalWeeks?Math.min(100,Math.round(doneWeeks/totalWeeks*100)):0;
+  document.getElementById("rate").textContent=rate+"%";document.getElementById("bar").style.width=rate+"%";
+  document.getElementById("fullpaid").textContent=data.filter(isCompleted).length;
+  document.getElementById("withpending").textContent=data.filter(x=>!isCompleted(x)).length;
+  const q=document.getElementById("search").value.toLowerCase();
+  const rows=data.filter(x=>(x.name+" "+x.phone).toLowerCase().includes(q));
+  document.getElementById("table").innerHTML=rows.length?`<table><thead><tr><th>Customer</th><th>Per Week</th><th>Total Payable</th><th>Paid Amount</th><th>Remaining</th><th>Status</th><th>Action</th></tr></thead><tbody>${rows.map(x=>{
+    const st=isCompleted(x)?'<span class="status paid">Completed</span>':x.missed?'<span class="status late">Missed</span>':'<span class="status pending">Pending</span>';
+    return `<tr><td><span class="customer-link" onclick="openCustomer(${x.id})">${esc(x.name)}</span><br><span style="color:var(--muted);font-size:11px">${esc(x.phone)}</span></td><td>${money(x.amount)}</td><td><b>${money(totalPayable(x))}</b><br><span style="color:var(--muted);font-size:11px">${x.total} weeks</span></td><td><b>${money(paidAmount(x))}</b><br><span style="color:var(--muted);font-size:11px">${paidWeeks(x)}/${x.total} weeks</span></td><td><b>${money(remainingPay(x))}</b><br><span style="color:var(--muted);font-size:11px">${remainingWeeks(x)} weeks</span></td><td>${st}</td><td><button class="btn" onclick="openCustomer(${x.id})">Open</button> <button class="btn" style="color:var(--red);border-color:rgba(255,101,119,.3)" onclick="deleteCustomer(${x.id})">Delete</button></td></tr>`}).join("")}</tbody></table>`:'<div class="empty">No customers found. Add your first customer.</div>';
+}
 function openAdd(){document.getElementById("modal").classList.add("show");document.getElementById("name").focus()}
 function closeModal(){document.getElementById("modal").classList.remove("show")}
 function saveCustomer(){
-let name=document.getElementById("name").value.trim();
-let amount=+document.getElementById("amount").value;
-let total=+document.getElementById("total").value;
-let initialPaid=Math.max(0,Math.min(+document.getElementById("initialPaid").value||0,total));
-if(!name||!amount||!total)return alert("Please enter customer name, weekly amount and total weeks.");
-data.push({id:Date.now(),name,phone:document.getElementById("phone").value.trim(),amount,total,paid:initialPaid,missed:0,loanDate:document.getElementById("loanDate").value||new Date().toLocaleDateString("en-GB"),paymentHistory:Array.from({length:initialPaid},(_,i)=>({date:"",amount:amount,mode:"Cash",week:i+1}))});
-save();closeModal();
-document.querySelectorAll(".form input").forEach(x=>x.value="");
-document.getElementById("total").value=20;
-document.getElementById("initialPaid").value=0;
-render();
+  const name=document.getElementById("name").value.trim();
+  const loanAmount=Number(document.getElementById("loanAmount").value||0);
+  const amount=Number(document.getElementById("amount").value||0);
+  const total=Number(document.getElementById("total").value||0);
+  const initialPaid=Math.max(0,Math.min(Number(document.getElementById("initialPaid").value||0),total));
+  if(!name||!amount||!total)return alert("Please enter customer name, weekly amount and total weeks.");
+  const history=Array.from({length:initialPaid},(_,i)=>({date:"",amount:amount,mode:"Cash",week:i+1,legacy:true}));
+  data.push({id:Date.now(),name,phone:document.getElementById("phone").value.trim(),loanAmount:loanAmount||amount*10,amount,total,paid:initialPaid,missed:0,loanDate:document.getElementById("loanDate").value||new Date().toISOString().slice(0,10),paymentHistory:history});
+  save();closeModal();document.querySelectorAll(".form input").forEach(x=>x.value="");document.getElementById("total").value=20;document.getElementById("initialPaid").value=0;render();
 }
-function pay(id){let x=data.find(a=>a.id===id);if(x&&x.paid<x.total){x.paid++;save();render()}}
-function miss(id){let x=data.find(a=>a.id===id);if(x&&x.paid<x.total){x.missed++;save();render()}}
-function deleteCustomer(id){
-let x=data.find(a=>a.id===id);
-if(!x)return;
-if(confirm(`Delete ${x.name}?\nThis will remove the customer and their collection data.`)){
-data=data.filter(a=>a.id!==id);
-save();
-render();
+function deleteCustomer(id){const x=data.find(a=>a.id===id);if(!x)return;if(confirm(`Delete ${x.name}?\nThis will remove the customer and all collection history.`)){data=data.filter(a=>a.id!==id);save();render()}}
+function resetDemo(){if(confirm("Reset all data to demo records?")){data=demo.map(x=>({...x,paymentHistory:[]})).map(normalizeCustomer);save();render()}}
+function exportCSV(){
+  let csv="Customer,Phone,Loan Amount,Per Week,Total Weeks,Paid Weeks,Paid Amount,Remaining Weeks,Remaining Pay,Status,Loan Date\n"+data.map(x=>[x.name,x.phone,x.loanAmount,x.amount,x.total,paidWeeks(x),paidAmount(x),remainingWeeks(x),remainingPay(x),isCompleted(x)?"Completed":"Pending",x.loanDate].map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n");
+  let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="weekly-collections.csv";a.click();
 }
-}
-function resetDemo(){if(confirm("Reset all data to demo records?")){data=demo.map(x=>({...x}));save();render()}}
-function exportCSV(){let csv="Customer,Phone,Weekly Amount,Total Weeks,Paid Weeks,Remaining Weeks,Pending Amount,Missed Weeks\n"+data.map(x=>[x.name,x.phone,x.amount,x.total,x.paid,x.total-x.paid,(x.total-x.paid)*x.amount,x.missed].map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="weekly-collections.csv";a.click()}
-function showTab(tab,btn){document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");document.getElementById("heading").textContent=tab==="customers"?"Customer Accounts":"Collection Dashboard"}
-
-/* ===== Customer Detail Page ===== */
-function openCustomer(id){
-  const x=data.find(a=>a.id===id); if(!x)return;
-  document.querySelector('.main').querySelector('.top').style.display='none';
-  document.querySelector('.main').querySelector('.cards').style.display='none';
-  document.querySelector('.main').querySelector('.grid').style.display='none';
-  const v=document.getElementById('detailView'); v.style.display='block'; renderCustomerDetail(x.id); window.scrollTo(0,0);
-}
-function closeCustomer(){
+function showHome(){
+  location.hash="";
   document.getElementById('detailView').style.display='none';
-  document.querySelector('.main').querySelector('.top').style.display='flex';
-  document.querySelector('.main').querySelector('.cards').style.display='grid';
-  document.querySelector('.main').querySelector('.grid').style.display='grid';
-  render(); window.scrollTo(0,0);
+  document.querySelector('.main .top').style.display='flex';
+  document.querySelector('.main .cards').style.display='grid';
+  document.querySelector('.main .grid').style.display='grid';
+  render();window.scrollTo(0,0);
+}
+function openCustomer(id){
+  if(!data.some(x=>x.id===id))return;
+  location.hash='customer-'+id;
+  document.querySelector('.main .top').style.display='none';
+  document.querySelector('.main .cards').style.display='none';
+  document.querySelector('.main .grid').style.display='none';
+  document.getElementById('detailView').style.display='block';
+  renderCustomerDetail(id);window.scrollTo(0,0);
 }
 function openPayment(id){
-  const x=data.find(a=>a.id===id); if(!x)return;
-  const amount=prompt('Enter amount paid for this week:', x.amount);
-  if(amount===null)return; const n=Number(amount); if(!n||n<0)return alert('Enter a valid amount.');
-  const mode=prompt('Cash or Online?', 'Cash'); if(mode===null)return;
-  const d=prompt('Payment date (DD-MM-YYYY):', new Date().toLocaleDateString('en-GB')); if(d===null)return;
-  x.paid=Math.min(x.total,x.paid+1); x.missed=0;
-  x.paymentHistory=x.paymentHistory||[]; x.paymentHistory.push({date:d,amount:n,mode:mode,week:x.paid});
-  save(); renderCustomerDetail(id);
+  const x=data.find(a=>a.id===id);if(!x||isCompleted(x))return;
+  document.getElementById('paymentCustomerId').value=id;
+  document.getElementById('paymentWeek').value=nextWeek(x);
+  document.getElementById('paymentAmount').value=x.amount;
+  document.getElementById('paymentMode').value='Cash';
+  document.getElementById('paymentDate').value=formatDateInput(new Date().toISOString().slice(0,10));
+  document.getElementById('paymentModal').classList.add('show');
+}
+function closePaymentModal(){document.getElementById('paymentModal').classList.remove('show')}
+function savePayment(){
+  const id=Number(document.getElementById('paymentCustomerId').value),x=data.find(a=>a.id===id);if(!x)return;
+  if(isCompleted(x)){closePaymentModal();return alert('This customer is already completed. Add a new week first if you want to continue.');}
+  const amount=Number(document.getElementById('paymentAmount').value||0);if(amount<=0)return alert('Enter a valid payment amount.');
+  const mode=document.getElementById('paymentMode').value;
+  const date=document.getElementById('paymentDate').value;
+  const week=nextWeek(x);
+  x.paymentHistory=x.paymentHistory||[];x.paymentHistory.push({date,amount,mode,week});x.paid=x.paymentHistory.length;x.missed=0;
+  save();closePaymentModal();renderCustomerDetail(id);
+}
+function addWeek(id){
+  const x=data.find(a=>a.id===id);if(!x)return;
+  if(!isCompleted(x))return alert('Add a new week only after the current payable weeks are completed.');
+  x.total=Number(x.total||0)+1;x.paid=x.paymentHistory.length;save();renderCustomerDetail(id);
 }
 function renderCustomerDetail(id){
-  const x=data.find(a=>a.id===id); if(!x)return;
-  const total=x.amount*x.total, paid=x.amount*x.paid, rem=Math.max(total-paid,0), rWeeks=Math.max(x.total-x.paid,0), pct=total?Math.round(paid/total*100):0;
-  const hist=x.paymentHistory||[];
+  const x=data.find(a=>a.id===id);if(!x)return;
+  const total=totalPayable(x),paid=paidAmount(x),rem=remainingPay(x),rWeeks=remainingWeeks(x),pct=total?Math.min(100,Math.round(paid/total*100)):0,hist=x.paymentHistory||[];
+  const complete=isCompleted(x);
+  const last=hist.length?hist[hist.length-1]:null;
+  const nextDue=last&&last.date?addDays(last.date,7):'';
   document.getElementById('detailView').innerHTML=`
-    <div class="detail-head"><button class="btn" onclick="closeCustomer()">← Back</button><div class="detail-title"><h2>${esc(x.name)}</h2><p>${esc(x.phone)} · Collection Account</p></div><div style="margin-left:auto"><button class="btn primary" onclick="openPayment(${x.id})">＋ Add Payment</button></div></div>
+    <div class="detail-head"><button class="btn home-btn" onclick="showHome()">⌂ Home</button><div class="detail-title"><h2>${esc(x.name)}</h2><p>${esc(x.phone||'-')} · Collection Account</p></div><div class="detail-actions"><button class="btn" onclick="addWeek(${x.id})">＋ Add Week</button>${complete?'':`<button class="btn primary" onclick="openPayment(${x.id})">＋ Add Payment</button>`}</div></div>
     <div class="info-grid">
-      <div class="info-card"><div class="k">TOTAL / LOAN AMOUNT</div><div class="v">${money(x.amount*10)}</div></div>
+      <div class="info-card"><div class="k">TOTAL / LOAN AMOUNT</div><div class="v">${money(x.loanAmount)}</div></div>
       <div class="info-card"><div class="k">PER WEEK</div><div class="v">${money(x.amount)}</div></div>
       <div class="info-card"><div class="k">TOTAL PAYABLE WEEKS</div><div class="v">${x.total}</div></div>
       <div class="info-card"><div class="k">TOTAL PAYABLE</div><div class="v">${money(total)}</div></div>
       <div class="info-card"><div class="k">CONTACT NO</div><div class="v" style="font-size:17px">${esc(x.phone||'-')}</div></div>
-      <div class="info-card"><div class="k">DATE LOAN TAKEN</div><div class="v" style="font-size:17px">${x.loanDate||'-'}</div></div>
+      <div class="info-card"><div class="k">DATE LOAN TAKEN</div><div class="v" style="font-size:17px">${prettyDate(x.loanDate)}</div></div>
       <div class="info-card"><div class="k">AMOUNT PAID</div><div class="v green">${money(paid)}</div></div>
       <div class="info-card"><div class="k">REMAINING PAY</div><div class="v orange">${money(rem)}</div></div>
     </div>
     <div class="detail-grid">
       <section class="panel"><div class="panel-head"><h2>Payment History</h2><span style="color:var(--muted);font-size:12px">${hist.length} recorded payments</span></div>
-      ${hist.length?`<div style="overflow:auto"><table><thead><tr><th>S.NO</th><th>Date</th><th>Amount Paid</th><th>Cash/Online</th><th>Remaining Pay</th></tr></thead><tbody>${hist.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.date)}</td><td><b>${money(p.amount)}</b></td><td>${esc(p.mode)}</td><td>${money(Math.max(total-hist.slice(0,i+1).reduce((a,b)=>a+Number(b.amount||0),0),0))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No payments recorded yet.</div>'}</section>
-      <section class="panel"><div class="remaining-box"><div class="label">REMAINING PAYABLE</div><div class="big">${money(rem)}</div><div style="color:var(--muted);font-size:12px">${rWeeks} weeks remaining</div><div class="bar-label"><span>Collection progress</span><b>${pct}%</b></div><div class="progress"><div style="width:${pct}%"></div></div><div class="metric"><span>Total payable</span><b>${money(total)}</b></div><div class="metric"><span>Amount paid</span><b class="green">${money(paid)}</b></div><div class="metric"><span>Remaining weeks</span><b class="red">${rWeeks}</b></div></div></section>
+      ${hist.length?`<div style="overflow:auto"><table><thead><tr><th>S.NO</th><th>Week</th><th>Date</th><th>Amount Paid</th><th>Cash/Online</th><th>Remaining Pay</th></tr></thead><tbody>${hist.map((p,i)=>{const cumulative=hist.slice(0,i+1).reduce((a,b)=>a+Number(b.amount||0),0);return `<tr><td>${i+1}</td><td>Week ${p.week||i+1}</td><td>${prettyDate(p.date)}</td><td><b>${money(p.amount)}</b></td><td>${esc(p.mode||'Cash')}</td><td>${money(Math.max(total-cumulative,0))}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">No payments recorded yet.</div>'}
+      </section>
+      <section class="panel"><div class="remaining-box"><div class="label">REMAINING PAYABLE</div><div class="big">${money(rem)}</div><div style="color:var(--muted);font-size:12px">${rWeeks} weeks remaining</div><div class="bar-label"><span>Collection progress</span><b>${pct}%</b></div><div class="progress"><div style="width:${pct}%"></div></div><div class="metric"><span>Total payable</span><b>${money(total)}</b></div><div class="metric"><span>Amount paid</span><b class="green">${money(paid)}</b></div><div class="metric"><span>Remaining weeks</span><b class="red">${rWeeks}</b></div>
+      ${complete?`<div class="complete-box"><h3>✓ Completed</h3><p class="small-note">All ${x.total} payable weeks are paid. No new week will be added automatically.</p><button class="btn primary" style="margin-top:10px" onclick="addWeek(${x.id})">＋ Add New Week</button></div>`:`<div class="next-box"><h3>Next Collection — Week ${nextWeek(x)}</h3><p>${nextDue?'Expected around '+prettyDate(nextDue):'Add the next payment to record this week.'}</p><button class="btn primary" style="margin-top:10px" onclick="openPayment(${x.id})">＋ Record Week ${nextWeek(x)}</button></div>`}</div></section>
     </div>`;
 }
-
-render();
+function handleRoute(){
+  const m=location.hash.match(/^#customer-(\d+)$/);
+  if(m){openCustomer(Number(m[1]))}else{showHome()}
+}
+window.addEventListener('hashchange',handleRoute);
+render();handleRoute();
 </script></body></html>

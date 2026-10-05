@@ -130,7 +130,6 @@ function mapRow(r){return{id:r.id,customerId:r.customer_id,name:r.name,phone:r.p
 async function cloudLoad(){if(!sb)return;var q=await sb.from("collectpro_customers").select("*").order("name");if(q.error){alert("Cloud database error: "+q.error.message);return}DB=(q.data||[]).map(mapRow);save();render()}
 async function cloudSaveCustomer(c,pin){if(!sb) return true;var a=await sb.rpc("collectpro_admin_save",{p_id:c.id||null,p_customer_id:c.customerId,p_pin:pin==null?null:pin,p_name:c.name,p_phone:c.phone||"",p_loan_amount:+c.loan||0,p_per_week:+c.perWeek||0,p_weeks:+c.weeks||0,p_loan_date:c.date||null,p_collection_weekday:(c.collectionWeekday==null?4:+c.collectionWeekday),p_h_paid:+c.hPaid||0,p_h_miss:+c.hMiss||0,p_h_amt:c.hAmt===""?0:+c.hAmt||0,p_pays:c.pays||[]});if(a.error){alert("Cloud save failed: "+a.error.message);return false}return true}
 async function cloudDelete(id){if(!sb)return true;var q=await sb.from("collectpro_customers").delete().eq("id",id);if(q.error){alert("Cloud delete failed: "+q.error.message);return false}return true}
-async 
 async function startApp(){
   if(window.supabase){initCloud();return}
   var msg=document.getElementById("app");

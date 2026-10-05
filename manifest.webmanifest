@@ -1,0 +1,10 @@
+{
+ "name":"CollectPro Weekly Collections",
+ "short_name":"CollectPro",
+ "start_url":"./",
+ "display":"standalone",
+ "background_color":"#0C1022",
+ "theme_color":"#0C1022",
+ "description":"Weekly collection management and customer portal",
+ "icons":[]
+}

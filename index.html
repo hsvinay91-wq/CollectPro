@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CollectPro">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>CollectPro — Cloud v19 Telugu</title>
+<title>CollectPro — Cloud v21 Premium</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -193,6 +193,41 @@ a.btn{text-decoration:none;display:inline-block}
 @keyframes glowFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-12px,10px,0)}}
 @media(prefers-reduced-motion:reduce){.portal-page,.portal-hero,.portal-welcome,.portal-name,.portal-subtitle,.portal-big,.portal-stat,.portal-section,.portal-history,.portal-section .w{animation:none!important}.portal-progress b{transition:none}}
 @media(max-width:560px){.portal-name{font-size:29px!important}.portal-hero{padding:22px!important}.portal-lang{padding:7px 10px!important;font-size:11px!important}}
+
+/* V21 Premium Fintech Design — visual only */
+:root{--bg:#060A1B;--card:#111936;--ink:#0B1230;--ink2:#18244B;--text:#F4F6FF;--muted:#9AA6C7;--line:rgba(112,145,220,.24);--gold:#D7A83F;--paid:#19D6A0;--miss:#FF9A3D;--pend:#344064;--in:rgba(255,255,255,.045);--onink:#F5F7FF}
+body{min-height:100vh;background:radial-gradient(circle at 8% 12%,rgba(61,94,190,.18),transparent 27%),radial-gradient(circle at 88% 22%,rgba(211,168,63,.10),transparent 25%),linear-gradient(145deg,#050918 0%,#090F27 48%,#0A1030 100%);overflow-x:hidden}
+body:before,body:after{position:fixed;pointer-events:none;z-index:0;font-family:Georgia,serif;line-height:1}
+body:before{content:"₹";right:-4vw;top:12vh;font-size:clamp(180px,28vw,420px);color:rgba(215,168,63,.035);text-shadow:0 0 70px rgba(215,168,63,.08);transform:rotate(-9deg)}
+body:after{content:"↗";left:-2vw;bottom:5vh;font-size:clamp(160px,24vw,340px);color:rgba(90,137,255,.045);transform:rotate(-8deg)}
+.wrap{position:relative;z-index:1;max-width:1120px;padding:22px 22px 56px}
+.wrap:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:linear-gradient(115deg,transparent 0 48%,rgba(93,133,255,.045) 48.2%,transparent 49%),repeating-linear-gradient(90deg,transparent 0 90px,rgba(255,255,255,.012) 91px 92px);mask-image:linear-gradient(to bottom,transparent,black 18%,black 82%,transparent)}
+.top{margin-bottom:20px;padding:4px 2px}.brand{font-size:34px;letter-spacing:-.7px;text-shadow:0 0 24px rgba(120,151,255,.18);animation:logoFloat 3.2s ease-in-out infinite}.brand i{color:#D7A83F;text-shadow:0 0 18px rgba(215,168,63,.35)}
+.top .btn{background:rgba(17,25,54,.72);border-color:rgba(125,155,230,.25);backdrop-filter:blur(12px);box-shadow:0 8px 22px rgba(0,0,0,.18)}
+.btn{border-radius:12px;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}.btn:hover{transform:translateY(-2px);border-color:rgba(215,168,63,.55);box-shadow:0 10px 24px rgba(0,0,0,.22)}
+.hero{background:linear-gradient(135deg,rgba(25,37,79,.97),rgba(9,16,43,.98) 62%,rgba(22,31,67,.96));border:1px solid rgba(102,143,230,.38);border-radius:26px;padding:30px;box-shadow:0 24px 70px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden}
+.portal-hero:before{content:"₹";position:absolute;width:auto;height:auto;border-radius:0;right:5%;top:7%;font:400 clamp(150px,24vw,300px)/1 Georgia,serif;color:rgba(215,168,63,.055);filter:none;animation:rupeeFloat 6s ease-in-out infinite;z-index:0}
+.portal-hero:after{content:"↗  •  ▰  •  ₹";position:absolute;left:42%;bottom:4%;font:700 40px/1 Manrope,sans-serif;letter-spacing:28px;color:rgba(90,137,255,.055);filter:blur(.2px);animation:financeDrift 9s linear infinite;z-index:0}
+.portal-hero>*{position:relative;z-index:2}.portal-name{letter-spacing:-.8px;text-shadow:0 4px 24px rgba(0,0,0,.25)}
+.portal-lang{border-color:rgba(125,155,230,.35)!important;background:rgba(255,255,255,.07)!important;color:#F6F7FF!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 6px 20px rgba(0,0,0,.18)}
+.badge{background:rgba(25,214,160,.12);color:#57E8BE;border-color:rgba(25,214,160,.45);box-shadow:0 0 18px rgba(25,214,160,.08)}
+.portal-big{gap:28px 64px}.portal-big .n{font-size:clamp(42px,7vw,62px);text-shadow:0 4px 22px rgba(0,0,0,.25)}.portal-big .n.g{color:#D7A83F;text-shadow:0 0 28px rgba(215,168,63,.2)}
+.portal-progress{height:10px!important;background:rgba(255,255,255,.09)!important;border:1px solid rgba(255,255,255,.05);box-shadow:inset 0 1px 4px rgba(0,0,0,.25),0 0 20px rgba(80,122,255,.06)}.portal-progress b{background:linear-gradient(90deg,#D7A83F,#F0D06C 48%,#7EA2FF)!important;box-shadow:0 0 18px rgba(215,168,63,.35)}
+.grid{gap:14px;margin:16px 0}.portal-stat,.stat,.sec{background:linear-gradient(145deg,rgba(24,35,75,.88),rgba(13,22,50,.88));border:1px solid rgba(94,132,215,.30);box-shadow:0 14px 34px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.045);backdrop-filter:blur(12px)}
+.portal-stat{position:relative;overflow:hidden;border-radius:18px;padding:18px}.portal-stat:before{content:"";position:absolute;inset:-50% auto auto -30%;width:120px;height:120px;border-radius:50%;background:rgba(82,126,255,.10);filter:blur(18px);pointer-events:none}.portal-stat:nth-child(2):before{background:rgba(25,214,160,.09)}.portal-stat:nth-child(3):before{background:rgba(168,105,255,.10)}.portal-stat:nth-child(4):before{background:rgba(255,154,61,.09)}
+.portal-stat .v{position:relative;z-index:1;font-size:30px;text-shadow:0 4px 16px rgba(0,0,0,.25)}.portal-stat .l,.portal-stat .s{position:relative;z-index:1}
+.sec.portal-section,.portal-history{border-radius:20px;padding:20px 22px;background:linear-gradient(145deg,rgba(18,29,64,.86),rgba(10,18,43,.90));border-color:rgba(99,137,221,.30);box-shadow:0 18px 44px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.04)}
+.portal-section h2,.portal-history h2{font-size:25px;text-shadow:0 3px 16px rgba(0,0,0,.24)}
+.strip{gap:9px}.w{border-radius:50%!important;background:#2B355C;color:#B9C4E3;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);min-width:32px}.w.p{background:linear-gradient(145deg,#22E0AA,#11B98A);box-shadow:0 0 18px rgba(25,214,160,.28)}.w.m{background:linear-gradient(145deg,#FFB04A,#E87825);box-shadow:0 0 18px rgba(255,154,61,.24)}
+.ph-list{border-top:1px solid rgba(255,255,255,.04)}.ph-row{padding:14px 8px;border-bottom:1px solid rgba(120,150,220,.14);border-radius:10px}.ph-row:hover{background:rgba(92,130,220,.06)}.ph-week{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.05)}.ph-view{background:linear-gradient(135deg,rgba(215,168,63,.17),rgba(92,132,255,.07));box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.portal-page>.row:last-child{margin-top:22px!important}.portal-page>.row:last-child .btn{border:1px solid rgba(215,168,63,.72);background:linear-gradient(135deg,rgba(215,168,63,.20),rgba(255,255,255,.05));color:#F1CD71;padding:11px 22px;border-radius:999px;box-shadow:0 0 0 1px rgba(215,168,63,.08),0 8px 26px rgba(0,0,0,.24),0 0 24px rgba(215,168,63,.10);animation:logoutPulse 2.8s ease-in-out infinite}.portal-page>.row:last-child .btn:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 12px 32px rgba(0,0,0,.3),0 0 30px rgba(215,168,63,.20)}
+@keyframes logoFloat{0%,100%{transform:translateY(0);filter:brightness(1)}50%{transform:translateY(-2px);filter:brightness(1.12)}}
+@keyframes logoutPulse{0%,100%{box-shadow:0 0 0 1px rgba(215,168,63,.08),0 8px 26px rgba(0,0,0,.24),0 0 18px rgba(215,168,63,.08)}50%{box-shadow:0 0 0 1px rgba(215,168,63,.18),0 10px 30px rgba(0,0,0,.28),0 0 30px rgba(215,168,63,.20)}}
+@keyframes rupeeFloat{0%,100%{transform:translate3d(0,0,0) rotate(-6deg)}50%{transform:translate3d(-12px,10px,0) rotate(-2deg)}}
+@keyframes financeDrift{0%{transform:translateX(20px)}50%{transform:translateX(-20px)}100%{transform:translateX(20px)}}
+@media(max-width:700px){.wrap{padding:12px 12px 38px}.top{padding:2px 1px}.brand{font-size:29px}.hero{padding:21px;border-radius:22px}.portal-big{gap:20px 28px}.portal-big .n{font-size:42px}.portal-hero:before{right:-8%;top:18%;font-size:170px}.portal-hero:after{left:10%;bottom:3%;font-size:24px;letter-spacing:14px}.grid{gap:10px}.portal-stat{padding:14px;border-radius:16px}.portal-stat .v{font-size:25px}.sec.portal-section,.portal-history{padding:16px 14px}.portal-section h2,.portal-history h2{font-size:22px}.strip{gap:7px}.w{font-size:10px}.portal-page>.row:last-child .btn{width:100%;justify-content:center}}
+@media(max-width:420px){.top .row .btn{padding:7px 10px;font-size:11px}.brand{font-size:27px}.hero{padding:18px}.portal-big{gap:16px 22px}.portal-big .n{font-size:37px}.portal-subtitle{font-size:12px}.portal-stat .v{font-size:22px}.strip{gap:5px}.w{min-width:27px}.portal-hero:before{opacity:.7}}
+@media(prefers-reduced-motion:reduce){.brand,.portal-page>.row:last-child .btn,.portal-hero:before,.portal-hero:after{animation:none!important}}
 
 </style></head><body>
 <div class="wrap">

@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CollectPro">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>CollectPro — Cloud v15</title>
+<title>CollectPro — Cloud v16 Telugu</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -111,6 +111,32 @@ a.btn{text-decoration:none;display:inline-block}
 }
 
 @media print{.btn{display:none}}
+
+/* Customer portal premium polish */
+.portal-page{animation:portalFade .55s ease both}
+.portal-hero{position:relative;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.18);animation:portalRise .65s ease both}
+.portal-hero:before{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:-90px;top:-110px;background:rgba(201,164,90,.14);filter:blur(8px);animation:glowFloat 5s ease-in-out infinite}
+.portal-hero:after{content:"";position:absolute;width:170px;height:170px;border-radius:50%;left:-90px;bottom:-100px;background:rgba(90,126,210,.13);filter:blur(10px);animation:glowFloat 6s ease-in-out infinite reverse}
+.portal-hero>*{position:relative;z-index:1}
+.portal-welcome{font-size:14px;color:#D8D3C7;letter-spacing:.2px;margin-bottom:3px;animation:portalRise .7s .05s ease both}
+.portal-name{font-size:32px!important;animation:portalRise .7s .12s ease both}
+.portal-subtitle{font-size:13px;color:#B9B6C8;margin:6px 0 0;animation:portalRise .7s .18s ease both}
+.portal-lang{border-color:rgba(255,255,255,.22)!important;background:rgba(255,255,255,.08)!important;color:#F5F0E5!important;backdrop-filter:blur(8px);font-weight:700}
+.portal-big{animation:portalRise .7s .22s ease both}
+.portal-stat{animation:portalRise .65s ease both}
+.portal-stat:nth-child(2){animation-delay:.08s}.portal-stat:nth-child(3){animation-delay:.14s}.portal-stat:nth-child(4){animation-delay:.20s}
+.portal-section{animation:portalRise .65s .22s ease both}
+.portal-section .w{animation:weekPop .45s ease both}
+.portal-section .w:nth-child(2){animation-delay:.03s}.portal-section .w:nth-child(3){animation-delay:.06s}.portal-section .w:nth-child(4){animation-delay:.09s}.portal-section .w:nth-child(5){animation-delay:.12s}.portal-section .w:nth-child(6){animation-delay:.15s}.portal-section .w:nth-child(7){animation-delay:.18s}.portal-section .w:nth-child(8){animation-delay:.21s}.portal-section .w:nth-child(9){animation-delay:.24s}.portal-section .w:nth-child(10){animation-delay:.27s}.portal-section .w:nth-child(11){animation-delay:.30s}.portal-section .w:nth-child(12){animation-delay:.33s}.portal-section .w:nth-child(n+13){animation-delay:.36s}
+.portal-history{animation:portalRise .65s .28s ease both}
+.portal-progress b{transition:width 1.15s cubic-bezier(.2,.8,.2,1)}
+@keyframes portalFade{from{opacity:0}to{opacity:1}}
+@keyframes portalRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes weekPop{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+@keyframes glowFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-12px,10px,0)}}
+@media(prefers-reduced-motion:reduce){.portal-page,.portal-hero,.portal-welcome,.portal-name,.portal-subtitle,.portal-big,.portal-stat,.portal-section,.portal-history,.portal-section .w{animation:none!important}.portal-progress b{transition:none}}
+@media(max-width:560px){.portal-name{font-size:29px!important}.portal-hero{padding:22px!important}.portal-lang{padding:7px 10px!important;font-size:11px!important}}
+
 </style></head><body>
 <div class="wrap">
  <div class="top"><div class="brand" onclick="go('')">Collect<i>Pro</i></div>
@@ -119,13 +145,111 @@ a.btn{text-decoration:none;display:inline-block}
 </div>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <script>
-var KEY="collectpro_v15",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="";
+var KEY="collectpro_v16",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en";
 var SUPABASE_URL="https://haqjtrcwhuoqwqpoanij.supabase.co";
 var SUPABASE_PUBLISHABLE_KEY="sb_publishable_ASbs_DhL_rRfPWd1grUq6Q_7-I87djF";
 var sb=null;
 try{DB=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){DB=[]}
 var save=function(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}};
 function cloudConfigured(){return SUPABASE_URL.indexOf("YOUR_")!==0&&SUPABASE_PUBLISHABLE_KEY.indexOf("YOUR_")!==0}
+
+var PT={
+ en:{
+  welcome:"Welcome back",
+  subtitle:"Your weekly collection account at a glance.",
+  customerId:"Customer ID",
+  active:"Active",
+  completed:"Completed",
+  remaining:"Remaining balance",
+  paidAmount:"Paid amount",
+  weeksPaid:"weeks paid",
+  loanAmount:"Loan amount",
+  originalLoan:"Original loan",
+  weeklyAmount:"Weekly amount",
+  eachWeek:"Each week",
+  totalPayable:"Total payable",
+  perWeekWeeks:"Per week × weeks",
+  weeksRemaining:"Weeks remaining",
+  remainingWord:"Remaining",
+  tracker:"Week-by-week tracker",
+  trackerSub:"Green = paid. Orange = missed or carry-over weeks.",
+  paid:"Paid",
+  pendingCarry:"Pending / carry-over",
+  upcoming:"Upcoming",
+  history:"Payment history",
+  recent:"Your recent collections.",
+  entry:"entry",
+  entries:"entries",
+  viewAll:"View all payments",
+  allPayments:"All payments",
+  close:"Close",
+  logout:"Logout",
+  language:"తెలుగు",
+  invalid:"Invalid Customer ID or PIN.",
+  loginTitle:"Customer Portal",
+  loginSub:"View your weekly collection, payment progress and remaining balance.",
+  login:"Login",
+  loginHint:"Customer access is view-only. Customers cannot add, edit or delete payments.",
+  enter:"Enter Customer ID and PIN.",
+  cloud:"Cloud connection is not configured yet.",
+  date:"Date",
+  week:"Week",
+  mode:"Mode",
+  status:"Status",
+  amount:"Amount",
+  historical:"Historical",
+  unpaid:"Unpaid"
+ },
+ te:{
+  welcome:"స్వాగతం",
+  subtitle:"మీ వారపు కలెక్షన్ ఖాతా వివరాలు ఇక్కడ చూడండి.",
+  customerId:"కస్టమర్ ID",
+  active:"యాక్టివ్",
+  completed:"పూర్తయింది",
+  remaining:"చెల్లించాల్సిన మొత్తం",
+  paidAmount:"చెల్లించిన మొత్తం",
+  weeksPaid:"వారాలు చెల్లించారు",
+  loanAmount:"లోన్ మొత్తం",
+  originalLoan:"ప్రారంభ లోన్",
+  weeklyAmount:"వారానికి మొత్తం",
+  eachWeek:"ప్రతి వారం",
+  totalPayable:"మొత్తం చెల్లించాల్సింది",
+  perWeekWeeks:"వారానికి మొత్తం × వారాలు",
+  weeksRemaining:"మిగిలిన వారాలు",
+  remainingWord:"మిగిలినవి",
+  tracker:"వారం వారీ ట్రాకర్",
+  trackerSub:"ఆకుపచ్చ = చెల్లించారు. ఆరెంజ్ = పెండింగ్ / క్యారీ-ఓవర్.",
+  paid:"చెల్లించారు",
+  pendingCarry:"పెండింగ్ / క్యారీ-ఓవర్",
+  upcoming:"రాబోయేది",
+  history:"చెల్లింపు చరిత్ర",
+  recent:"మీ ఇటీవలి చెల్లింపులు.",
+  entry:"ఎంట్రీ",
+  entries:"ఎంట్రీలు",
+  viewAll:"అన్ని చెల్లింపులు చూడండి",
+  allPayments:"అన్ని చెల్లింపులు",
+  close:"మూసివేయి",
+  logout:"లాగ్ అవుట్",
+  language:"English",
+  invalid:"కస్టమర్ ID లేదా PIN తప్పుగా ఉంది.",
+  loginTitle:"కస్టమర్ పోర్టల్",
+  loginSub:"మీ వారపు కలెక్షన్, చెల్లింపు వివరాలు మరియు మిగిలిన మొత్తాన్ని చూడండి.",
+  login:"లాగిన్",
+  loginHint:"ఇది వీక్షణ కోసం మాత్రమే. కస్టమర్లు చెల్లింపులను జోడించలేరు, మార్చలేరు లేదా తొలగించలేరు.",
+  enter:"కస్టమర్ ID మరియు PIN నమోదు చేయండి.",
+  cloud:"క్లౌడ్ కనెక్షన్ ఇంకా సిద్ధంగా లేదు.",
+  date:"తేదీ",
+  week:"వారం",
+  mode:"విధానం",
+  status:"స్థితి",
+  amount:"మొత్తం",
+  historical:"చరిత్ర",
+  unpaid:"చెల్లించలేదు"
+ }
+};
+function pt(k){return PT[portalLang][k]||PT.en[k]||k}
+function togglePortalLang(){portalLang=portalLang==="en"?"te":"en";render()}
+
 function mapRow(r){return{id:r.id,customerId:r.customer_id,name:r.name,phone:r.phone||"",loan:+r.loan_amount||0,perWeek:+r.per_week||0,weeks:+r.weeks||0,date:r.loan_date||"",collectionWeekday:(r.collection_weekday==null?4:+r.collection_weekday),hPaid:+r.h_paid||0,hMiss:+r.h_miss||0,hAmt:r.h_amt==null?"":+r.h_amt,pays:Array.isArray(r.pays)?r.pays:[]}}
 async function cloudLoad(){if(!sb)return;var q=await sb.from("collectpro_customers").select("*").order("name");if(q.error){alert("Cloud database error: "+q.error.message);return}DB=(q.data||[]).map(mapRow);save();render()}
 async function cloudSaveCustomer(c,pin){if(!sb) return true;var a=await sb.rpc("collectpro_admin_save",{p_id:c.id||null,p_customer_id:c.customerId,p_pin:pin==null?null:pin,p_name:c.name,p_phone:c.phone||"",p_loan_amount:+c.loan||0,p_per_week:+c.perWeek||0,p_weeks:+c.weeks||0,p_loan_date:c.date||null,p_collection_weekday:(c.collectionWeekday==null?4:+c.collectionWeekday),p_h_paid:+c.hPaid||0,p_h_miss:+c.hMiss||0,p_h_amt:c.hAmt===""?0:+c.hAmt||0,p_pays:c.pays||[]});if(a.error){alert("Cloud save failed: "+a.error.message);return false}return true}
@@ -202,20 +326,35 @@ function trackerItems(c){
 function strip(c){return trackerItems(c).map(function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""});}
 function portal(){location.hash="#portal"}
 function portalAdmin(){location.hash="#"}
-async function portalLogin(){var cid=$("portal_cid").value.trim(),pin=$("portal_pin").value.trim();if(!cid||!pin){$("perr").textContent="Enter Customer ID and PIN.";return}if(!sb){$("perr").textContent="Cloud connection is not configured yet.";return}var r=await sb.rpc("collectpro_customer_login",{p_customer_id:cid,p_pin:pin});if(r.error){$("perr").textContent=r.error.message;return}if(!r.data||!r.data.length){$("perr").textContent="Invalid Customer ID or PIN.";return}portalData=mapRow(r.data[0]);portalError="";render()}
+async function portalLogin(){var cid=$("portal_cid").value.trim(),pin=$("portal_pin").value.trim();if(!cid||!pin){$("perr").textContent=pt("enter");return}if(!sb){$("perr").textContent=pt("cloud");return}var r=await sb.rpc("collectpro_customer_login",{p_customer_id:cid,p_pin:pin});if(r.error){$("perr").textContent=r.error.message;return}if(!r.data||!r.data.length){$("perr").textContent=pt("invalid");return}portalData=mapRow(r.data[0]);portalError="";render()}
 function portalLogout(){portalData=null;portalError="";render()}
 function portalView(){
  if(portalData){
   var c=portalData,k=calc(c),st=strip(c);
-  return '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>Customer ID: '+esc(c.customerId||"")+'</small></div><span class="badge sp'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div>'+
-  '<div class="big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">Remaining balance</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">Paid amount</div></div></div>'+
-  '<div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div>'+
-  '<div class="grid">'+[["Loan amount",inr(c.loan),"Original loan"],["Weekly amount",inr(c.perWeek),"Each week"],["Total payable",inr(k.payable),"Per week × weeks"],["Weeks remaining",k.pendW,"Remaining"]].map(function(x){return '<div class="stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
-  '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = paid. Orange = missed or carry-over weeks.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Pending / carry-over</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
+  var status=k.done?pt("completed"):pt("active");
+  return '<div class="portal-page">'+
+  '<div class="hero portal-hero"><div class="row"><div>'+
+  '<div class="portal-welcome">'+pt("welcome")+' 👋</div>'+
+  '<h1 class="portal-name">'+esc(c.name)+'</h1>'+
+  '<div class="portal-subtitle">'+pt("subtitle")+'</div>'+
+  '</div><div class="row sp" style="align-self:flex-start">'+
+  '<button class="btn portal-lang" onclick="togglePortalLang()">'+pt("language")+'</button>'+
+  '<span class="badge sp'+(k.done?' o':'')+'">'+status+'</span></div></div>'+
+  '<div class="portal-big big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">'+pt("remaining")+'</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">'+pt("paidAmount")+'</div></div></div>'+
+  '<div class="bar portal-progress"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' '+pt("weeksPaid")+' / '+c.weeks+'</span><span class="sp">'+k.pct+'%</span></div>'+
+  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+'</div></div>'+
+  '<div class="grid">'+[
+   [pt("loanAmount"),inr(c.loan),pt("originalLoan")],
+   [pt("weeklyAmount"),inr(c.perWeek),pt("eachWeek")],
+   [pt("totalPayable"),inr(k.payable),pt("perWeekWeeks")],
+   [pt("weeksRemaining"),k.pendW,pt("remainingWord")]
+  ].map(function(x){return '<div class="stat portal-stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
+  '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+
   paymentHistoryHtml(c,false)+
-  '<div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">Logout</button></div>';
+  '<div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button></div>'+
+  '</div>';
  }
- return '<div class="sec" style="max-width:520px;margin:30px auto"><div class="av" style="width:64px;height:64px;font-size:20px;margin-bottom:18px">CP</div><h1 style="font-size:34px">Customer Portal</h1><p style="font-size:15px;margin-top:10px">View your weekly collection, payment progress and remaining balance.</p><div class="fg" style="margin-top:24px">'+F("portal_cid","Customer ID","text","")+F("portal_pin","PIN","password","")+'</div><div class="row"><button class="btn pri sp" onclick="portalLogin()">Login</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">Customer access is <b>view-only</b>. Customers cannot add, edit or delete payments.</div></div>';
+ return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="row" style="justify-content:space-between"><div class="av" style="width:64px;height:64px;font-size:20px">CP</div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid","Customer ID","text","")+F("portal_pin","PIN","password","")+'</div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
 }
 function route(){var m=location.hash.match(/^#customer\/(.+)$/);view=m?m[1]:"";armed=null;if(location.hash==="#portal"){view="";render();return}render();window.scrollTo(0,0)}
 function go(v){var h=v?"#customer/"+v:"";if(location.hash===h||(!v&&(location.hash===""||location.hash==="#")))route();else location.hash=h||"#"}
@@ -273,6 +412,7 @@ function render(){
  paymentHistoryHtml(c,true)+((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
 }
 
+
 function paymentRows(c){
   return c.pays.map(function(p,i){return {p:p,i:i}}).sort(function(a,b){
     var d=String(b.p.date||"").localeCompare(String(a.p.date||""));
@@ -286,12 +426,13 @@ function paymentDay(s){
 }
 function paymentRowHtml(c,p,adminMode){
   var u=p.type==="unpaid";
-  var status=u?"Unpaid":(p.type==="hist"?"Historical":"Paid");
+  var status=u?pt("unpaid"):(p.type==="hist"?pt("historical"):pt("paid"));
   var statusClass=u?"unpaid":"";
-  var action=adminMode ? ' onclick="payForm(\''+c.id+'\',\''+(p.id||"")+'\')"' : '';
+  var action=adminMode ? " onclick=\"payForm('"+c.id+"','"+(p.id||"")+"')\"" : "";
+  var weekLabel=portalLang==="te"?("వారం "+esc(p.week)):("W"+esc(p.week));
   return '<div class="ph-row"'+action+'>'+
     '<div class="ph-date">'+fmt(p.date)+'<small>'+paymentDay(p.date)+'</small></div>'+
-    '<div class="ph-week">W'+esc(p.week)+'</div>'+
+    '<div class="ph-week">'+weekLabel+'</div>'+
     '<div class="ph-status '+statusClass+'"><span class="ph-dot"></span>'+status+'</div>'+
     '<div class="ph-amount">'+(u?inr(0):inr(p.amt))+'</div>'+
     '<div class="ph-arrow">›</div>'+
@@ -299,19 +440,20 @@ function paymentRowHtml(c,p,adminMode){
 }
 function paymentHistoryHtml(c,adminMode){
   var rows=paymentRows(c),recent=rows.slice(0,5);
-  return '<div class="sec">'+
-    '<div class="ph-head"><div><h2>Payment history</h2><p style="margin-bottom:0">'+(adminMode?"Recent collections. Tap a row to edit.":"Your recent collections.")+'</p></div>'+
-    '<span class="ph-count">'+rows.length+' '+(rows.length===1?"entry":"entries")+'</span></div>'+
+  return '<div class="sec '+(adminMode?"":"portal-history")+'">'+
+    '<div class="ph-head"><div><h2>'+pt("history")+'</h2><p style="margin-bottom:0">'+(adminMode?"Recent collections. Tap a row to edit.":pt("recent"))+'</p></div>'+
+    '<span class="ph-count">'+rows.length+' '+(rows.length===1?pt("entry"):pt("entries"))+'</span></div>'+
     (recent.length?'<div class="ph-list">'+recent.map(function(p){return paymentRowHtml(c,p,adminMode)}).join("")+'</div>':'<div class="ph-empty">No payment rows yet.</div>')+
-    (rows.length>5?'<button class="ph-view" onclick="viewAllPayments(\''+c.id+'\','+(adminMode?'true':'false')+')">View all payments <span class="arr">›</span></button>':'')+
+    (rows.length>5?'<button class="ph-view" onclick="viewAllPayments(\''+c.id+'\','+(adminMode?'true':'false')+')">'+pt("viewAll")+' <span class="arr">›</span></button>':'')+
     '</div>';
 }
 function viewAllPayments(cid,adminMode){
   var c=DB.filter(function(x){return x.id===cid})[0]; if(!c)return;
   var rows=paymentRows(c);
   var body=rows.length?'<div class="ph-list">'+rows.map(function(p){return paymentRowHtml(c,p,adminMode)}).join("")+'</div>':'<div class="ph-empty">No payment rows yet.</div>';
-  open_('<div class="row"><div><h2>All payments</h2><p style="color:var(--muted);font-size:13px;margin:4px 0 0">'+esc(c.name)+' · '+rows.length+' entries</p></div><button class="btn sm sp" onclick="close_()">Close</button></div><div style="margin-top:14px">'+body+'</div>');
+  open_('<div class="row"><div><h2>'+pt("allPayments")+'</h2><p style="color:var(--muted);font-size:13px;margin:4px 0 0">'+esc(c.name)+' · '+rows.length+' '+(rows.length===1?pt("entry"):pt("entries"))+'</p></div><button class="btn sm sp" onclick="close_()">'+pt("close")+'</button></div><div style="margin-top:14px">'+body+'</div>');
 }
+
 
 function backup(){open_('<h2>Backup &amp; restore</h2><p style="color:var(--muted);font-size:13px;margin:6px 0 12px">Copy this text and keep it safe (Notes, WhatsApp to yourself). To move data to another device, paste it here and tap Restore. Restore replaces current data.</p><textarea id="bk" rows="7" onfocus="this.select()">'+esc(JSON.stringify(DB))+'</textarea><div class="row" style="margin-top:12px"><button class="btn" onclick="close_()">Close</button><button class="btn pri sp" onclick="restore()">Restore from text</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
 function restore(){try{var d=JSON.parse($("bk").value);if(!Array.isArray(d)||d.some(function(c){return !c.id||!c.name||!Array.isArray(c.pays)}))throw 0;DB=d;save();close_();go("")}catch(e){$("err").textContent="This text is not a valid CollectPro backup."}}

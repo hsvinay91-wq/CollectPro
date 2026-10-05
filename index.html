@@ -229,9 +229,315 @@ body:after{content:"↗";left:-2vw;bottom:5vh;font-size:clamp(160px,24vw,340px);
 @media(max-width:420px){.top .row .btn{padding:7px 10px;font-size:11px}.brand{font-size:27px}.hero{padding:18px}.portal-big{gap:16px 22px}.portal-big .n{font-size:37px}.portal-subtitle{font-size:12px}.portal-stat .v{font-size:22px}.strip{gap:5px}.w{min-width:27px}.portal-hero:before{opacity:.7}}
 @media(prefers-reduced-motion:reduce){.brand,.portal-page>.row:last-child .btn,.portal-hero:before,.portal-hero:after{animation:none!important}}
 
+
+/* =========================
+   CollectPro V22 — Premium Fintech Visual Layer
+   UI-only changes: content, calculations, Supabase logic and payment data untouched.
+   ========================= */
+
+:root{
+  --bg:#070B1D;
+  --card:rgba(18,25,60,.78);
+  --ink:#111A42;
+  --ink2:#18255A;
+  --text:#F3F5FF;
+  --muted:#AEB7D8;
+  --line:rgba(105,137,255,.30);
+  --gold:#FFC84A;
+  --paid:#20E0B2;
+  --miss:#FF9D3D;
+  --pend:#28345E;
+  --in:rgba(13,19,48,.72);
+  --violet:#8D6BFF;
+  --cyan:#32B9FF;
+}
+
+html{background:#070B1D}
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 8% 18%,rgba(53,111,255,.18),transparent 28%),
+    radial-gradient(circle at 88% 24%,rgba(153,75,255,.16),transparent 27%),
+    radial-gradient(circle at 72% 86%,rgba(0,224,205,.09),transparent 25%),
+    linear-gradient(135deg,#050817 0%,#0A1230 48%,#10154A 100%);
+  color:var(--text);
+  position:relative;
+}
+body:before,
+body:after{
+  content:"";
+  position:fixed;
+  inset:-25%;
+  pointer-events:none;
+  z-index:-1;
+}
+body:before{
+  background:
+    radial-gradient(ellipse at 30% 25%,transparent 0 28%,rgba(72,115,255,.10) 29%,transparent 30%),
+    radial-gradient(ellipse at 72% 68%,transparent 0 26%,rgba(167,82,255,.09) 27%,transparent 28%);
+  filter:blur(2px);
+  animation:financeDrift 18s ease-in-out infinite alternate;
+}
+body:after{
+  background-image:
+    radial-gradient(circle,rgba(255,255,255,.7) 0 1px,transparent 1.5px),
+    radial-gradient(circle,rgba(87,185,255,.55) 0 1px,transparent 1.5px);
+  background-size:170px 170px,230px 230px;
+  background-position:20px 30px,100px 120px;
+  opacity:.24;
+  animation:starFloat 28s linear infinite;
+}
+@keyframes financeDrift{
+  from{transform:translate3d(-2%,0,0) rotate(0deg) scale(1)}
+  to{transform:translate3d(3%,-2%,0) rotate(2deg) scale(1.05)}
+}
+@keyframes starFloat{to{background-position:190px 0,0 240px}}
+
+.wrap{
+  max-width:1180px;
+  padding:18px 22px 60px;
+  position:relative;
+}
+.top{
+  margin-bottom:20px;
+  min-height:58px;
+  position:relative;
+}
+.top:after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:-8px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(104,150,255,.35),rgba(184,108,255,.25),transparent);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font:500 31px/1 'Instrument Serif',Georgia,serif;
+  cursor:pointer;
+  color:#F7F7FF;
+  text-shadow:0 0 18px rgba(111,143,255,.18);
+  transition:transform .25s ease,filter .25s ease;
+}
+.brand:hover{transform:translateY(-2px);filter:brightness(1.12)}
+.brand-word strong{
+  color:#A77BFF;
+  font-weight:500;
+}
+.brand-mark{
+  width:38px;height:38px;
+  position:relative;
+  display:inline-flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:3px;
+  padding:7px 5px 6px;
+  border-radius:11px;
+  background:linear-gradient(145deg,rgba(54,156,255,.26),rgba(139,89,255,.22));
+  border:1px solid rgba(116,158,255,.42);
+  box-shadow:0 0 22px rgba(70,130,255,.22),inset 0 0 18px rgba(150,93,255,.10);
+  animation:logoPulse 2.8s ease-in-out infinite;
+}
+.brand-mark b{
+  width:4px;
+  border-radius:5px;
+  background:linear-gradient(180deg,#63D8FF,#7C67FF);
+  box-shadow:0 0 7px rgba(66,191,255,.55);
+}
+.brand-mark b:nth-child(1){height:9px}
+.brand-mark b:nth-child(2){height:16px}
+.brand-mark b:nth-child(3){height:23px}
+.brand-mark i{
+  position:absolute;
+  right:2px;top:-7px;
+  color:#FFC84A;
+  font:700 16px Manrope,sans-serif;
+  font-style:normal;
+  text-shadow:0 0 9px rgba(255,200,74,.8);
+  animation:arrowRise 1.8s ease-in-out infinite;
+}
+@keyframes logoPulse{50%{box-shadow:0 0 30px rgba(116,91,255,.38),inset 0 0 22px rgba(83,180,255,.16)}}
+@keyframes arrowRise{50%{transform:translate(2px,-2px) scale(1.08)}}
+
+.btn{
+  border:1px solid rgba(103,139,255,.34);
+  background:linear-gradient(135deg,rgba(26,36,82,.88),rgba(12,18,47,.88));
+  color:#F2F4FF;
+  padding:10px 15px;
+  border-radius:13px;
+  box-shadow:inset 0 1px rgba(255,255,255,.05),0 8px 24px rgba(0,0,0,.16);
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,filter .22s ease;
+}
+.btn:hover{
+  transform:translateY(-2px);
+  border-color:rgba(102,184,255,.7);
+  box-shadow:0 10px 28px rgba(23,89,210,.20),0 0 18px rgba(104,108,255,.12);
+}
+.btn.pri{
+  color:#15101F;
+  border-color:#FFD45E;
+  background:linear-gradient(135deg,#FFD96A,#FFB82E 55%,#FF9C31);
+  box-shadow:0 8px 25px rgba(255,183,51,.25),0 0 20px rgba(255,201,74,.15);
+  font-weight:800;
+}
+.add-nav-btn{position:relative}
+.add-nav-btn:before{content:"＋";margin-right:5px;font-weight:800}
+.portal-nav-btn:before{content:"⌂";margin-right:7px;color:#B58BFF}
+.logout-nav-btn:before{content:"↪";margin-right:7px;color:#FF9DFF}
+.logout-nav-btn{border-color:rgba(166,105,255,.38)}
+
+.grid{gap:14px}
+.stat,.sec{
+  background:
+    linear-gradient(145deg,rgba(26,37,83,.80),rgba(10,16,43,.78));
+  border:1px solid rgba(90,130,255,.30);
+  border-radius:19px;
+  box-shadow:0 18px 45px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.045);
+  backdrop-filter:blur(14px);
+}
+.stat{transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease}
+.stat:hover{transform:translateY(-4px);border-color:rgba(100,160,255,.55);box-shadow:0 18px 42px rgba(23,69,170,.20)}
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 82% 50%,rgba(75,126,255,.18),transparent 25%),
+    radial-gradient(circle at 72% 20%,rgba(168,78,255,.13),transparent 25%),
+    linear-gradient(145deg,rgba(24,35,86,.92),rgba(8,14,39,.92));
+  border:1px solid rgba(86,136,255,.45);
+  box-shadow:0 24px 60px rgba(0,0,0,.30),inset 0 1px rgba(255,255,255,.05);
+}
+.hero:before{
+  content:"₹";
+  position:absolute;
+  right:7%;top:9%;
+  font:400 150px/1 'Instrument Serif',serif;
+  color:rgba(255,197,74,.055);
+  transform:rotate(-8deg);
+  text-shadow:0 0 35px rgba(255,197,74,.06);
+  pointer-events:none;
+}
+.hero:after{
+  content:"";
+  position:absolute;
+  width:46%;height:160px;
+  right:-7%;bottom:-65px;
+  border-top:2px solid rgba(72,175,255,.18);
+  border-radius:50%;
+  box-shadow:0 -20px 0 rgba(154,87,255,.10),0 -42px 0 rgba(255,197,74,.07);
+  transform:rotate(-9deg);
+  pointer-events:none;
+  animation:heroWave 6s ease-in-out infinite alternate;
+}
+@keyframes heroWave{to{transform:translateY(-12px) rotate(-5deg)}}
+
+.badge{
+  border-color:rgba(32,224,178,.55)!important;
+  background:rgba(20,224,178,.08)!important;
+  color:#36E8BC!important;
+  box-shadow:0 0 18px rgba(32,224,178,.08);
+}
+
+.cust{
+  background:linear-gradient(135deg,rgba(21,32,74,.86),rgba(10,16,42,.82));
+  border:1px solid rgba(85,128,255,.28);
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.cust:hover{
+  transform:translateY(-3px);
+  border-color:rgba(113,159,255,.58);
+  box-shadow:0 15px 35px rgba(28,72,190,.20);
+}
+.ring{filter:drop-shadow(0 0 8px rgba(94,145,255,.18))}
+
+.portal-page{position:relative}
+.portal-page:before{
+  content:"";
+  position:fixed;
+  width:260px;height:260px;
+  right:-80px;top:18%;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(130,76,255,.15),transparent 68%);
+  pointer-events:none;
+  animation:orbFloat 7s ease-in-out infinite;
+}
+@keyframes orbFloat{50%{transform:translate(-30px,25px) scale(1.1)}}
+
+.portal-hero{
+  border-radius:24px;
+  box-shadow:0 26px 70px rgba(0,0,0,.32),0 0 45px rgba(71,108,255,.08),inset 0 1px rgba(255,255,255,.06);
+}
+.portal-hero .portal-big .n{
+  text-shadow:0 0 20px rgba(255,255,255,.10);
+}
+.portal-hero .portal-big .n.g{
+  color:#FFC84A!important;
+  text-shadow:0 0 22px rgba(255,197,74,.18);
+}
+.portal-progress{
+  box-shadow:0 0 18px rgba(255,198,73,.14);
+}
+.portal-progress b{
+  background:linear-gradient(90deg,#FFC84A,#FFDA72,#A987FF)!important;
+  box-shadow:0 0 16px rgba(255,199,73,.45);
+}
+.portal-stat{
+  background:linear-gradient(145deg,rgba(27,42,94,.82),rgba(10,17,43,.82))!important;
+  border-color:rgba(84,134,255,.34)!important;
+  border-radius:18px!important;
+}
+.portal-section{
+  background:linear-gradient(145deg,rgba(24,36,83,.82),rgba(9,15,40,.82))!important;
+  border-color:rgba(90,132,255,.32)!important;
+  box-shadow:0 20px 48px rgba(0,0,0,.20),inset 0 1px rgba(255,255,255,.045);
+}
+.ph-row{
+  background:linear-gradient(135deg,rgba(32,46,99,.72),rgba(18,27,65,.76))!important;
+  border-color:rgba(89,132,255,.18)!important;
+}
+.portal-lang{
+  border-color:rgba(116,155,255,.48)!important;
+  background:linear-gradient(135deg,rgba(36,49,101,.85),rgba(15,22,55,.85))!important;
+}
+
+.ph-row,.w{transition:transform .22s ease,box-shadow .22s ease}
+.w:hover{transform:translateY(-3px) scale(1.04);filter:brightness(1.08)}
+
+#ov{background:rgba(3,6,18,.74)!important;backdrop-filter:blur(8px)}
+.modal{
+  background:linear-gradient(145deg,#111A43,#080E2A)!important;
+  border-color:rgba(93,139,255,.40)!important;
+  box-shadow:0 30px 90px rgba(0,0,0,.45),0 0 35px rgba(88,108,255,.12)!important;
+}
+
+@media(max-width:700px){
+  .wrap{padding:12px 12px 42px}
+  .top{align-items:flex-start;flex-direction:column;gap:12px}
+  .top .row{width:100%}
+  .top .row .btn{flex:1;min-width:0}
+  .brand{font-size:28px}
+  .brand-mark{width:35px;height:35px}
+  .hero{border-radius:20px}
+  .hero:before{font-size:90px;right:2%}
+  .stat,.sec{border-radius:16px}
+  .portal-hero{border-radius:20px}
+  .portal-page:before{width:180px;height:180px;right:-80px}
+}
+@media(prefers-reduced-motion:reduce){
+  body:before,body:after,.brand-mark,.brand-mark i,.hero:after,.portal-page:before{animation:none!important}
+}
+
 </style></head><body>
 <div class="wrap">
- <div class="top"><div class="brand" onclick="go('')">Collect<i>Pro</i></div>
+ <div class="top"><div class="brand" onclick="go('')" aria-label="CollectPro home">
+  <span class="brand-mark" aria-hidden="true"><b></b><b></b><b></b><i>↗</i></span>
+  <span class="brand-word">Collect<strong>Pro</strong></span>
+</div>
   <div class="row" id="topActions"></div></div>
  <div id="app"></div>
 </div>
@@ -485,7 +791,7 @@ function topActions(){
    return;
  }
  if(cloudReady && adminSession){
-   t.innerHTML='<button class="btn" onclick="portal()">Customer Portal</button><button class="btn" onclick="adminLogout()">Logout</button><button class="btn pri" onclick="custForm()">+ Add customer</button>';
+   t.innerHTML='<button class="btn portal-nav-btn" onclick="portal()">Customer Portal</button><button class="btn logout-nav-btn" onclick="adminLogout()">Logout</button><button class="btn pri add-nav-btn" onclick="custForm()">+ Add customer</button>';
  }else if(cloudReady){
    t.innerHTML='<button class="btn" onclick="portal()">Customer Portal</button><button class="btn" onclick="adminLogin()">Admin Login</button>';
  }else{

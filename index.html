@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C1022">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CollectPro">
+<link rel="manifest" href="./manifest.webmanifest">
 <title>CollectPro — Cloud</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -44,9 +49,20 @@ h1,h2{font-family:'Instrument Serif',Georgia,serif;font-weight:400;margin:0}
 .w.p{background:var(--paid);color:#fff}.w.m{background:var(--miss);color:#fff}
 .leg{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-size:12.5px;color:var(--muted)}
 .leg span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:var(--c)}
-.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:480px}
+.tw{width:100%;overflow:visible}table{width:100%;border-collapse:collapse;table-layout:fixed}
 th{text-align:left;font-size:12px;color:var(--muted);padding:8px 6px;border-bottom:1px solid var(--line)}
-td{padding:10px 6px;border-bottom:1px solid var(--line)}
+td{padding:10px 6px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+@media(max-width:560px){
+ .sec{padding:14px}
+ .tw table,.tw thead,.tw tbody,.tw tr,.tw th,.tw td{display:block;width:100%}
+ .tw thead{display:none}
+ .tw tr{background:var(--in);border:1px solid var(--line);border-radius:12px;margin:0 0 10px;padding:10px}
+ .tw td{border:0;padding:4px 0;display:flex;justify-content:space-between;gap:10px;min-width:0}
+ .tw td::before{font-size:11px;color:var(--muted);font-weight:600;flex:0 0 72px}
+ .tw td:nth-child(1)::before{content:"Date"}.tw td:nth-child(2)::before{content:"Week"}.tw td:nth-child(3)::before{content:"Mode"}.tw td:nth-child(4)::before{content:"Status"}.tw td:nth-child(5)::before{content:"Amount"}.tw td:nth-child(6)::before{content:"Balance"}.tw td:nth-child(7)::before{content:"Actions"}
+ .tw td:last-child{justify-content:flex-end;padding-top:8px}.tw td:last-child::before{display:none}
+ .tw .btn.sm{padding:6px 9px}
+}
 .tag{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(201,164,90,.2)}
 .empty{text-align:center;padding:30px 10px;color:var(--muted)}
 .ov{position:fixed;inset:0;background:rgba(8,10,24,.6);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:24px 14px;z-index:9}
@@ -72,7 +88,7 @@ a.btn{text-decoration:none;display:inline-block}
 </div>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <script>
-var KEY="collectpro_v12",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="";
+var KEY="collectpro_v13",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="";
 var SUPABASE_URL="https://haqjtrcwhuoqwqpoanij.supabase.co";
 var SUPABASE_PUBLISHABLE_KEY="sb_publishable_ASbs_DhL_rRfPWd1grUq6Q_7-I87djF";
 var sb=null;
@@ -119,38 +135,25 @@ function nextWeekDate(loanDate,weekNo,weekday){
   d.setDate(d.getDate()+delta+((Number(weekNo)-1)*7));
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
-function scheduleStatus(c,week){
-  var hit=c.pays.filter(function(p){return +p.week===+week && (p.type==="paid"||p.type==="hist")});
-  if(hit.length)return "paid";
-  var miss=c.pays.filter(function(p){return +p.week===+week && p.type==="unpaid"});
-  return miss.length?"unpaid":"upcoming";
+function trackerItems(c){
+ var base=[],i;
+ for(i=1;i<=c.weeks;i++)base.push({week:i,status:"upcoming"});
+ c.pays.forEach(function(p){if(p.week>=1&&p.week<=c.weeks){if((p.type==="paid"||p.type==="hist")&&base[p.week-1].status!=="paid")base[p.week-1].status="paid";if(p.type==="unpaid"&&base[p.week-1].status!=="paid")base[p.week-1].status="unpaid";}});
+ var unresolved=base.filter(function(x){return x.status==="unpaid"}).length;
+ for(i=1;i<=unresolved;i++){
+   var carryWeek=c.weeks+i,carryStatus="carry";
+   c.pays.forEach(function(p){if(+p.week===carryWeek && (p.type==="paid"||p.type==="hist"))carryStatus="paid";});
+   base.push({week:carryWeek,status:carryStatus});
+ }
+ return base;
 }
-function scheduleTable(c,portalMode){
-  var weekday=(c.collectionWeekday==null?4:+c.collectionWeekday);
-  var rows=[];
-  for(var i=1;i<=c.weeks;i++){
-    var d=nextWeekDate(c.date,i,weekday),st=scheduleStatus(c,i);
-    var cls=st==="paid"?"p":st==="unpaid"?"m":"";
-    rows.push('<tr><td>Week '+i+'</td><td><b>'+weekdayName(weekday)+'</b> · '+fmt(d)+'</td><td><span class="w '+cls+'" style="display:inline-grid;width:26px;height:26px;aspect-ratio:auto">'+(st==="paid"?"✓":st==="unpaid"?"!":"·")+'</span></td><td>'+(st==="paid"?"Paid":st==="unpaid"?'<span style="color:var(--miss);font-weight:700">Unpaid</span>':'Upcoming')+'</td></tr>');
-  }
-  return '<div class="sec"><h2>Weekly payment schedule</h2><p>Week 1 starts on the first selected weekday after the loan date. Every following week stays 7 days apart.</p><div class="note"><b>Collection day:</b> '+weekdayName(weekday)+' · <b>Loan date:</b> '+fmt(c.date)+'</div><div class="tw"><table><thead><tr><th>Week</th><th>Scheduled date</th><th></th><th>Status</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div></div>';
-}
-
-function strip(c){
- var s=[],i;for(i=0;i<c.weeks;i++)s.push("");
- c.pays.forEach(function(p){if(p.type==="paid"||p.type==="hist"){if(p.week>=1&&p.week<=c.weeks)s[p.week-1]="p"}});
- c.pays.forEach(function(p){if(p.type==="unpaid"&&p.week>=1&&p.week<=c.weeks&&!s[p.week-1])s[p.week-1]="m"});
- var hist=Math.max((+c.hPaid||0)-c.pays.filter(function(p){return p.type==="hist"}).length,0),m=+c.hMiss||0;
- for(i=0;i<c.weeks;i++){if(!s[i]&&hist>0){s[i]="p";hist--}}
- for(i=0;i<c.weeks;i++){if(!s[i]&&m>0){s[i]="m";m--}}
- return s;
-}
+function strip(c){return trackerItems(c).map(function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""});}
 function portal(){location.hash="#portal"}
 function portalAdmin(){location.hash="#"}
 async function portalLogin(){var cid=$("portal_cid").value.trim(),pin=$("portal_pin").value.trim();if(!cid||!pin){$("perr").textContent="Enter Customer ID and PIN.";return}if(!sb){$("perr").textContent="Cloud connection is not configured yet.";return}var r=await sb.rpc("collectpro_customer_login",{p_customer_id:cid,p_pin:pin});if(r.error){$("perr").textContent=r.error.message;return}if(!r.data||!r.data.length){$("perr").textContent="Invalid Customer ID or PIN.";return}portalData=mapRow(r.data[0]);portalError="";render()}
 function portalLogout(){portalData=null;portalError="";render()}
 function portalView(){
- if(portalData){var c=portalData,k=calc(c),st=strip(c),ps=c.pays.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))});return '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>Customer ID: '+esc(c.customerId||"")+'</small></div><span class="badge sp'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div><div class="big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">Remaining balance</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">Paid amount</div></div></div><div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div><div class="grid">'+[["Loan amount",inr(c.loan),"Original loan"],["Weekly amount",inr(c.perWeek),"Each week"],["Total payable",inr(k.payable),"Per week × weeks"],["Weeks remaining",k.pendW,"Remaining" ]].map(function(x){return '<div class="stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div><div class="sec"><h2>Weekly tracker</h2><p>Your collection progress.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+scheduleTable(c,true)+'<div class="sec"><h2>Payment history</h2><p>View-only. Payments can only be added or changed by Admin.</p>'+(ps.length?'<div class="tw"><table><thead><tr><th>Date</th><th>Week</th><th>Status</th><th>Amount</th></tr></thead><tbody>'+ps.map(function(p){return '<tr><td>'+fmt(p.date)+'</td><td>Week '+p.week+'</td><td>'+(p.type==="unpaid"?'<b style="color:var(--miss)">Unpaid</b>':p.type==="hist"?"Historical":"Paid")+'</td><td>'+inr(p.amt||0)+'</td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">No payments recorded yet.</div>')+'</div><div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">Logout</button></div>'}
+ if(portalData){var c=portalData,k=calc(c),st=strip(c),ps=c.pays.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))});return '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>Customer ID: '+esc(c.customerId||"")+'</small></div><span class="badge sp'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div><div class="big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">Remaining balance</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">Paid amount</div></div></div><div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div><div class="grid">'+[["Loan amount",inr(c.loan),"Original loan"],["Weekly amount",inr(c.perWeek),"Each week"],["Total payable",inr(k.payable),"Per week × weeks"],["Weeks remaining",k.pendW,"Remaining" ]].map(function(x){return '<div class="stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div><div class="sec"><h2>Week-by-week tracker</h2><p>Green = paid. Orange = missed or carry-over weeks.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Pending / carry-over</span><span style="--c:var(--pend)">Upcoming</span></div></div><div class="sec"><h2>Payment history</h2><p>View-only. Payments can only be added or changed by Admin.</p>'+(ps.length?'<div class="tw"><table><thead><tr><th>Date</th><th>Week</th><th>Status</th><th>Amount</th></tr></thead><tbody>'+ps.map(function(p){return '<tr><td>'+fmt(p.date)+'</td><td>Week '+p.week+'</td><td>'+(p.type==="unpaid"?'<b style="color:var(--miss)">Unpaid</b>':p.type==="hist"?"Historical":"Paid")+'</td><td>'+inr(p.amt||0)+'</td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">No payments recorded yet.</div>')+'</div><div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">Logout</button></div>'}
  return '<div class="sec" style="max-width:520px;margin:30px auto"><div class="av" style="width:64px;height:64px;font-size:20px;margin-bottom:18px">CP</div><h1 style="font-size:34px">Customer Portal</h1><p style="font-size:15px;margin-top:10px">View your weekly collection, payment progress and remaining balance.</p><div class="fg" style="margin-top:24px">'+F("portal_cid","Customer ID","text","")+F("portal_pin","PIN","password","")+'</div><div class="row"><button class="btn pri sp" onclick="portalLogin()">Login</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">Customer access is <b>view-only</b>. Customers cannot add, edit or delete payments.</div></div>'
 }
 function route(){var m=location.hash.match(/^#customer\/(.+)$/);view=m?m[1]:"";armed=null;if(location.hash==="#portal"){view="";render();return}render();window.scrollTo(0,0)}
@@ -189,7 +192,7 @@ function render(){
   var T=DB.reduce(function(t,c){var k=calc(c);t.paid+=k.paid;t.pend+=k.pend;t.pw+=k.pendW;return t},{paid:0,pend:0,pw:0});
   a.innerHTML='<div class="grid">'+[["Total customers",DB.length,"Active collection accounts"],["Total collected",inr(T.paid),"Recorded payments"],["Total pending",inr(T.pend),"Outstanding amount"],["Pending weeks",T.pw,"Across all customers"]].map(function(s){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
   '<div class="sec"><h2>Customers ('+DB.length+')</h2><p>Tap a customer to open their collection account.</p><input id="srch" placeholder="Search by name or phone" value="'+esc(q)+'" oninput="q=this.value.toLowerCase();list()"><div class="row" id="chips" style="margin:12px 0 6px"></div><div id="lst"></div></div>'+
-  '<div class="row" style="margin-top:14px"><button class="btn sm" onclick="backup()">Backup &amp; restore</button></div>';
+  '<div class="row" style="margin-top:14px"><button class="btn sm" onclick="backup()">Backup &amp; restore</button><button class="btn sm" id="installBtn" style="display:none" onclick="installApp()">Install App</button></div>';
   chips();list();return;
  }
  var c=DB.filter(function(x){return x.id===view})[0];if(!c){go("");return}
@@ -204,8 +207,8 @@ function render(){
  '<div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;font-size:13px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div>'+
  '<div class="row" style="margin-top:14px"><button class="btn pri" onclick="payForm(\''+c.id+'\')">+ Add payment</button><button class="btn" onclick="custForm(\''+c.id+'\')">Edit customer</button>'+(c.phone?'<a class="btn" href="tel:'+esc(c.phone)+'">Call</a><a class="btn" target="_blank" rel="noopener" href="'+wa(c,k)+'">WhatsApp reminder</a>':'')+'<button class="btn del sp" onclick="delC(\''+c.id+'\',this)">Delete customer</button></div>'+
  '<div class="grid">'+[["Loan amount",inr(c.loan),"Original principal"],["Total payable",inr(k.payable),inr(c.perWeek)+" × "+c.weeks+" weeks"],["Missed weeks",k.miss,inr(k.miss*c.perWeek)+" overdue"],["Weeks remaining",k.pendW,"Until account closes"]].map(function(s,i){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v"'+(i===2&&k.miss?' '+R:'')+'>'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
- '<div class="sec"><h2>Week-by-week tracker</h2><p>Every payable week of this loan at a glance.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
- scheduleTable(c,false)+
+ '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = paid. Orange = missed or carried over beyond the original payable weeks.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
+
  '<div class="sec"><h2>Payment history</h2><p>Pending balance reduces with every paid entry. Edit or remove any entry.</p>'+
  (ps.length?'<div class="tw"><table><thead><tr><th>Date</th><th>Week</th><th>Mode</th><th>Status</th><th>Amount</th><th>Balance</th><th></th></tr></thead><tbody>'+ps.map(function(p){var u=p.type==="unpaid";return '<tr><td>'+fmt(p.date)+'</td><td><span class="tag" '+(u?'style="background:rgba(212,96,76,.18);color:var(--miss)"':'')+'>Week '+p.week+'</span></td><td>'+(u?'-':esc(p.mode))+'</td><td>'+(u?'<b '+R+'>Unpaid</b>':p.type==="hist"?"Historical":"Paid")+'</td><td>'+(u?'<b '+R+'>₹0</b>':'<b>'+inr(p.amt)+'</b>')+'</td><td>'+(p.type==="paid"?inr(B[p.id]):'-')+'</td><td style="white-space:nowrap"><button class="btn sm" onclick="payForm(\''+c.id+'\',\''+p.id+'\')">Edit</button> <button class="btn sm del" onclick="delP(\''+c.id+'\',\''+p.id+'\',this)">Delete</button></td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">No payment rows yet.</div>')+'</div>'+
  ((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
@@ -230,8 +233,6 @@ function custForm(id){
  F("f_name","Customer name","text",c.name)+F("f_cid","Customer ID","text",c.customerId||"")+F("f_pin","PIN","password","")+F("f_phone","Contact no","tel",c.phone)+
  F("f_loan","Loan amount (₹)","number",c.loan,'min="0"')+F("f_pw","Per week (₹)","number",c.perWeek,'min="1"')+
  F("f_wk","Total payable weeks","number",c.weeks,'min="1"')+F("f_date","Date loan taken","date",c.date)+
- '<div class="full">'+selDay("f_day","Weekly collection day",c.collectionWeekday==null?4:+c.collectionWeekday)+'</div>'+
- '<div class="note full">Week 1 is the first selected weekday after the loan date. Later weeks remain on the same weekday even if a previous week is unpaid.</div>'+
  '<div class="hd">Old customer? Enter what was already paid</div>'+
  F("f_hp","Historical paid weeks","number",c.hPaid,'min="0"')+F("f_hm","Historical missed weeks","number",c.hMiss,'min="0"')+
  '<div class="full">'+F("f_ha","Historical paid amount (optional)","number",c.hAmt,'min="0"')+'</div>'+
@@ -240,7 +241,7 @@ function custForm(id){
 }
 async function saveC(id){
  var g=function(i){return $(i).value.trim()};
- var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),collectionWeekday:+g("f_day"),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
+ var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),collectionWeekday:(c.collectionWeekday==null?4:+c.collectionWeekday),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
  var pin=g("f_pin");
  var e=!o.name?"Enter the customer name.":!o.customerId?"Enter a Customer ID.":(!id&&!pin)?"Set a PIN for this customer.":!(o.perWeek>0)?"Enter the per week amount.":!(o.weeks>0)?"Enter the total payable weeks.":(o.hPaid+o.hMiss>o.weeks)?"Paid + missed weeks cannot exceed total weeks.":"";
  if(e){$("err").textContent=e;return}
@@ -256,7 +257,7 @@ function payForm(cid,pid){
  var sel=function(id,l,opts,v){return '<div><label>'+l+'<select id="'+id+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===v?" selected":"")+'>'+o[1]+'</option>'}).join("")+'</select></label></div>'};
  open_('<h2>'+(pid?"Edit payment":"Add payment")+'</h2><div class="fg">'+
  F("p_date","Payment date","date",p.date)+F("p_amt","Amount paid (₹)","number",p.amt,'min="0"')+
- sel("p_mode","Payment mode",["Cash","UPI","Online","Bank Transfer"].map(function(m){return[m,m]}),p.mode)+F("p_wk","Week no.","number",p.week,'min="1" max="'+c.weeks+'"')+
+ sel("p_mode","Payment mode",["Cash","UPI","Online","Bank Transfer"].map(function(m){return[m,m]}),p.mode)+F("p_wk","Week no.","number",p.week,'min="1" max="'+trackerItems(c).length+'"')+
  '<div class="full">'+sel("p_type","Payment type",[["paid","Paid week"],["unpaid","Unpaid (missed week)"],["hist","Historical paid week"]],p.type)+'</div>'+
  '<div class="note full">Unpaid weeks are saved as ₹0 and shown in red. Historical rows add dates to weeks already counted in setup, so they are not counted twice.</div></div>'+
  '<div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="saveP(\''+cid+'\',\''+(pid||"")+'\')">Save payment</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
@@ -265,13 +266,18 @@ function payForm(cid,pid){
 async function saveP(cid,pid){
  var c=DB.filter(function(x){return x.id===cid})[0];
  var o={date:$("p_date").value,amt:+$("p_amt").value,mode:$("p_mode").value,week:+$("p_wk").value,type:$("p_type").value};
- if(!o.date||!(o.amt>=0)||!(o.week>=1&&o.week<=c.weeks)){$("err").textContent="Enter a date, amount and a week between 1 and "+c.weeks+".";return}
+ var maxWeek=trackerItems(c).length;if(!o.date||!(o.amt>=0)||!(o.week>=1&&o.week<=maxWeek)){$("err").textContent="Enter a date, amount and a week between 1 and "+maxWeek+".";return}
  if(pid){var p=c.pays.filter(function(x){return x.id===pid})[0];for(var k in o)p[k]=o[k]}else{o.id=uid();c.pays.push(o)}
  if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await cloudLoad()}else save();close_();render();
 }
 function arm(key,b){if(armed===key)return true;armed=key;var t=b.textContent;b.textContent="Tap again";setTimeout(function(){if(armed===key){armed=null;b.textContent=t}},3000);return false}
 async function delP(cid,pid,b){if(!arm(pid,b))return;var c=DB.filter(function(x){return x.id===cid})[0];c.pays=c.pays.filter(function(x){return x.id!==pid});if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await cloudLoad()}else save();armed=null;render()}
 async function delC(cid,b){if(!arm(cid,b))return;if(sb){var ok=await cloudDelete(cid);if(!ok)return}DB=DB.filter(function(x){return x.id!==cid});save();go("")}
+var deferredInstallPrompt=null;
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferredInstallPrompt=e;var b=$("installBtn");if(b)b.style.display="inline-block"});
+async function installApp(){if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;var b=$("installBtn");if(b)b.style.display="none"}
+window.addEventListener("appinstalled",function(){var b=$("installBtn");if(b)b.style.display="none"});
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(e){console.warn("PWA service worker:",e)})})}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")close_()});
 initCloud();
 </script></body></html>

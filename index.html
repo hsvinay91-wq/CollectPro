@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CollectPro">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>CollectPro — Cloud v16 Telugu</title>
+<title>CollectPro — Cloud v18 Telugu</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -112,6 +112,33 @@ a.btn{text-decoration:none;display:inline-block}
 
 @media print{.btn{display:none}}
 
+
+@media(max-width:560px){
+ .ov{padding:12px 10px;align-items:flex-start;-webkit-overflow-scrolling:touch}
+ .ov.on{display:flex}
+ .modal{width:100%;max-height:calc(100dvh - 24px);overflow:auto;-webkit-overflow-scrolling:touch;padding:16px;border-radius:18px}
+ .modal .ph-list{padding-bottom:4px}
+}
+
+
+.ph-view{transition:transform .16s ease,box-shadow .16s ease}
+.ph-view:active{transform:scale(.98);box-shadow:0 6px 18px rgba(201,164,90,.18)}
+
+
+/* CollectPro customer attraction animations */
+.countup-ready{opacity:.98}
+.portal-progress{overflow:hidden;position:relative}
+.portal-progress:after{content:"";position:absolute;top:0;bottom:0;width:80px;left:-90px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);animation:goldSweep 2.8s ease-in-out infinite}
+@keyframes goldSweep{0%{left:-90px}55%,100%{left:110%}}
+.ph-row{transition:transform .18s ease,background .18s ease}
+.ph-row:active{transform:scale(.985);background:rgba(201,164,90,.06)}
+.portal-hero .n.g,.portal-hero .n:not(.g){font-variant-numeric:tabular-nums}
+.completion-card{margin-top:14px;padding:14px 16px;border:1px solid rgba(201,164,90,.35);border-radius:16px;background:linear-gradient(135deg,rgba(201,164,90,.13),rgba(255,255,255,.03));display:flex;align-items:center;gap:12px;animation:completionIn .8s ease both}
+.completion-icon{font-size:26px;animation:celebratePop 1.1s ease both}
+@keyframes completionIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes celebratePop{0%{transform:scale(.4) rotate(-12deg);opacity:0}55%{transform:scale(1.18) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@media(prefers-reduced-motion:reduce){.portal-progress:after{animation:none}.completion-card,.completion-icon{animation:none}.ph-row{transition:none}}
+
 /* Customer portal premium polish */
 .portal-page{animation:portalFade .55s ease both}
 .portal-hero{position:relative;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.18);animation:portalRise .65s ease both}
@@ -145,7 +172,7 @@ a.btn{text-decoration:none;display:inline-block}
 </div>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <script>
-var KEY="collectpro_v16",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en";
+var KEY="collectpro_v18",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en";
 var SUPABASE_URL="https://haqjtrcwhuoqwqpoanij.supabase.co";
 var SUPABASE_PUBLISHABLE_KEY="sb_publishable_ASbs_DhL_rRfPWd1grUq6Q_7-I87djF";
 var sb=null;
@@ -332,6 +359,8 @@ function portalView(){
  if(portalData){
   var c=portalData,k=calc(c),st=strip(c);
   var status=k.done?pt("completed"):pt("active");
+  var paidTarget=Math.round(Number(k.paid)||0), pendTarget=Math.round(Number(k.pend)||0);
+  var completion=k.done?'<div class="completion-card"><div class="completion-icon">🎉</div><div><b>'+pt("completed")+'</b><div style="font-size:12px;color:var(--muted);margin-top:2px">'+(portalLang==="te"?"అభినందనలు! ఈ లోన్‌లో అన్ని వారాలు పూర్తయ్యాయి.":"Congratulations! All payable weeks are completed.")+'</div></div></div>':'';
   return '<div class="portal-page">'+
   '<div class="hero portal-hero"><div class="row"><div>'+
   '<div class="portal-welcome">'+pt("welcome")+' 👋</div>'+
@@ -340,9 +369,9 @@ function portalView(){
   '</div><div class="row sp" style="align-self:flex-start">'+
   '<button class="btn portal-lang" onclick="togglePortalLang()">'+pt("language")+'</button>'+
   '<span class="badge sp'+(k.done?' o':'')+'">'+status+'</span></div></div>'+
-  '<div class="portal-big big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">'+pt("remaining")+'</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">'+pt("paidAmount")+'</div></div></div>'+
-  '<div class="bar portal-progress"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' '+pt("weeksPaid")+' / '+c.weeks+'</span><span class="sp">'+k.pct+'%</span></div>'+
-  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+'</div></div>'+
+  '<div class="portal-big big"><div><div class="n g countup-ready" data-count="'+pendTarget+'">'+inr(0)+'</div><div class="l">'+pt("remaining")+'</div></div><div><div class="n countup-ready" data-count="'+paidTarget+'">'+inr(0)+'</div><div class="l">'+pt("paidAmount")+'</div></div></div>'+
+  '<div class="bar portal-progress"><b style="width:0%" data-progress="'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' '+pt("weeksPaid")+' / '+c.weeks+'</span><span class="sp">'+k.pct+'%</span></div>'+
+  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+'</div>'+completion+'</div>'+
   '<div class="grid">'+[
    [pt("loanAmount"),inr(c.loan),pt("originalLoan")],
    [pt("weeklyAmount"),inr(c.perWeek),pt("eachWeek")],
@@ -355,6 +384,21 @@ function portalView(){
   '</div>';
  }
  return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="row" style="justify-content:space-between"><div class="av" style="width:64px;height:64px;font-size:20px">CP</div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid","Customer ID","text","")+F("portal_pin","PIN","password","")+'</div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
+}
+function animateCustomerPortal(){
+  if(!portalData)return;
+  document.querySelectorAll(".countup-ready").forEach(function(el){
+    var target=Number(el.getAttribute("data-count")||0),start=0,duration=900,t0=performance.now();
+    function tick(now){
+      var p=Math.min(1,(now-t0)/duration), eased=1-Math.pow(1-p,3);
+      var value=Math.round(start+(target-start)*eased);
+      el.textContent=inr(value);
+      if(p<1)requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+  var bar=document.querySelector(".portal-progress b");
+  if(bar)setTimeout(function(){bar.style.width=bar.getAttribute("data-progress")||"0%"},120);
 }
 function route(){var m=location.hash.match(/^#customer\/(.+)$/);view=m?m[1]:"";armed=null;if(location.hash==="#portal"){view="";render();return}render();window.scrollTo(0,0)}
 function go(v){var h=v?"#customer/"+v:"";if(location.hash===h||(!v&&(location.hash===""||location.hash==="#")))route();else location.hash=h||"#"}
@@ -448,7 +492,10 @@ function paymentHistoryHtml(c,adminMode){
     '</div>';
 }
 function viewAllPayments(cid,adminMode){
-  var c=DB.filter(function(x){return x.id===cid})[0]; if(!c)return;
+  var c=null;
+  if(portalData && portalData.id===cid)c=portalData;
+  if(!c)c=DB.filter(function(x){return x.id===cid})[0];
+  if(!c)return;
   var rows=paymentRows(c);
   var body=rows.length?'<div class="ph-list">'+rows.map(function(p){return paymentRowHtml(c,p,adminMode)}).join("")+'</div>':'<div class="ph-empty">No payment rows yet.</div>';
   open_('<div class="row"><div><h2>'+pt("allPayments")+'</h2><p style="color:var(--muted);font-size:13px;margin:4px 0 0">'+esc(c.name)+' · '+rows.length+' '+(rows.length===1?pt("entry"):pt("entries"))+'</p></div><button class="btn sm sp" onclick="close_()">'+pt("close")+'</button></div><div style="margin-top:14px">'+body+'</div>');
@@ -521,5 +568,14 @@ async function installApp(){if(!deferredInstallPrompt)return;deferredInstallProm
 window.addEventListener("appinstalled",function(){var b=$("installBtn");if(b)b.style.display="none"});
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(e){console.warn("PWA service worker:",e)})})}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")close_()});
+
+(function(){
+  var oldRender=render;
+  render=function(){
+    oldRender();
+    if(portalData)setTimeout(animateCustomerPortal,40);
+  };
+})();
+
 startApp();
 </script></body></html>

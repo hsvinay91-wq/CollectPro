@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CollectPro">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>CollectPro — Cloud</title>
+<title>CollectPro — Cloud v14</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -63,6 +63,30 @@ td{padding:10px 6px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
  .tw td:last-child{justify-content:flex-end;padding-top:8px}.tw td:last-child::before{display:none}
  .tw .btn.sm{padding:6px 9px}
 }
+
+/* Compact payment history */
+.ph-list{display:grid;gap:0;margin-top:8px}
+.ph-row{display:grid;grid-template-columns:minmax(88px,1.05fr) 56px minmax(78px,.9fr) minmax(74px,.8fr) 20px;align-items:center;gap:8px;padding:13px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.ph-row:last-child{border-bottom:0}
+.ph-date{font-weight:600;font-size:13px;line-height:1.25}
+.ph-date small{display:block;color:var(--muted);font-weight:500;font-size:11px;margin-top:2px}
+.ph-week{justify-self:start;font-size:11.5px;font-weight:700;padding:6px 8px;border-radius:9px;background:var(--in);color:var(--text)}
+.ph-status{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+.ph-dot{width:9px;height:9px;border-radius:50%;background:var(--paid);box-shadow:0 0 0 3px rgba(46,159,122,.14);flex:none}
+.ph-status.unpaid{color:var(--miss)}
+.ph-status.unpaid .ph-dot{background:var(--miss);box-shadow:0 0 0 3px rgba(212,96,76,.14)}
+.ph-amount{text-align:right;font-weight:700;font-size:14px}
+.ph-arrow{text-align:right;color:var(--muted);font-size:20px}
+.ph-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+.ph-count{font-size:11.5px;font-weight:700;color:var(--muted);padding:6px 9px;border:1px solid var(--line);border-radius:99px;background:var(--in);white-space:nowrap}
+.ph-view{width:100%;margin-top:12px;border:1px solid var(--gold);background:linear-gradient(180deg,rgba(201,164,90,.16),rgba(201,164,90,.06));color:var(--gold);padding:11px 14px;border-radius:12px;font-weight:700;cursor:pointer}
+.ph-view .arr{float:right;font-size:18px;line-height:14px}
+.ph-empty{padding:20px 8px;text-align:center;color:var(--muted)}
+@media(max-width:420px){
+ .ph-row{grid-template-columns:minmax(82px,1.05fr) 48px minmax(68px,.85fr) minmax(62px,.7fr) 12px;gap:5px;padding:12px 2px}
+ .ph-week{padding:5px 6px}.ph-status{font-size:11.5px}.ph-amount{font-size:13px}.ph-arrow{font-size:18px}
+}
+
 .tag{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(201,164,90,.2)}
 .empty{text-align:center;padding:30px 10px;color:var(--muted)}
 .ov{position:fixed;inset:0;background:rgba(8,10,24,.6);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:24px 14px;z-index:9}
@@ -79,6 +103,13 @@ a.btn{text-decoration:none;display:inline-block}
 .chip.on{background:var(--gold);border-color:var(--gold);color:#1A1608}
 .ring{width:48px;height:48px;border-radius:50%;background:conic-gradient(var(--gold) var(--p),var(--pend) 0);display:grid;place-items:center;flex:none}
 .ring .av{width:40px;height:40px;border:3px solid var(--card)}
+
+@media(max-width:560px){
+ .modal{padding:16px}
+ .modal .ph-row{grid-template-columns:minmax(72px,1fr) 42px minmax(64px,.9fr) 58px 10px;gap:5px}
+ .modal .ph-date{font-size:12px}.modal .ph-status{font-size:11px}.modal .ph-amount{font-size:12px}
+}
+
 @media print{.btn{display:none}}
 </style></head><body>
 <div class="wrap">
@@ -88,7 +119,7 @@ a.btn{text-decoration:none;display:inline-block}
 </div>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <script>
-var KEY="collectpro_v13",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="";
+var KEY="collectpro_v14",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="";
 var SUPABASE_URL="https://haqjtrcwhuoqwqpoanij.supabase.co";
 var SUPABASE_PUBLISHABLE_KEY="sb_publishable_ASbs_DhL_rRfPWd1grUq6Q_7-I87djF";
 var sb=null;
@@ -138,13 +169,19 @@ function nextWeekDate(loanDate,weekNo,weekday){
 function trackerItems(c){
  var base=[],i;
  for(i=1;i<=c.weeks;i++)base.push({week:i,status:"upcoming"});
- c.pays.forEach(function(p){if(p.week>=1&&p.week<=c.weeks){if((p.type==="paid"||p.type==="hist")&&base[p.week-1].status!=="paid")base[p.week-1].status="paid";if(p.type==="unpaid"&&base[p.week-1].status!=="paid")base[p.week-1].status="unpaid";}});
- var unresolved=base.filter(function(x){return x.status==="unpaid"}).length;
- for(i=1;i<=unresolved;i++){
-   var carryWeek=c.weeks+i,carryStatus="carry";
-   c.pays.forEach(function(p){if(+p.week===carryWeek && (p.type==="paid"||p.type==="hist"))carryStatus="paid";});
-   base.push({week:carryWeek,status:carryStatus});
- }
+ c.pays.forEach(function(p){
+   if(p.week>=1&&p.week<=c.weeks){
+     if(p.type==="paid"||p.type==="hist")base[p.week-1].status="paid";
+     else if(p.type==="unpaid"&&base[p.week-1].status!=="paid")base[p.week-1].status="unpaid";
+   }
+ });
+ var debt=base.filter(function(x){return x.status==="unpaid"});
+ debt.forEach(function(d,i){
+   var cw=c.weeks+i+1;
+   var cp=c.pays.filter(function(p){return +p.week===cw});
+   var paid=cp.some(function(p){return p.type==="paid"||p.type==="hist"});
+   base.push({week:cw,status:paid?"paid":"carry"});
+ });
  return base;
 }
 function strip(c){return trackerItems(c).map(function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""});}
@@ -153,8 +190,17 @@ function portalAdmin(){location.hash="#"}
 async function portalLogin(){var cid=$("portal_cid").value.trim(),pin=$("portal_pin").value.trim();if(!cid||!pin){$("perr").textContent="Enter Customer ID and PIN.";return}if(!sb){$("perr").textContent="Cloud connection is not configured yet.";return}var r=await sb.rpc("collectpro_customer_login",{p_customer_id:cid,p_pin:pin});if(r.error){$("perr").textContent=r.error.message;return}if(!r.data||!r.data.length){$("perr").textContent="Invalid Customer ID or PIN.";return}portalData=mapRow(r.data[0]);portalError="";render()}
 function portalLogout(){portalData=null;portalError="";render()}
 function portalView(){
- if(portalData){var c=portalData,k=calc(c),st=strip(c),ps=c.pays.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))});return '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>Customer ID: '+esc(c.customerId||"")+'</small></div><span class="badge sp'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div><div class="big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">Remaining balance</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">Paid amount</div></div></div><div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div><div class="grid">'+[["Loan amount",inr(c.loan),"Original loan"],["Weekly amount",inr(c.perWeek),"Each week"],["Total payable",inr(k.payable),"Per week × weeks"],["Weeks remaining",k.pendW,"Remaining" ]].map(function(x){return '<div class="stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div><div class="sec"><h2>Week-by-week tracker</h2><p>Green = paid. Orange = missed or carry-over weeks.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Pending / carry-over</span><span style="--c:var(--pend)">Upcoming</span></div></div><div class="sec"><h2>Payment history</h2><p>View-only. Payments can only be added or changed by Admin.</p>'+(ps.length?'<div class="tw"><table><thead><tr><th>Date</th><th>Week</th><th>Status</th><th>Amount</th></tr></thead><tbody>'+ps.map(function(p){return '<tr><td>'+fmt(p.date)+'</td><td>Week '+p.week+'</td><td>'+(p.type==="unpaid"?'<b style="color:var(--miss)">Unpaid</b>':p.type==="hist"?"Historical":"Paid")+'</td><td>'+inr(p.amt||0)+'</td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">No payments recorded yet.</div>')+'</div><div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">Logout</button></div>'}
- return '<div class="sec" style="max-width:520px;margin:30px auto"><div class="av" style="width:64px;height:64px;font-size:20px;margin-bottom:18px">CP</div><h1 style="font-size:34px">Customer Portal</h1><p style="font-size:15px;margin-top:10px">View your weekly collection, payment progress and remaining balance.</p><div class="fg" style="margin-top:24px">'+F("portal_cid","Customer ID","text","")+F("portal_pin","PIN","password","")+'</div><div class="row"><button class="btn pri sp" onclick="portalLogin()">Login</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">Customer access is <b>view-only</b>. Customers cannot add, edit or delete payments.</div></div>'
+ if(portalData){
+  var c=portalData,k=calc(c),st=strip(c);
+  return '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>Customer ID: '+esc(c.customerId||"")+'</small></div><span class="badge sp'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div>'+
+  '<div class="big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">Remaining balance</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">Paid amount</div></div></div>'+
+  '<div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div>'+
+  '<div class="grid">'+[["Loan amount",inr(c.loan),"Original loan"],["Weekly amount",inr(c.perWeek),"Each week"],["Total payable",inr(k.payable),"Per week × weeks"],["Weeks remaining",k.pendW,"Remaining"]].map(function(x){return '<div class="stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
+  '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = paid. Orange = missed or carry-over weeks.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Pending / carry-over</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
+  paymentHistoryHtml(c,false)+
+  '<div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">Logout</button></div>';
+ }
+ return '<div class="sec" style="max-width:520px;margin:30px auto"><div class="av" style="width:64px;height:64px;font-size:20px;margin-bottom:18px">CP</div><h1 style="font-size:34px">Customer Portal</h1><p style="font-size:15px;margin-top:10px">View your weekly collection, payment progress and remaining balance.</p><div class="fg" style="margin-top:24px">'+F("portal_cid","Customer ID","text","")+F("portal_pin","PIN","password","")+'</div><div class="row"><button class="btn pri sp" onclick="portalLogin()">Login</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">Customer access is <b>view-only</b>. Customers cannot add, edit or delete payments.</div></div>';
 }
 function route(){var m=location.hash.match(/^#customer\/(.+)$/);view=m?m[1]:"";armed=null;if(location.hash==="#portal"){view="";render();return}render();window.scrollTo(0,0)}
 function go(v){var h=v?"#customer/"+v:"";if(location.hash===h||(!v&&(location.hash===""||location.hash==="#")))route();else location.hash=h||"#"}
@@ -209,10 +255,49 @@ function render(){
  '<div class="grid">'+[["Loan amount",inr(c.loan),"Original principal"],["Total payable",inr(k.payable),inr(c.perWeek)+" × "+c.weeks+" weeks"],["Missed weeks",k.miss,inr(k.miss*c.perWeek)+" overdue"],["Weeks remaining",k.pendW,"Until account closes"]].map(function(s,i){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v"'+(i===2&&k.miss?' '+R:'')+'>'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
  '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = paid. Orange = missed or carried over beyond the original payable weeks.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
 
- '<div class="sec"><h2>Payment history</h2><p>Pending balance reduces with every paid entry. Edit or remove any entry.</p>'+
- (ps.length?'<div class="tw"><table><thead><tr><th>Date</th><th>Week</th><th>Mode</th><th>Status</th><th>Amount</th><th>Balance</th><th></th></tr></thead><tbody>'+ps.map(function(p){var u=p.type==="unpaid";return '<tr><td>'+fmt(p.date)+'</td><td><span class="tag" '+(u?'style="background:rgba(212,96,76,.18);color:var(--miss)"':'')+'>Week '+p.week+'</span></td><td>'+(u?'-':esc(p.mode))+'</td><td>'+(u?'<b '+R+'>Unpaid</b>':p.type==="hist"?"Historical":"Paid")+'</td><td>'+(u?'<b '+R+'>₹0</b>':'<b>'+inr(p.amt)+'</b>')+'</td><td>'+(p.type==="paid"?inr(B[p.id]):'-')+'</td><td style="white-space:nowrap"><button class="btn sm" onclick="payForm(\''+c.id+'\',\''+p.id+'\')">Edit</button> <button class="btn sm del" onclick="delP(\''+c.id+'\',\''+p.id+'\',this)">Delete</button></td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">No payment rows yet.</div>')+'</div>'+
- ((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
+ paymentHistoryHtml(c,true)+((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
 }
+
+function paymentRows(c){
+  return c.pays.map(function(p,i){return {p:p,i:i}}).sort(function(a,b){
+    var d=String(b.p.date||"").localeCompare(String(a.p.date||""));
+    return d!==0?d:b.i-a.i;
+  }).map(function(x){return x.p});
+}
+function paymentDay(s){
+  if(!s)return "";
+  var d=new Date(s+"T00:00:00");
+  return Number.isNaN(d.getTime())?"":d.toLocaleDateString("en-IN",{weekday:"short"});
+}
+function paymentRowHtml(c,p,adminMode){
+  var u=p.type==="unpaid";
+  var status=u?"Unpaid":(p.type==="hist"?"Historical":"Paid");
+  var statusClass=u?"unpaid":"";
+  var action=adminMode ? ' onclick="payForm(\\''+c.id+'\\',\\''+(p.id||"")+'\\')"' : '';
+  return '<div class="ph-row"'+action+'>'+
+    '<div class="ph-date">'+fmt(p.date)+'<small>'+paymentDay(p.date)+'</small></div>'+
+    '<div class="ph-week">W'+esc(p.week)+'</div>'+
+    '<div class="ph-status '+statusClass+'"><span class="ph-dot"></span>'+status+'</div>'+
+    '<div class="ph-amount">'+(u?inr(0):inr(p.amt))+'</div>'+
+    '<div class="ph-arrow">›</div>'+
+  '</div>';
+}
+function paymentHistoryHtml(c,adminMode){
+  var rows=paymentRows(c),recent=rows.slice(0,5);
+  return '<div class="sec">'+
+    '<div class="ph-head"><div><h2>Payment history</h2><p style="margin-bottom:0">'+(adminMode?"Recent collections. Tap a row to edit.":"Your recent collections.")+'</p></div>'+
+    '<span class="ph-count">'+rows.length+' '+(rows.length===1?"entry":"entries")+'</span></div>'+
+    (recent.length?'<div class="ph-list">'+recent.map(function(p){return paymentRowHtml(c,p,adminMode)}).join("")+'</div>':'<div class="ph-empty">No payment rows yet.</div>')+
+    (rows.length>5?'<button class="ph-view" onclick="viewAllPayments(\\''+c.id+'\\','+(adminMode?'true':'false')+')">View all payments <span class="arr">›</span></button>':'')+
+    '</div>';
+}
+function viewAllPayments(cid,adminMode){
+  var c=DB.filter(function(x){return x.id===cid})[0]; if(!c)return;
+  var rows=paymentRows(c);
+  var body=rows.length?'<div class="ph-list">'+rows.map(function(p){return paymentRowHtml(c,p,adminMode)}).join("")+'</div>':'<div class="ph-empty">No payment rows yet.</div>';
+  open_('<div class="row"><div><h2>All payments</h2><p style="color:var(--muted);font-size:13px;margin:4px 0 0">'+esc(c.name)+' · '+rows.length+' entries</p></div><button class="btn sm sp" onclick="close_()">Close</button></div><div style="margin-top:14px">'+body+'</div>');
+}
+
 function backup(){open_('<h2>Backup &amp; restore</h2><p style="color:var(--muted);font-size:13px;margin:6px 0 12px">Copy this text and keep it safe (Notes, WhatsApp to yourself). To move data to another device, paste it here and tap Restore. Restore replaces current data.</p><textarea id="bk" rows="7" onfocus="this.select()">'+esc(JSON.stringify(DB))+'</textarea><div class="row" style="margin-top:12px"><button class="btn" onclick="close_()">Close</button><button class="btn pri sp" onclick="restore()">Restore from text</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
 function restore(){try{var d=JSON.parse($("bk").value);if(!Array.isArray(d)||d.some(function(c){return !c.id||!c.name||!Array.isArray(c.pays)}))throw 0;DB=d;save();close_();go("")}catch(e){$("err").textContent="This text is not a valid CollectPro backup."}}
 
@@ -241,7 +326,7 @@ function custForm(id){
 }
 async function saveC(id){
  var g=function(i){return $(i).value.trim()};
- var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),collectionWeekday:(c.collectionWeekday==null?4:+c.collectionWeekday),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
+ var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),collectionWeekday:(id?((DB.filter(function(x){return x.id===id})[0].collectionWeekday==null)?4:+DB.filter(function(x){return x.id===id})[0].collectionWeekday):4),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
  var pin=g("f_pin");
  var e=!o.name?"Enter the customer name.":!o.customerId?"Enter a Customer ID.":(!id&&!pin)?"Set a PIN for this customer.":!(o.perWeek>0)?"Enter the per week amount.":!(o.weeks>0)?"Enter the total payable weeks.":(o.hPaid+o.hMiss>o.weeks)?"Paid + missed weeks cannot exceed total weeks.":"";
  if(e){$("err").textContent=e;return}

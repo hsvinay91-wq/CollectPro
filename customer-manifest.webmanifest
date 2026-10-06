@@ -1,0 +1,10 @@
+{
+  "name": "CollectPro Customer Portal",
+  "short_name": "CollectPro",
+  "start_url": "./customer.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070B1D",
+  "theme_color": "#070B1D",
+  "description": "CollectPro customer weekly collection portal"
+}

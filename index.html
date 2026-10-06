@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CollectPro">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>CollectPro — Cloud v24 Premium</title>
+<title>CollectPro — Weekly Collections</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -649,9 +649,22 @@ body:after{
 @media(max-width:1100px){.dashboard-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.dashboard-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.dashboard-cards{grid-template-columns:1fr}}
+
+/* v25 collection workspace */
+
+
+/* v26 motion and icon system */
+body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:none;width:45vw;height:45vw;border-radius:50%;filter:blur(70px);opacity:.12;animation:cpAmbient 22s ease-in-out infinite alternate}body::before{background:#5e8ee8;top:-20vw;left:-12vw}body::after{background:var(--gold);bottom:-25vw;right:-10vw;animation-delay:-10s}.wrap{isolation:isolate}.cp-icon{width:17px;height:17px;vertical-align:-3px;display:inline-block;flex:none;margin-right:7px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.stat .cp-icon{color:var(--gold);width:19px;height:19px}.cp-enter{animation:cpPage .32s ease both}.btn,.chip{transition:background .18s,border-color .18s,transform .18s}.btn:hover{border-color:var(--gold);transform:translateY(-1px)}.btn:active{transform:scale(.97)}.cp-reconcile{display:grid;grid-template-columns:1fr 1fr;gap:14px}.cp-reconcile>div{padding:15px;background:var(--in);border:1px solid var(--line);border-radius:12px}.cp-reconcile small{display:block;color:var(--muted);font-size:11px;margin-top:6px}.cp-check{padding:12px 0;border-top:1px solid var(--line);font-size:12px}.cp-check:first-child{border-top:0}.cp-note{font-size:11px;color:var(--muted);margin:12px 0 0}.cp-check b{color:var(--miss)}@keyframes cpAmbient{from{transform:translate3d(0,0,0)}to{transform:translate3d(8vw,5vw,0)}}@keyframes cpPage{from{opacity:.4;transform:translateY(9px)}to{opacity:1;transform:none}}@media(max-width:560px){.cp-reconcile{grid-template-columns:1fr}.cp-icon{width:15px;height:15px}}@media(prefers-reduced-motion:reduce){body::before,body::after{animation:none}.cp-enter{animation:none}.btn,.chip{transition:none}.btn:hover,.btn:active{transform:none}}
+
+
+/* Payment timeline: due, paid, amount, and remaining balance */
+.ph-row{grid-template-columns:minmax(130px,1.45fr) 48px minmax(72px,.85fr) minmax(112px,1fr) 18px;gap:7px}.ph-date>span{display:block;font-size:12px;font-weight:700}.ph-date small{font-size:10px}.ph-amount b{display:block}.ph-amount small{display:block;font-size:10px;font-weight:500;color:var(--muted);white-space:nowrap}.ph-arrow{font-size:15px}
+@media(max-width:700px){.ph-row{grid-template-columns:minmax(108px,1.3fr) 42px minmax(65px,.8fr) minmax(100px,1fr) 14px;gap:5px}.ph-date>span{font-size:11px}.ph-amount{font-size:12px}.ph-amount small{font-size:9px}}
+@media(max-width:420px){.ph-row{grid-template-columns:minmax(102px,1.2fr) 39px minmax(61px,.8fr) minmax(93px,1fr) 12px;gap:4px}.ph-week{padding:5px}.ph-arrow{font-size:13px}}
+
 </style></head><body>
 <div class="wrap">
- <div class="top"><div class="brand" onclick="go(\'\')" aria-label="CollectPro home">
+ <div class="top"><div class="brand" onclick="go('')" aria-label="CollectPro home">
   <span class="brand-word">Collect<i>Pro</i></span>
 </div>
   <div class="row" id="topActions"></div></div>
@@ -824,7 +837,7 @@ var uid=function(){return "c"+Date.now().toString(36)+Math.floor(Math.random()*9
 var armed=null;
 
 function loanHistory(c){return Array.isArray(c.loanHistory)?c.loanHistory:[]}
-function loanRecordCalc(h){return calc({perWeek:+h.perWeek||0,weeks:+h.weeks||0,hPaid:+h.hPaid||0,hMiss:+h.hMiss||0,hAmt:h.hAmt==null?"":+h.hAmt,pays:Array.isArray(h.pays)?h.pays:[]})}
+function loanRecordCalc(h){return calc(h)}
 function businessTerms(x){
  var isY=/^\s*yalamanda\s*$/i.test(String(x&&x.name||''));
  var pw=Number(x&&x.perWeek)||0;
@@ -838,19 +851,15 @@ function businessTerms(x){
  if(isY){ weeks=10; cutting=0; if(pw>0) loan=pw*weeks; }
  return {loan:loan,cutting:cutting,weeks:weeks,perWeek:pw,isYalamanda:isY};
 }
-function businessCalc(x){
- var t=businessTerms(x);
- var base=calc(x);
- var payable=t.perWeek*t.weeks;
- return {paidW:base.paidW,paid:base.paid,hAmt:base.hAmt,miss:base.miss,payable:payable,pend:Math.max(payable-base.paid,0),pendW:Math.max(t.weeks-base.paidW,0),done:base.paidW>=t.weeks,pct:t.weeks?Math.min(100,Math.round(base.paidW/t.weeks*100)):0,terms:t};
-}
+function businessCalc(x){var k=calc(x);k.terms=businessTerms(x);return k}
+
 function loanProfitRate(h,k){
  var t=businessTerms(h);
  var payable=Number(k&&k.payable)||t.perWeek*t.weeks;
  var loan=t.loan,cutting=t.cutting;
  if(payable<=0||loan<=0)return 0;
  /* Net cash actually given = loan - cutting. Full-loan profit = total payable - net cash given.
-    Realized profit = collected amount × this loan's profit margin. */
+    Allocated loan margin = collected amount × this loan's profit margin. */
  return Math.max((payable-(loan-cutting))/payable,0);
 }
 function loanProfit(h,k){
@@ -860,7 +869,7 @@ function loanProfit(h,k){
 function makeLoanId(c){return "LN-"+String(c.customerId||c.name||"CUS").replace(/[^A-Za-z0-9]/g,"").slice(0,12).toUpperCase()+"-"+Date.now().toString(36).toUpperCase()}
 function archiveCurrentLoan(c){
  var k=calc(c);
- var rec={loanId:makeLoanId(c),loanAmount:+c.loan||0,perWeek:+c.perWeek||0,weeks:+c.weeks||0,loanDate:c.date||"",collectionWeekday:c.collectionWeekday==null?4:+c.collectionWeekday,hPaid:+c.hPaid||0,hMiss:+c.hMiss||0,hAmt:c.hAmt==null?"":+c.hAmt,pays:Array.isArray(c.pays)?JSON.parse(JSON.stringify(c.pays)):[],completedAt:new Date().toISOString(),totalPayable:k.payable,totalPaid:k.paid,pending:k.pend,profit:Math.max(k.paid-((+c.loan||0)-(+c.cutting||0)),0)};
+ var rec={loanId:makeLoanId(c),loanAmount:+c.loan||0,cutting:+c.cutting||0,perWeek:+c.perWeek||0,weeks:+c.weeks||0,loanDate:c.date||"",collectionWeekday:c.collectionWeekday==null?4:+c.collectionWeekday,hPaid:+c.hPaid||0,hMiss:+c.hMiss||0,hAmt:c.hAmt==null?"":+c.hAmt,pays:Array.isArray(c.pays)?JSON.parse(JSON.stringify(c.pays)):[],completedAt:new Date().toISOString(),totalPayable:k.payable,totalPaid:k.paid,pending:k.pend,profit:Math.max(k.paid-((+c.loan||0)-(+c.cutting||0)),0)};
  if(!Array.isArray(c.loanHistory))c.loanHistory=[];
  c.loanHistory.unshift(rec);
  return rec;
@@ -881,21 +890,24 @@ async function autoArchiveCompletedCurrentLoans(){
  return changed;
 }
 
-function totalPortfolioHistory(){
- var t={loans:0,loan:0,payable:0,collected:0,profit:0};
- DB.forEach(function(c){loanHistory(c).forEach(function(h){var k=loanRecordCalc(h);t.loans++;t.loan+=Number(h.loanAmount)||0;t.payable+=k.payable;t.collected+=k.paid;t.profit+=loanProfit(h,k)})});
- HIST.forEach(function(h){var k=loanRecordCalc(h);t.loans++;t.loan+=Number(h.loanAmount)||0;t.payable+=k.payable;t.collected+=k.paid;t.profit+=loanProfit(h,k)});
- return t;
+function cpHistoryRecords(){
+ var all=[],seen={};function add(h,c){var x=Object.assign({},h);x.name=x.name||(c&&c.name)||"";x.customerId=x.customerId||(c&&c.customerId)||"";
+ var key=x.loanId?"id:"+x.loanId:JSON.stringify([x.customerId,x.loanDate,x.loanAmount,x.perWeek,x.weeks,x.completedAt,x.hPaid,x.hAmt,x.pays]);
+ if(!seen[key]){seen[key]=true;all.push(x)}}
+ HIST.forEach(function(h){add(h)});DB.forEach(function(c){loanHistory(c).forEach(function(h){add(h,c)})});return all;
 }
+function totalPortfolioHistory(){return cpHistoryRecords().reduce(function(t,h){var k=calc(h);t.loans++;t.loan+=businessTerms(h).loan;t.payable+=k.payable;t.collected+=k.paid;t.profit+=loanProfit(h,k);return t},{loans:0,loan:0,payable:0,collected:0,profit:0})}
 
 function calc(c){
- var live=c.pays.filter(function(p){return p.type==="paid"});
- var paidW=(+c.hPaid||0)+live.length;
- var hAmt=c.hAmt!==""&&c.hAmt!=null?+c.hAmt:(+c.hPaid||0)*c.perWeek;
- var paid=hAmt+live.reduce(function(s,p){return s+(+p.amt||0)},0);
- var payable=c.perWeek*c.weeks,ps={};live.forEach(function(p){ps[p.week]=1});
- var miss=(+c.hMiss||0)+c.pays.filter(function(p){return p.type==="unpaid"&&!ps[p.week]}).length;
- return{paidW:paidW,paid:paid,hAmt:hAmt,miss:miss,payable:payable,pend:Math.max(payable-paid,0),pendW:Math.max(c.weeks-paidW,0),done:paidW>=c.weeks,pct:Math.min(100,Math.round(paidW/c.weeks*100))};
+ var t=businessTerms(c),pw=Math.max(0,t.perWeek),weeks=Math.max(0,t.weeks),pays=Array.isArray(c.pays)?c.pays:[];
+ var live=pays.filter(function(p){return p.type==="paid"||p.type==="hist"}),hp=Math.max(0,Number(c.hPaid)||0);
+ var hAmt=c.hAmt!==""&&c.hAmt!=null?Math.max(0,Number(c.hAmt)||0):hp*pw;
+ var paid=hAmt+live.reduce(function(s,p){return s+Math.max(0,Number(p.amt)||0)},0),payable=pw*weeks;
+ var full={},missed={};live.forEach(function(p){var w=Number(p.week);full[w]=(full[w]||0)+Math.max(0,Number(p.amt)||0)});
+ var paidW=Math.min(weeks,hp+Object.keys(full).filter(function(w){return Number(w)>hp&&full[w]+.005>=pw}).length);
+ pays.forEach(function(p){if(p.type==="unpaid"&&!(full[p.week]+.005>=pw))missed[p.week]=true});
+ var miss=Math.max(0,Number(c.hMiss)||0)+Object.keys(missed).length,pend=Math.max(payable-paid,0);
+ return {paidW:paidW,paid:paid,hAmt:hAmt,miss:miss,payable:payable,pend:pend,pendW:pw?Math.ceil(Math.max(0,pend-.005)/pw):0,done:payable>0&&pend<.005,pct:payable?Math.min(100,Math.round(paid/payable*100)):0};
 }
 
 function weekdayName(n){return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][Number(n)];}
@@ -912,34 +924,28 @@ function nextWeekDate(loanDate,weekNo,weekday){
   d.setDate(d.getDate()+delta+((Number(weekNo)-1)*7));
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
-function trackerItems(c){
- var base=[],i;
- for(i=1;i<=c.weeks;i++)base.push({week:i,status:"upcoming"});
- c.pays.forEach(function(p){
-   if(p.week>=1&&p.week<=c.weeks){
-     if(p.type==="paid"||p.type==="hist")base[p.week-1].status="paid";
-     else if(p.type==="unpaid"&&base[p.week-1].status!=="paid")base[p.week-1].status="unpaid";
-   }
- });
- /* Carry-over weeks are released one-at-a-time. If Week 13 is unpaid,
-    Week 14 is not added. Once Week 13 is paid, Week 14 can appear when
-    its real collection date arrives. */
+function trackerItems(c,asOf){
+ var terms=businessTerms(c),base=[],amounts={},i,pw=terms.perWeek,today=asOf?new Date(asOf):new Date();today.setHours(0,0,0,0);
+ for(i=1;i<=Math.min(terms.weeks,520);i++)base.push({week:i,status:"upcoming"});
+ var opening=calc(c).hAmt,hp=Math.min(base.length,Math.max(0,Number(c.hPaid)||0));
+ for(i=1;i<=hp;i++)amounts[i]=Math.min(pw,Math.max(0,opening-(i-1)*pw));
+ var hm=Math.min(base.length-hp,Math.max(0,Number(c.hMiss)||0));for(i=hp+1;i<=hp+hm;i++)base[i-1].status="unpaid";
+ (c.pays||[]).forEach(function(p){var w=Number(p.week);if(w<1||w>base.length)return;if(p.type==="paid"||p.type==="hist")amounts[w]=(amounts[w]||0)+Math.max(0,Number(p.amt)||0);else if(p.type==="unpaid")base[w-1].status="unpaid"});
+ base.forEach(function(x){if(pw>0&&(amounts[x.week]||0)+.005>=pw)x.status="paid";else if(x.status!=="unpaid"){var due=nextWeekDate(c.date,x.week,c.collectionWeekday);x.status=due&&new Date(due+"T00:00:00")<today?"unpaid":"upcoming"}});
  var debt=base.filter(function(x){return x.status==="unpaid"});
  if(debt.length){
-   var cw=c.weeks+1,weekday=(c.collectionWeekday==null?4:+c.collectionWeekday);
+   var cw=terms.weeks+1,weekday=(c.collectionWeekday==null?4:+c.collectionWeekday);
    for(var guard=0;guard<20;guard++,cw++){
-     var due=nextWeekDate(c.date,cw,weekday);
-     var today=new Date();today.setHours(0,0,0,0);
-     var dueDate=due?new Date(due+"T00:00:00"):null;
-     if(dueDate && dueDate>today)break;
-     var cp=c.pays.filter(function(p){return +p.week===cw});
-     var paid=cp.some(function(p){return p.type==="paid"||p.type==="hist"});
-     base.push({week:cw,status:paid?"paid":"carry"});
-     if(!paid)break;
+     var due=nextWeekDate(c.date,cw,weekday),dueDate=due?new Date(due+"T00:00:00"):null;
+     if(dueDate&&dueDate>today)break;
+     var cp=c.pays.filter(function(p){return +p.week===cw}),paid=cp.some(function(p){return p.type==="paid"||p.type==="hist"});
+     base.push({week:cw,status:paid?"paid":"carry"});if(!paid)break;
    }
  }
  return base;
 }
+function overdueSummary(c,asOf){var today=asOf?new Date(asOf):new Date();today.setHours(0,0,0,0);var ages=trackerItems(c,today).reduce(function(a,x){if(x.status!=="unpaid"&&x.status!=="carry")return a;var due=nextWeekDate(c.date,x.week,c.collectionWeekday),dt=due?new Date(due+"T00:00:00"):null;if(dt&&dt<today)a.push(Math.ceil((today-dt)/604800000));return a},[]);return {count:ages.length,oldest:ages.length?Math.max.apply(null,ages):0}}
+
 function strip(c){return trackerItems(c).map(function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""});}
 function portal(){location.hash="#portal"}
 function portalAdmin(){location.hash="#"}
@@ -1091,13 +1097,15 @@ function go(v){var h=v?"#customer/"+v:"";if(location.hash===h||(!v&&(location.ha
 window.addEventListener("hashchange",route);
 var q="",flt="all";
 function wa(c,k){var d=(c.phone||"").replace(/\D/g,"");if(d.length===10)d="91"+d;return "https://wa.me/"+d+"?text="+encodeURIComponent("Hi "+c.name+", reminder for your weekly collection of "+inr(c.perWeek)+". Pending balance: "+inr(k.pend)+". Thank you!")}
-function row(c){var k=calc(c);return '<div class="cust" onclick="go(\''+c.id+'\')"><div class="ring" style="--p:'+k.pct+'%"><div class="av">'+esc(c.name.charAt(0).toUpperCase())+'</div></div><div class="m"><b>'+esc(c.name)+'</b><small>'+esc(c.phone||"No contact")+' · '+k.paidW+'/'+c.weeks+' weeks</small>'+(k.miss&&!k.done?'<small style="color:var(--miss);font-weight:600"> · '+k.miss+' unpaid</small>':'')+'</div><div class="amt">'+inr(k.pend)+'<small>'+(k.done?"Completed":"pending")+'</small></div></div>'}
+function row(c){var k=calc(c),late=overdueSummary(c);return '<div class="cust" onclick="go(\''+c.id+'\')"><div class="ring" style="--p:'+k.pct+'%"><div class="av">'+esc(c.name.charAt(0).toUpperCase())+'</div></div><div class="m"><b>'+esc(c.name)+'</b><small>'+esc(c.phone||"No contact")+' · '+k.paidW+'/'+c.weeks+' weeks</small>'+(late.count?'<small style="color:var(--miss);font-weight:700"> · '+late.count+' overdue · oldest '+late.oldest+' week'+(late.oldest===1?'':'s')+' late</small>':'')+'</div><div class="amt">'+inr(k.pend)+'<small>'+(k.done?"Completed":"pending")+'</small></div></div>'}
+
 function list(){
- var L=DB.filter(function(c){if(c.isActive===false)return false;var k=calc(c);return(!q||(c.name+" "+c.phone).toLowerCase().indexOf(q)>=0)&&(flt==="all"||(flt==="over"&&k.miss>0&&!k.done)||(flt==="act"&&!k.done)||(flt==="done"&&k.done))});
+ var L=DB.filter(function(c){if(c.isActive===false)return false;var k=calc(c),late=overdueSummary(c).oldest;return(!q||(c.name+" "+c.phone).toLowerCase().indexOf(q)>=0)&&(flt==="all"||(flt==="over_1"&&late===1)||(flt==="over_2_4"&&late>=2&&late<=4)||(flt==="over_5"&&late>=5)||(flt==="act"&&!k.done)||(flt==="done"&&k.done))});
  $("lst").innerHTML=L.length?L.map(row).join(""):'<div class="empty">'+(DB.length?"No customers match this filter.":'No customers yet. Add your first customer, or enter an old customer with their past paid weeks.<br><br><button class="btn pri" onclick="custForm()">+ Add customer</button>')+'</div>';
 }
-function chips(){$("chips").innerHTML=[["all","All"],["act","Active"],["over","Overdue"],["done","Completed"]].map(function(x){return '<button class="chip'+(flt===x[0]?" on":"")+'" onclick="setF(\''+x[0]+'\')">'+x[1]+'</button>'}).join("")}
+function chips(){$("chips").innerHTML=[["all","All"],["act","Active"],["over_1","1 week late"],["over_2_4","2–4 weeks late"],["over_5","5+ weeks late"],["done","Completed"]].map(function(x){return '<button class="chip'+(flt===x[0]?" on":"")+'" onclick="setF(\''+x[0]+'\')">'+x[1]+'</button>'}).join("")}
 function setF(f){flt=f;chips();list()}
+
 function topActions(){
  var t=$("topActions");
  if(!t)return;
@@ -1131,33 +1139,13 @@ function monthLabel(key){
  return d.toLocaleDateString("en-IN",{month:"short"});
 }
 function monthlyAnalytics(){
- function make(){var now=new Date();now.setDate(1);now.setHours(0,0,0,0);var a=[];for(var i=5;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth()-i,1);a.push({key:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("en-IN",{month:"short",year:"2-digit"}),collection:0,profit:0,paidWeeks:0})}return a}
- var current=make(),historical=make(),cm={},hm={};current.forEach(function(m){cm[m.key]=m});historical.forEach(function(m){hm[m.key]=m});
- DB.filter(function(c){return c.isActive!==false}).forEach(function(c){
-   var k=calc(c),rate=loanProfitRate(c,k);
-   (c.pays||[]).forEach(function(p){
-     if(p.type!=="paid"&&p.type!=="hist")return;
-     var m=cm[monthKeyFromDate(p.date)];if(!m)return;
-     var amt=Number(p.amt)||0;m.collection+=amt;m.paidWeeks++;m.profit+=amt*rate;
-   });
- });
- function addHist(h){
-   var k=loanRecordCalc(h),rate=loanProfitRate(h,k),hasDated=false;
-   (h.pays||[]).forEach(function(p){
-     if(p.type!=="paid"&&p.type!=="hist")return;
-     var m=hm[monthKeyFromDate(p.date)];if(!m)return;
-     hasDated=true;var amt=Number(p.amt)||0;m.collection+=amt;m.paidWeeks++;m.profit+=amt*rate;
-   });
-   /* Old records often contain only a historical paid amount and completed date.
-      Put that undated collection into its completed month rather than showing a misleading ₹0 chart. */
-   if(!hasDated){
-     var amt=Number(k.paid)||0,m=hm[monthKeyFromDate(String(h.completedAt||h.loanDate||"").slice(0,10))];
-     if(m&&amt>0){m.collection+=amt;m.paidWeeks+=Number(k.paidW)||0;m.profit+=amt*rate;}
-   }
- }
- DB.forEach(function(c){loanHistory(c).forEach(addHist)});
- HIST.forEach(addHist);
- return {current:current,historical:historical};
+ function make(){var n=new Date(),a=[];for(var i=5;i>=0;i--){var d=new Date(n.getFullYear(),n.getMonth()-i,1);a.push({key:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("en-IN",{month:"short",year:"2-digit"}),collection:0,profit:0,paidWeeks:0})}return a}
+ var current=make(),historical=make(),undatedCurrent=0,undatedHistorical=0;
+ function add(c,arr){var rate=loanProfitRate(c,calc(c));var opening=calc(c).hAmt,undated=opening;
+ (c.pays||[]).forEach(function(p){if(p.type!=="paid"&&p.type!=="hist")return;var amt=Math.max(0,Number(p.amt)||0),ds=String(p.date||"");if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)){undated+=amt;return}var m=arr.find(function(x){return x.key===ds.slice(0,7)});if(m){m.collection+=amt;m.profit+=amt*rate;m.paidWeeks++}});return undated}
+ DB.filter(function(c){return c.isActive!==false}).forEach(function(c){undatedCurrent+=add(c,current)});
+ cpHistoryRecords().forEach(function(h){undatedHistorical+=add(h,historical)});
+ return {current:current,historical:historical,undatedCurrent:undatedCurrent,undatedHistorical:undatedHistorical};
 }
 
 function dashboardCategory(miss,done){
@@ -1175,16 +1163,17 @@ function dashboardView(){
  /* Business run-rate from the current 12 customer accounts.
     The standard model is ₹2,500 profit on ₹12,000 collection = 20.8333%.
     Use each active loan's own margin so custom cutting/terms are also supported. */
- var weeklyCollection=activeDB.reduce(function(s,c){return s+(Number(c.perWeek)||0)},0);
- var weeklyProfit=activeDB.reduce(function(s,c){var k=businessCalc(c);return s+(Number(c.perWeek)||0)*loanProfitRate(c,k)},0);
+ var weeklyCollection=activeDB.filter(function(c){return !calc(c).done}).reduce(function(s,c){return s+businessTerms(c).perWeek},0);
+ var weeklyProfit=activeDB.filter(function(c){return !calc(c).done}).reduce(function(s,c){var k=businessCalc(c);return s+(Number(c.perWeek)||0)*loanProfitRate(c,k)},0);
  var monthlyRunRate=weeklyCollection*52/12,monthlyProfitRunRate=weeklyProfit*52/12;
  var months=monthlyAnalytics();
- function chart(arr,title,kind){var maxC=Math.max.apply(null,arr.map(function(m){return m.collection}).concat([1]));var maxP=Math.max.apply(null,arr.map(function(m){return m.profit}).concat([1]));return '<div class="monthly-panel"><div class="monthly-panel-head"><div><h3>'+title+'</h3><p>'+ (kind==='current'?'Active/current loans only.':'Completed/old loans only.') +'</p></div><div class="mini-kpi"><b>'+inr(arr.reduce(function(s,m){return s+m.collection},0))+'</b><span>collection</span><b>'+inr(arr.reduce(function(s,m){return s+m.profit},0))+'</b><span>profit</span></div></div><div class="monthly-chart">'+arr.map(function(m){var ch=Math.max(3,Math.round((m.collection/maxC)*145)),ph=Math.max(3,Math.round((m.profit/maxP)*145));return '<div class="month-col"><div class="month-value">'+(m.collection?inr(m.collection):'₹0')+'</div><div class="month-bars"><div class="month-bar collection" style="height:'+ch+'px" title="'+m.label+' collection '+inr(m.collection)+'"></div><div class="month-bar profit" style="height:'+ph+'px" title="'+m.label+' profit '+inr(m.profit)+'"></div></div><div class="month-label">'+m.label+'</div></div>'}).join('')+'</div><div class="month-legend"><span style="--c:#5D9DFF">Collection</span><span style="--c:#24A97E">Realized profit</span></div><div class="monthly-table"><div class="monthly-row head"><span>Month</span><span>Collection</span><span>Profit</span><span>Payments</span></div>'+arr.map(function(m){return '<div class="monthly-row"><b>'+m.label+'</b><b class="collection-num">'+inr(m.collection)+'</b><b class="profit-num">'+inr(m.profit)+'</b><span>'+m.paidWeeks+'</span></div>'}).join('')+'</div></div>'}
- var cards=[['Current Profit',inr(currentProfit),'Realized from active-loan payments'],['Historical Profit',inr(historicalProfit),'Completed/old loans only'],['Current Collected',inr(currentCollected),'Actual active-loan payments'],['Historical Collected',inr(historicalCollected),'Completed/old-loan payments'],['Weekly Collection',inr(weeklyCollection),'Current customer run-rate'],['Weekly Profit',inr(weeklyProfit),'Expected profit from current weekly collections'],['Monthly Collection Run-rate',inr(monthlyRunRate),'₹ weekly × 52 ÷ 12'],['Monthly Profit Run-rate',inr(monthlyProfitRunRate),'Expected current-business profit'],['Total Pending',inr(totals.pending),'Active/current loans'],['Active Customers',activeDB.length,'Current collection accounts']];
+ function chart(arr,title,kind){var maxC=Math.max.apply(null,arr.map(function(m){return m.collection}).concat([1]));var maxP=maxC;return '<div class="monthly-panel"><div class="monthly-panel-head"><div><h3>'+title+'</h3><p>'+ (kind==='current'?'Last 6 months · dated current payments.':'Last 6 months · dated completed-loan payments.') +'</p></div><div class="mini-kpi"><b>'+inr(arr.reduce(function(s,m){return s+m.collection},0))+'</b><span>collection</span><b>'+inr(arr.reduce(function(s,m){return s+m.profit},0))+'</b><span>profit</span></div></div><div class="monthly-chart">'+arr.map(function(m){var ch=Math.round((m.collection/maxC)*145),ph=Math.round((m.profit/maxP)*145);return '<div class="month-col"><div class="month-value">'+(m.collection?inr(m.collection):'₹0')+'</div><div class="month-bars"><div class="month-bar collection" style="height:'+ch+'px" title="'+m.label+' collection '+inr(m.collection)+'"></div><div class="month-bar profit" style="height:'+ph+'px" title="'+m.label+' profit '+inr(m.profit)+'"></div></div><div class="month-label">'+m.label+'</div></div>'}).join('')+'</div><div class="month-legend"><span style="--c:#5D9DFF">Collection</span><span style="--c:#24A97E">Allocated loan margin</span></div><div class="monthly-table"><div class="monthly-row head"><span>Month</span><span>Collection</span><span>Profit</span><span>Payments</span></div>'+arr.map(function(m){return '<div class="monthly-row"><b>'+m.label+'</b><b class="collection-num">'+inr(m.collection)+'</b><b class="profit-num">'+inr(m.profit)+'</b><span>'+m.paidWeeks+'</span></div>'}).join('')+'</div></div>'}
+ var cards=[['Current Allocated Margin',inr(currentProfit),'All-time allocated loan margin'],['Historical Allocated Margin',inr(historicalProfit),'All-time completed loans'],['Current Collected',inr(currentCollected),'All-time active-loan receipts'],['Historical Collected',inr(historicalCollected),'All-time completed-loan receipts'],['Weekly Collection',inr(weeklyCollection),'Current customer run-rate'],['Weekly Expected Margin',inr(weeklyProfit),'Expected profit from current weekly collections'],['Monthly Collection Run-rate',inr(monthlyRunRate),'₹ weekly × 52 ÷ 12'],['Monthly Expected Margin',inr(monthlyProfitRunRate),'Expected current-business profit'],['Total Pending',inr(totals.pending),'Active/current loans'],['Active Customers',activeDB.filter(function(c){return !calc(c).done}).length,'Current collection accounts']];
  var catRows=[['Prime Customers','1–3 pending weeks',totals.prime,'Best-performing active accounts'],['Standard Customers','4–5 pending weeks',totals.standard,'Medium-range accounts'],['At-Risk Customers','6+ pending weeks',totals.risk,'Follow-up required'],['Healthy Customers','0 pending weeks',totals.healthy,'No pending weeks']];
  return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Analytics</div><h1>Business Dashboard</h1><p>Current business profit, historical profit and collection run-rates are shown separately for clear decisions.</p></div><button class="btn" onclick="go(\'\')">← Back to Customers</button></div>'+
  '<div class="grid dashboard-cards">'+cards.map(function(s){return '<div class="stat dashboard-card"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join('')+'</div>'+
- '<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Current vs Historical Performance</h2><p>Current payments and completed/old loans are calculated separately. The business model uses the actual cutting amount on each loan.</p></div><div class="profit-model"><b>Each loan uses its own cutting-based margin.</b><br>₹10K−₹500 → ₹9.5K given → ₹2.5K profit; Yalamanda: 10 weeks, ₹0 cutting → ₹0 profit.</div></div><div class="dashboard-split-charts">'+chart(months.current,'Current Loans','current')+chart(months.historical,'Historical / Completed Loans','historical')+'</div><div class="monthly-note"><b>Profit formula:</b> Loan profit = Total payable − (Loan amount − cutting). Profit margin = Loan profit ÷ Total payable. Weekly profit = each customer weekly amount × that loan margin. Monthly run-rate = weekly × 52 ÷ 12. Yalamanda is treated as 10 weeks with ₹0 cutting, so its profit is ₹0 when ₹3,000 × 10 = ₹30,000 is repaid on a ₹30,000 loan.</div></div>'+
+ cpAuditHTML(months)+
+ '<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Current vs Historical Performance</h2><p>Current payments and completed/old loans are calculated separately. The business model uses the actual cutting amount on each loan.</p></div><div class="profit-model"><b>Contract margin allocation · before expenses</b><br>₹10K−₹500 → ₹9.5K given → ₹2.5K profit; Yalamanda: 10 weeks, ₹0 cutting → ₹0 profit.</div></div><div class="dashboard-split-charts">'+chart(months.current,'Current Loans','current')+chart(months.historical,'Historical / Completed Loans','historical')+'</div><div class="monthly-note"><b>Profit formula:</b> Contract margin = Total payable − (Loan amount − cutting). Allocated margin = receipts × contract margin ÷ total payable; this is not net cash profit and excludes expenses. Weekly expected margin = weekly amount × contract margin rate. Monthly run-rate = weekly × 52 ÷ 12. Yalamanda is treated as 10 weeks with ₹0 cutting, so its profit is ₹0 when ₹3,000 × 10 = ₹30,000 is repaid on a ₹30,000 loan.</div></div>'+
  '<div class="dashboard-layout"><div class="sec"><div class="dash-title"><div><h2>Customer Categories</h2><p>Active customers only.</p></div></div><div class="category-list">'+catRows.map(function(r){return '<div class="category-row"><div><b>'+r[0]+'</b><small>'+r[1]+' · '+r[3]+'</small></div><strong>'+r[2]+'</strong></div>'}).join('')+'</div></div>'+
  '<div class="sec"><h2>Business Snapshot</h2><p>Separate portfolio view.</p><div class="snapshot"><div><span>Current payable</span><b>'+inr(totals.payable)+'</b></div><div><span>Current collected</span><b>'+inr(currentCollected)+'</b></div><div><span>Current profit</span><b>'+inr(currentProfit)+'</b></div><div><span>Historical collected</span><b>'+inr(historicalCollected)+'</b></div><div><span>Historical profit</span><b>'+inr(historicalProfit)+'</b></div><div><span>Completed loans</span><b>'+hp.loans+'</b></div></div></div></div>'+
  '<div class="sec dashboard-card" style="margin-top:14px"><div class="dash-title"><div><h2>Completed</h2><p>Completed loans are automatically moved here when a current loan reaches its final payable week.</p></div><button class="btn sm" onclick="completedPage()">Open Completed →</button></div><div class="loan-summary-grid"><div><span>Completed loans</span><b>'+hp.loans+'</b></div><div><span>Historical collected</span><b>'+inr(historicalCollected)+'</b></div><div><span>Historical profit</span><b>'+inr(historicalProfit)+'</b></div><div><span>Historical customers</span><b>'+Object.keys(historyCustomerGroups()).length+'</b></div></div></div>'+
@@ -1195,21 +1184,23 @@ function render(){
  topActions();
  var a=$("app");
  if(CUSTOMER_MODE){a.innerHTML=portalView();return}
+ if(location.hash==="#portal"){a.innerHTML=portalView();return}
+ if(cloudConfigured() && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><div class="av" style="width:64px;height:64px;margin:0 auto 16px">CP</div><h1 style="font-size:34px">CollectPro Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
  if(location.hash==="#dashboard"){a.innerHTML=dashboardView();return}
  if(location.hash==="#completed"||location.hash.indexOf("#completed/")===0){a.innerHTML=completedView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
- if(cloudReady && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><div class="av" style="width:64px;height:64px;margin:0 auto 16px">CP</div><h1 style="font-size:34px">CollectPro Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
+
  if(!view){
-  var T=DB.reduce(function(t,c){var k=calc(c);t.paid+=k.paid;t.pend+=k.pend;t.pw+=k.pendW;return t},{paid:0,pend:0,pw:0});
-  a.innerHTML='<div class="grid">'+[["Total customers",DB.length,"Active collection accounts"],["Total collected",inr(T.paid),"Recorded payments"],["Total pending",inr(T.pend),"Outstanding amount"],["Pending weeks",T.pw,"Across all customers"]].map(function(s){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
-  '<div class="sec"><h2>Customers ('+DB.length+')</h2><p>Tap a customer to open their collection account.</p><input id="srch" placeholder="Search by name or phone" value="'+esc(q)+'" oninput="q=this.value.toLowerCase();list()"><div class="row" id="chips" style="margin:12px 0 6px"></div><div id="lst"></div></div>'+
+  var currentDB=DB.filter(function(c){return c.isActive!==false});var T=currentDB.reduce(function(t,c){var k=calc(c);t.paid+=k.paid;t.pend+=k.pend;t.pw+=k.pendW;return t},{paid:0,pend:0,pw:0});
+  a.innerHTML='<div class="grid">'+[["Total customers",currentDB.length,"Current collection accounts"],["Total collected",inr(T.paid),"Recorded payments"],["Total pending",inr(T.pend),"Outstanding amount"],["Pending weeks",T.pw,"Across all customers"]].map(function(s){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
+  '<div class="sec"><h2>Customers ('+currentDB.length+')</h2><p>Tap a customer to open their collection account.</p><input id="srch" placeholder="Search by name or phone" value="'+esc(q)+'" oninput="q=this.value.toLowerCase();list()"><div class="row" id="chips" style="margin:12px 0 6px"></div><div id="lst"></div></div>'+
   '<div class="row" style="margin-top:14px"><button class="btn sm" onclick="backup()">Backup &amp; restore</button><button class="btn sm" id="installBtn" style="display:none" onclick="installApp()">Install App</button></div>';
   chips();list();return;
  }
  var c=DB.filter(function(x){return x.id===view && x.isActive!==false})[0];if(!c){go("");return}
  var k=calc(c),st=strip(c);
  var asc=c.pays.map(function(p,i){return{p:p,i:i}}).sort(function(x,y){return x.p.date<y.p.date?-1:x.p.date>y.p.date?1:x.i-y.i});
- var bal=k.payable-k.hAmt,B={};asc.forEach(function(o){if(o.p.type==="paid")bal-=(+o.p.amt||0);B[o.p.id]=Math.max(bal,0)});
+ var bal=k.payable-k.hAmt,B={};asc.forEach(function(o){if(o.p.type==="paid"||o.p.type==="hist")bal-=(+o.p.amt||0);B[o.p.id]=Math.max(bal,0)});
  var ps=asc.map(function(o){return o.p}).reverse(),R='style="color:var(--miss)"';
  a.innerHTML='<div class="row" style="margin-bottom:12px"><button class="btn sm" onclick="go(\'\')">← All customers</button></div>'+
  '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>'+esc(c.phone||"No contact")+' · Loan taken '+fmt(c.date)+'</small></div><span class="badge sp'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div>'+
@@ -1217,8 +1208,8 @@ function render(){
  '<div class="l" style="margin-top:12px;font-size:12.5px;color:#B9B6C8">'+inr(k.payable)+' total payable − '+inr(k.paid)+' paid = '+inr(k.pend)+'</div>'+
  '<div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;font-size:13px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div>'+
  '<div class="row" style="margin-top:14px"><button class="btn pri" onclick="payForm(\''+c.id+'\')">+ Add payment</button><button class="btn" onclick="newLoanForm(\''+c.id+'\')">+ New Loan</button><button class="btn" onclick="custForm(\''+c.id+'\')">Edit customer</button>'+(c.phone?'<a class="btn" href="tel:'+esc(c.phone)+'">Call</a><a class="btn" target="_blank" rel="noopener" href="'+wa(c,k)+'">WhatsApp reminder</a>':'')+'<button class="btn del sp" onclick="delC(\''+c.id+'\',this)">Delete customer</button></div>'+
- '<div class="grid">'+[["Loan amount",inr(c.loan),"Original principal"],["Initial cutting",inr(c.cutting),"Profit at disbursement"],["Total payable",inr(k.payable),inr(c.perWeek)+" × "+c.weeks+" weeks"],["Missed weeks",k.miss,inr(k.miss*c.perWeek)+" overdue"],["Weeks remaining",k.pendW,"Until account closes"]].map(function(s,i){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v"'+(i===2&&k.miss?' '+R:'')+'>'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
- '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = paid. Orange = missed or carried over beyond the original payable weeks.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
+ '<div class="grid">'+[["Loan amount",inr(c.loan),"Original principal"],["Initial cutting",inr(c.cutting),"Withheld at disbursement"],["Total payable",inr(k.payable),inr(c.perWeek)+" × "+c.weeks+" weeks"],["Missed weeks",k.miss,inr(k.miss*c.perWeek)+" overdue"],["Weeks remaining",k.pendW,"Until account closes"]].map(function(s,i){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v"'+(i===2&&k.miss?' '+R:'')+'>'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
+ '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = fully paid. Orange = missed, partial or carried over.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
 
  paymentHistoryHtml(c,true)+((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
 }
@@ -1412,30 +1403,21 @@ async function saveNewLoan(cid){
 }
 
 function paymentRows(c){
-  return c.pays.map(function(p,i){return {p:p,i:i}}).sort(function(a,b){
-    var d=String(b.p.date||"").localeCompare(String(a.p.date||""));
-    return d!==0?d:b.i-a.i;
-  }).map(function(x){return x.p});
+ var all=(c.pays||[]).map(function(p,i){return {p:Object.assign({},p),i:i}}).sort(function(a,b){var d=String(a.p.date||"").localeCompare(String(b.p.date||""));return d!==0?d:a.i-b.i}),balance=Math.max(0,calc(c).payable-calc(c).hAmt);
+ all.forEach(function(x){if(x.p.type==="paid"||x.p.type==="hist")balance=Math.max(0,balance-Math.max(0,Number(x.p.amt)||0));x.p.balanceAfter=balance;x.p.dueDate=nextWeekDate(c.date,x.p.week,c.collectionWeekday==null?4:+c.collectionWeekday)});
+ return all.reverse().map(function(x){return x.p});
 }
+
 function paymentDay(s){
   if(!s)return "";
   var d=new Date(s+"T00:00:00");
   return Number.isNaN(d.getTime())?"":d.toLocaleDateString("en-IN",{weekday:"short"});
 }
 function paymentRowHtml(c,p,adminMode){
-  var u=p.type==="unpaid";
-  var status=u?pt("unpaid"):(p.type==="hist"?pt("historical"):pt("paid"));
-  var statusClass=u?"unpaid":"";
-  var action=adminMode ? " onclick=\"payForm('"+c.id+"','"+(p.id||"")+"')\"" : "";
-  var weekLabel=portalLang==="te"?("వారం "+esc(p.week)):("W"+esc(p.week));
-  return '<div class="ph-row"'+action+'>'+
-    '<div class="ph-date">'+fmt(p.date)+'<small>'+paymentDay(p.date)+'</small></div>'+
-    '<div class="ph-week">'+weekLabel+'</div>'+
-    '<div class="ph-status '+statusClass+'"><span class="ph-dot"></span>'+status+'</div>'+
-    '<div class="ph-amount">'+(u?inr(0):inr(p.amt))+'</div>'+
-    '<div class="ph-arrow">›</div>'+
-  '</div>';
+ var u=p.type==="unpaid",status=u?pt("unpaid"):(p.type==="hist"?pt("historical"):pt("paid")),statusClass=u?"unpaid":"",action=adminMode?" onclick=\"payForm('"+c.id+"','"+(p.id||"")+"')\"":"",weekLabel=portalLang==="te"?("వారం "+esc(p.week)):("W"+esc(p.week));
+ return '<div class="ph-row"'+action+'><div class="ph-date"><span>Due · '+(p.dueDate?fmt(p.dueDate):"—")+'</span><small>Paid · '+(u?"Not paid":fmt(p.date))+'</small></div><div class="ph-week">'+weekLabel+'</div><div class="ph-status '+statusClass+'"><span class="ph-dot"></span>'+status+'</div><div class="ph-amount"><b>'+inr(u?0:p.amt)+'</b><small>Balance · '+inr(p.balanceAfter)+'</small></div><div class="ph-arrow">'+(adminMode?'✎':'›')+'</div></div>';
 }
+
 function paymentHistoryHtml(c,adminMode){
   var rows=paymentRows(c),recent=rows.slice(0,5);
   return '<div class="sec '+(adminMode?"":"portal-history")+'">'+
@@ -1456,8 +1438,8 @@ function viewAllPayments(cid,adminMode){
 }
 
 
-function backup(){open_('<h2>Backup &amp; restore</h2><p style="color:var(--muted);font-size:13px;margin:6px 0 12px">Copy this text and keep it safe (Notes, WhatsApp to yourself). To move data to another device, paste it here and tap Restore. Restore replaces current data.</p><textarea id="bk" rows="7" onfocus="this.select()">'+esc(JSON.stringify(DB))+'</textarea><div class="row" style="margin-top:12px"><button class="btn" onclick="close_()">Close</button><button class="btn pri sp" onclick="restore()">Restore from text</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
-function restore(){try{var d=JSON.parse($("bk").value);if(!Array.isArray(d)||d.some(function(c){return !c.id||!c.name||!Array.isArray(c.pays)}))throw 0;DB=d;save();close_();go("")}catch(e){$("err").textContent="This text is not a valid CollectPro backup."}}
+function backup(){open_('<h2>Backup &amp; restore</h2><p style="color:var(--muted);font-size:13px;margin:6px 0 12px">Copy this text and keep it safe (Notes, WhatsApp to yourself). To move data to another device, paste it here and tap Restore. Restore replaces current data.</p><textarea id="bk" rows="7" onfocus="this.select()">'+esc(JSON.stringify({version:25,customers:DB,completed:HIST}))+'</textarea><div class="row" style="margin-top:12px"><button class="btn" onclick="close_()">Close</button><button class="btn pri sp" onclick="restore()">Restore from text</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
+function restore(){if(sb){$("err").textContent="Cloud restore is not supported here. Download this backup for safekeeping; use your database restore workflow for cloud records.";return}try{var d=JSON.parse($("bk").value),customers=Array.isArray(d)?d:d.customers,history=Array.isArray(d)?HIST:d.completed;if(!Array.isArray(customers)||customers.some(function(c){return !c.id||!c.name||!Array.isArray(c.pays)})||!Array.isArray(history))throw 0;if(!confirm("Replace all local customer and completed-loan records with this backup?"))return;DB=customers;HIST=history;save();close_();go("")}catch(e){$("err").textContent="This text is not a valid CollectPro backup."}}
 
 function open_(h){$("modal").innerHTML=h;$("ov").classList.add("on")}
 function close_(){$("ov").classList.remove("on")}
@@ -1543,9 +1525,44 @@ async function saveP(cid,pid){
  var c=DB.filter(function(x){return x.id===cid})[0];
  var o={date:$("p_date").value,amt:+$("p_amt").value,mode:$("p_mode").value,week:+$("p_wk").value,type:$("p_type").value};
  var maxWeek=trackerItems(c).length;if(!o.date||!(o.amt>=0)||!(o.week>=1&&o.week<=maxWeek)){$("err").textContent="Enter a date, amount and a week between 1 and "+maxWeek+".";return}
+ if(!Number.isInteger(o.week)||!Number.isFinite(o.amt)||((o.type==="paid"||o.type==="hist")&&o.amt<=0)){$("err").textContent="Enter a whole week number and a positive payment amount.";return}
+ if((o.type==="paid"||o.type==="hist")&&c.pays.some(function(p){return p.id!==pid&&+p.week===o.week&&(p.type==="paid"||p.type==="hist")})){$("err").textContent="This week already has a payment. Edit the existing payment instead.";return}
+ var previousPays=JSON.parse(JSON.stringify(c.pays));
  if(pid){var p=c.pays.filter(function(x){return x.id===pid})[0];for(var k in o)p[k]=o[k]}else{o.id=uid();c.pays.push(o)}
- if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await autoArchiveCompletedCurrentLoans();await cloudLoad()}else{save();await autoArchiveCompletedCurrentLoans();save()}close_();render();
+ var savedPayment=Object.assign({},o);if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok){c.pays=previousPays;return}await autoArchiveCompletedCurrentLoans();await cloudLoad()}else{save();await autoArchiveCompletedCurrentLoans();save()}var updatedCustomer=DB.filter(function(x){return x.id===cid})[0]||c;close_();render();if(savedPayment.type==="paid"||savedPayment.type==="hist")showPaymentReceipt(updatedCustomer,savedPayment);
 }
+function paymentReceiptLink(c,p,balance){var phone=(c.phone||"").replace(/\D/g,"");if(phone.length===10)phone="91"+phone;var msg="Hi "+c.name+", your CollectPro payment receipt for Week "+p.week+": amount "+inr(p.amt)+", paid on "+fmt(p.date)+", remaining balance "+inr(balance)+". Please find the attached CollectPro receipt.";return "https://wa.me/"+phone+"?text="+encodeURIComponent(msg)}
+function receiptRoundRect(ctx,x,y,w,h,r,fill){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();if(fill)ctx.fill()}
+function receiptText(ctx,text,x,y,size,color,weight,align){ctx.font=(weight||"400")+" "+size+"px Arial, sans-serif";ctx.fillStyle=color||"#18233f";ctx.textAlign=align||"left";ctx.fillText(String(text==null?"":text),x,y)}
+function receiptCanvas(c,p,balance){
+ var cv=document.createElement("canvas");cv.width=1080;cv.height=1420;var x=cv.getContext("2d"),terms=businessTerms(c),total=calc(c).paid,customerId=c.customerId||"—",due=nextWeekDate(c.date,p.week,c.collectionWeekday==null?4:+c.collectionWeekday),dateDigits=String(p.date||"").replace(/\D/g,"");
+ x.fillStyle="#f1f0eb";x.fillRect(0,0,cv.width,cv.height);x.shadowColor="rgba(14,25,50,.14)";x.shadowBlur=28;x.shadowOffsetY=12;x.fillStyle="#fff";receiptRoundRect(x,52,48,976,1320,30,true);x.shadowColor="transparent";x.shadowBlur=0;x.shadowOffsetY=0;
+ x.fillStyle="#111b38";receiptRoundRect(x,52,48,976,382,30,true);x.fillRect(52,360,976,70);
+ x.fillStyle="#d7a83f";x.beginPath();x.arc(142,141,42,0,Math.PI*2);x.fill();receiptText(x,"CP",142,153,32,"#111b38","700","center");
+ receiptText(x,"CollectPro",204,140,43,"#f8f7f2","700");receiptText(x,"WEEKLY COLLECTIONS",206,177,16,"#d6c27d","700");
+ x.fillStyle="#27b286";receiptRoundRect(x,805,94,158,46,22,true);receiptText(x,"PAYMENT RECEIVED",884,124,14,"#fff","700","center");
+ receiptText(x,"WEEKLY PAYMENT RECEIPT",106,254,30,"#bec8e1","700");receiptText(x,inr(p.amt),106,335,60,"#fff","700");receiptText(x,"Amount received",111,379,17,"#bdc5da","400");
+ var receiptNo="CP-"+String(customerId).replace(/[^A-Za-z0-9]/g,"").slice(-10).toUpperCase()+"-W"+String(p.week)+"-"+(dateDigits||"DATE");
+ receiptText(x,"RECEIPT NO.",106,484,15,"#777f91","700");receiptText(x,receiptNo,106,520,21,"#18233f","700");receiptText(x,"PAYMENT DATE",974,484,15,"#777f91","700","right");receiptText(x,fmt(p.date),974,520,21,"#18233f","700","right");
+ x.strokeStyle="#e5e7ed";x.lineWidth=2;x.beginPath();x.moveTo(106,550);x.lineTo(974,550);x.stroke();
+ function detail(label,value,y){receiptText(x,label.toUpperCase(),108,y,14,"#777f91","700");receiptText(x,value,108,y+34,22,"#18233f","600")}
+ detail("Received from",c.name||"Customer",610);detail("Customer ID",customerId,704);detail("Instalment","Week "+p.week+" of "+terms.weeks,798);detail("Scheduled due date",due?fmt(due):"—",892);detail("Payment method",p.mode||"—",986);
+ x.fillStyle="#edf3fc";receiptRoundRect(x,100,1050,880,205,22,true);x.strokeStyle="#dbe4f2";x.lineWidth=2;x.stroke();receiptText(x,"ACCOUNT SUMMARY",132,1098,16,"#586782","700");
+ receiptText(x,"Total payable",132,1147,16,"#555e70","400");receiptText(x,inr(calc(c).payable),490,1147,18,"#18233f","700","right");
+ receiptText(x,"Total paid to date",132,1192,16,"#555e70","400");receiptText(x,inr(total),490,1192,18,"#18233f","700","right");
+ receiptText(x,"Remaining balance",548,1147,16,"#555e70","400");receiptText(x,inr(balance),950,1147,20,"#18233f","700","right");
+ x.strokeStyle="#e5e7ed";x.beginPath();x.moveTo(106,1290);x.lineTo(974,1290);x.stroke();receiptText(x,"Thank you for your payment.",540,1330,16,"#697184","400","center");return cv;
+}
+var receiptDraft=null;
+function showPaymentReceipt(c,p){
+ var balance=calc(c).pend,cv=receiptCanvas(c,p,balance),png=cv.toDataURL("image/png"),name="CollectPro-Receipt-W"+p.week+"-"+String(p.date||"").replace(/[^0-9]/g,"")+".png";
+ receiptDraft={customer:Object.assign({},c),payment:Object.assign({},p),balance:balance,file:null,name:name};
+ var link=paymentReceiptLink(c,p,balance);
+ open_('<div class="row"><div><h2>CollectPro payment receipt</h2><p style="color:var(--muted);font-size:13px">Week '+esc(p.week)+' · '+fmt(p.date)+'</p></div><button class="btn sm sp" onclick="close_()">Close</button></div><img alt="CollectPro weekly payment receipt preview" src="'+png+'" style="display:block;width:100%;max-height:390px;object-fit:contain;background:#f1f0eb;border-radius:12px;margin:12px auto"><div class="row" style="justify-content:flex-end;margin-top:12px"><a class="btn" href="'+png+'" download="'+esc(name)+'">↓ Download PNG</a><button class="btn pri" id="receiptShareBtn" disabled onclick="shareReceiptImage()">Preparing image…</button><a class="btn" id="receiptWhatsAppFallback" style="display:none" target="_blank" rel="noopener" href="'+link+'">Open WhatsApp</a></div><small id="receiptStatus" style="display:block;color:var(--muted);margin-top:9px">Receipt includes the CollectPro logo and payment summary.</small>');
+ cv.toBlob(function(blob){var share=$("receiptShareBtn"),fallback=$("receiptWhatsAppFallback"),status=$("receiptStatus");if(!blob){share.textContent="Image not ready";if(fallback)fallback.style.display="inline-block";if(status)status.textContent="Download the PNG and attach it in WhatsApp.";return}try{receiptDraft.file=new File([blob],name,{type:"image/png"})}catch(e){receiptDraft.file=null}if(share){share.disabled=false;share.textContent="Share receipt image"}var supported=!!(navigator.share&&navigator.canShare&&receiptDraft.file&&navigator.canShare({files:[receiptDraft.file]}));if(status)status.textContent=supported?"Tap Share receipt image, then choose WhatsApp and the customer chat.":"Your browser cannot attach images from this share button. Download the PNG, open WhatsApp, and attach it to the customer chat.";if(fallback)fallback.style.display=supported?"none":"inline-block"},"image/png");
+}
+function shareReceiptImage(){if(!receiptDraft||!receiptDraft.file)return;var data={files:[receiptDraft.file],title:"CollectPro payment receipt",text:"CollectPro weekly payment receipt for "+receiptDraft.customer.name+", Week "+receiptDraft.payment.week+"."};if(!navigator.share||!navigator.canShare||!navigator.canShare({files:data.files})){var s=$("receiptStatus");if(s)s.textContent="Download the PNG and attach it in WhatsApp.";return}navigator.share(data).catch(function(e){if(e&&e.name!=="AbortError"){var s=$("receiptStatus");if(s)s.textContent="Could not open the share sheet. Download the PNG and share it from WhatsApp."}})}
+
 function arm(key,b){if(armed===key)return true;armed=key;var t=b.textContent;b.textContent="Tap again";setTimeout(function(){if(armed===key){armed=null;b.textContent=t}},3000);return false}
 async function delP(cid,pid,b){if(!arm(pid,b))return;var c=DB.filter(function(x){return x.id===cid})[0];c.pays=c.pays.filter(function(x){return x.id!==pid});if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await cloudLoad()}else save();armed=null;render()}
 async function delC(cid,b){if(!arm(cid,b))return;if(sb){var ok=await cloudDelete(cid);if(!ok)return}DB=DB.filter(function(x){return x.id!==cid});save();go("")}
@@ -1563,6 +1580,18 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")close_()});
     if(portalData)setTimeout(animateCustomerPortal,40);
   };
 })();
+
+function cpIcon(kind){var paths={money:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 9h10M9 9c5 0 5 5 0 5l5 3M7 12h10"/>',users:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0112 0v2M16 5a3 3 0 010 6M18 14a5 5 0 013 4v2"/>',chart:'<path d="M4 4v16h17M8 16v-4M13 16V8M18 16V5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M7 12l3 3 7-7"/>',arrow:'<path d="M19 12H5m6-6l-6 6 6 6"/>',plus:'<path d="M12 5v14M5 12h14"/>',download:'<path d="M12 3v12m-5-5l5 5 5-5M4 16v4h16v-4"/>',portal:'<rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="9" r="2"/><path d="M8 17a4 4 0 018 0"/>',edit:'<path d="M14 5l5 5M4 20l5-1L20 8l-5-5L4 14z"/>',trash:'<path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7"/>',phone:'<path d="M7 3H4a1 1 0 00-1 1c0 9 8 17 17 17a1 1 0 001-1v-3l-5-2-2 2-7-7 2-2z"/>',logout:'<path d="M9 3H3v18h6M10 12h11m-4-4l4 4-4 4"/>'};return '<svg class="cp-icon" viewBox="0 0 24 24" aria-hidden="true">'+(paths[kind]||paths.money)+'</svg>'}
+function cpDecorate(){if(!document.querySelectorAll)return;document.querySelectorAll('.btn,.chip,.stat .l').forEach(function(e){if(e.querySelector('svg'))return;var s=e.textContent.toLowerCase(),kind=/delete/.test(s)?'trash':/back|all customers|cancel/.test(s)?'arrow':/logout/.test(s)?'logout':/add|new loan/.test(s)?'plus':/edit|target/.test(s)?'edit':/dashboard|performance|rate|profit|margin/.test(s)?'chart':/portal|login/.test(s)?'portal':/customer|member/.test(s)?'users':/completed|save/.test(s)?'check':/csv|backup|download|install/.test(s)?'download':/call|whatsapp/.test(s)?'phone':/pending|week|due/.test(s)?'clock':'money';e.insertAdjacentHTML('afterbegin',cpIcon(kind))})}
+function cpAuditHTML(months){
+ var issues=[],active=DB.filter(function(c){return c.isActive!==false});active.concat(cpHistoryRecords()).forEach(function(c){var k=calc(c),weeks={},dup=false;(c.pays||[]).forEach(function(p){if((p.type==='paid'||p.type==='hist')){if(weeks[p.week])dup=true;weeks[p.week]=true}});var label=esc(c.name||c.customerId||'Account');if(dup)issues.push(label+': multiple paid entries for a week; cash amounts are included, week count is unique. Review payment history.');if(k.paid>k.payable+.005)issues.push(label+': receipts exceed payable by '+inr(k.paid-k.payable)+'.');if(k.pend>0&&Number(c.hPaid)>=businessTerms(c).weeks)issues.push(label+': historical week count says completed, but an amount is still outstanding.');if(businessTerms(c).isYalamanda)issues.push(label+': existing special rule uses 10 weeks and zero cutting; verify these agreed terms.');if(businessTerms(c).cutting>businessTerms(c).loan)issues.push(label+': cutting exceeds principal; correct loan terms.');});
+ function reconcile(arr,total,undated){var windowTotal=arr.reduce(function(s,m){return s+m.collection},0);return '<b>All-time '+inr(total)+'</b><small>Last 6 months, dated: '+inr(windowTotal)+'</small><small>Undated historical / opening: '+inr(undated)+'</small><small>Other dated periods: '+inr(Math.max(0,total-windowTotal-undated))+'</small>'}
+ var current=active.reduce(function(s,c){return s+calc(c).paid},0),historical=totalPortfolioHistory().collected;
+ return '<section class="sec"><h2>Totals explained</h2><p>Cards show all-time receipts. Charts show dated payments in the last 6 months, using one shared rupee scale.</p><div class="cp-reconcile"><div><span class="tag">Current loans</span><div style="margin-top:9px">'+reconcile(months.current,current,months.undatedCurrent)+'</div></div><div><span class="tag">Completed loans</span><div style="margin-top:9px">'+reconcile(months.historical,historical,months.undatedHistorical)+'</div></div></div><p class="cp-note">Allocated margin distributes the contract margin across receipts. Net cash surplus = receipts − cash disbursed, before expenses; it is a different measure. Undated opening amounts are not assigned invented dates.</p><details style="margin-top:14px"><summary>Data checks · '+issues.length+' item'+(issues.length===1?'':'s')+' to review</summary>'+(issues.length?issues.map(function(x){return '<div class="cp-check">'+x+'</div>'}).join(''):'<div class="cp-check">No duplicate-week, overpayment or invalid-cutting flags detected.</div>')+'</details></section>';
+}
+var cpLastPage='';
+var cpRenderBase=render;render=function(){cpRenderBase();cpDecorate();var a=$('app');if(a&&cpLastPage!==location.hash){a.classList.remove('cp-enter');void a.offsetWidth;a.classList.add('cp-enter');cpLastPage=location.hash}};
+var cpOpenBase=open_;open_=function(html){cpOpenBase(html);cpDecorate()};
 
 startApp();
 </script></body></html>

@@ -825,17 +825,31 @@ var armed=null;
 
 function loanHistory(c){return Array.isArray(c.loanHistory)?c.loanHistory:[]}
 function loanRecordCalc(h){return calc({perWeek:+h.perWeek||0,weeks:+h.weeks||0,hPaid:+h.hPaid||0,hMiss:+h.hMiss||0,hAmt:h.hAmt==null?"":+h.hAmt,pays:Array.isArray(h.pays)?h.pays:[]})}
+function businessTerms(x){
+ var isY=/^\s*yalamanda\s*$/i.test(String(x&&x.name||''));
+ var pw=Number(x&&x.perWeek)||0;
+ var weeks=Number(x&&x.weeks)||0;
+ var loan=Number(x&&x.loanAmount);
+ if(!isFinite(loan)||loan<=0) loan=Number(x&&x.loan)||0;
+ var cutting=Number(x&&x.cutting);
+ if(!isFinite(cutting)||cutting<0) cutting=Number(x&&x.cutting_amount)||0;
+ /* Business rule: Yalamanda is a 10-week, zero-cutting account.
+    With ₹3,000/week this is ₹30,000 payable and ₹30,000 given, hence ₹0 profit. */
+ if(isY){ weeks=10; cutting=0; if(pw>0) loan=pw*weeks; }
+ return {loan:loan,cutting:cutting,weeks:weeks,perWeek:pw,isYalamanda:isY};
+}
+function businessCalc(x){
+ var t=businessTerms(x);
+ var base=calc(x);
+ var payable=t.perWeek*t.weeks;
+ return {paidW:base.paidW,paid:base.paid,hAmt:base.hAmt,miss:base.miss,payable:payable,pend:Math.max(payable-base.paid,0),pendW:Math.max(t.weeks-base.paidW,0),done:base.paidW>=t.weeks,pct:t.weeks?Math.min(100,Math.round(base.paidW/t.weeks*100)):0,terms:t};
+}
 function loanProfitRate(h,k){
- var payable=Number(k&&k.payable)||0;
- /* Current customers store the principal as loan; historical loans store it as loanAmount. */
- var loan=Number(h&&h.loanAmount);
- if(!isFinite(loan)||loan<=0) loan=Number(h&&h.loan)||0;
- var rawCut=h&&h.cutting;
- var cutting=Number(rawCut);
- if(rawCut===undefined||rawCut===null||rawCut===""||!isFinite(cutting)||cutting<0) cutting=loan*0.05;
+ var t=businessTerms(h);
+ var payable=Number(k&&k.payable)||t.perWeek*t.weeks;
+ var loan=t.loan,cutting=t.cutting;
  if(payable<=0||loan<=0)return 0;
- /* Net cash actually given = loan - cutting.
-    Full-loan profit = total payable - net cash given.
+ /* Net cash actually given = loan - cutting. Full-loan profit = total payable - net cash given.
     Realized profit = collected amount × this loan's profit margin. */
  return Math.max((payable-(loan-cutting))/payable,0);
 }
@@ -867,38 +881,21 @@ async function autoArchiveCompletedCurrentLoans(){
  return changed;
 }
 
-function historicalRecordKey(h){
- var loanId=String(h.loanId||"").trim().toLowerCase();
- if(loanId)return "loan:"+loanId;
- return "fallback:"+String(h.customerId||h.name||"").trim().toLowerCase()+"|"+String(h.loanDate||"")+"|"+(Number(h.loanAmount)||0)+"|"+(Number(h.perWeek)||0);
-}
-function allHistoricalRecords(){
- var out=[],seen={};
- HIST.forEach(function(h){var k=historicalRecordKey(h);if(!seen[k]){seen[k]=1;out.push({type:"standalone",h:h})}});
- DB.forEach(function(c){loanHistory(c).forEach(function(h){var hh=Object.assign({},h,{customerId:h.customerId||c.customerId,name:h.name||c.name,phone:h.phone||c.phone});var k=historicalRecordKey(hh);if(!seen[k]){seen[k]=1;out.push({type:"embedded",c:c,h:hh})}})});
- return out;
-}
-
 function totalPortfolioHistory(){
  var t={loans:0,loan:0,payable:0,collected:0,profit:0};
- allHistoricalRecords().forEach(function(x){var h=x.h,k=loanRecordCalc(h);t.loans++;t.loan+=Number(h.loanAmount)||0;t.payable+=k.payable;t.collected+=k.paid;t.profit+=loanProfit(h,k)});
+ DB.forEach(function(c){loanHistory(c).forEach(function(h){var k=loanRecordCalc(h);t.loans++;t.loan+=Number(h.loanAmount)||0;t.payable+=k.payable;t.collected+=k.paid;t.profit+=loanProfit(h,k)})});
+ HIST.forEach(function(h){var k=loanRecordCalc(h);t.loans++;t.loan+=Number(h.loanAmount)||0;t.payable+=k.payable;t.collected+=k.paid;t.profit+=loanProfit(h,k)});
  return t;
 }
 
-function todayKey(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
-function paymentIsEffective(p){
- if(!p||p.type!=="paid")return false;
- var d=String(p.date||"").slice(0,10);
- return !d || d<=todayKey();
-}
 function calc(c){
- var live=c.pays.filter(paymentIsEffective);
+ var live=c.pays.filter(function(p){return p.type==="paid"});
  var paidW=(+c.hPaid||0)+live.length;
  var hAmt=c.hAmt!==""&&c.hAmt!=null?+c.hAmt:(+c.hPaid||0)*c.perWeek;
  var paid=hAmt+live.reduce(function(s,p){return s+(+p.amt||0)},0);
  var payable=c.perWeek*c.weeks,ps={};live.forEach(function(p){ps[p.week]=1});
- var miss=(+c.hMiss||0)+c.pays.filter(function(p){return p.type==="unpaid" && String(p.date||"").slice(0,10)<=todayKey() && !ps[p.week]}).length;
- return{paidW:paidW,paid:paid,hAmt:hAmt,miss:miss,payable:payable,pend:Math.max(payable-paid,0),pendW:Math.max(c.weeks-paidW,0),done:paidW>=c.weeks,pct:c.weeks?Math.min(100,Math.round(paidW/c.weeks*100)):0};
+ var miss=(+c.hMiss||0)+c.pays.filter(function(p){return p.type==="unpaid"&&!ps[p.week]}).length;
+ return{paidW:paidW,paid:paid,hAmt:hAmt,miss:miss,payable:payable,pend:Math.max(payable-paid,0),pendW:Math.max(c.weeks-paidW,0),done:paidW>=c.weeks,pct:Math.min(100,Math.round(paidW/c.weeks*100))};
 }
 
 function weekdayName(n){return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][Number(n)];}
@@ -1139,7 +1136,7 @@ function monthlyAnalytics(){
  DB.filter(function(c){return c.isActive!==false}).forEach(function(c){
    var k=calc(c),rate=loanProfitRate(c,k);
    (c.pays||[]).forEach(function(p){
-     if((p.type!=="paid"&&p.type!=="hist") || (String(p.date||"").slice(0,10)>todayKey()))return;
+     if(p.type!=="paid"&&p.type!=="hist")return;
      var m=cm[monthKeyFromDate(p.date)];if(!m)return;
      var amt=Number(p.amt)||0;m.collection+=amt;m.paidWeeks++;m.profit+=amt*rate;
    });
@@ -1147,7 +1144,7 @@ function monthlyAnalytics(){
  function addHist(h){
    var k=loanRecordCalc(h),rate=loanProfitRate(h,k),hasDated=false;
    (h.pays||[]).forEach(function(p){
-     if((p.type!=="paid"&&p.type!=="hist") || (String(p.date||"").slice(0,10)>todayKey()))return;
+     if(p.type!=="paid"&&p.type!=="hist")return;
      var m=hm[monthKeyFromDate(p.date)];if(!m)return;
      hasDated=true;var amt=Number(p.amt)||0;m.collection+=amt;m.paidWeeks++;m.profit+=amt*rate;
    });
@@ -1158,7 +1155,8 @@ function monthlyAnalytics(){
      if(m&&amt>0){m.collection+=amt;m.paidWeeks+=Number(k.paidW)||0;m.profit+=amt*rate;}
    }
  }
- allHistoricalRecords().forEach(function(x){addHist(x.h)});
+ DB.forEach(function(c){loanHistory(c).forEach(addHist)});
+ HIST.forEach(addHist);
  return {current:current,historical:historical};
 }
 
@@ -1171,26 +1169,22 @@ function dashboardCategory(miss,done){
 }
 function dashboardView(){
  var activeDB=DB.filter(function(c){return c.isActive!==false});
- var totals=activeDB.reduce(function(t,c){var k=calc(c);t.collected+=k.paid;t.pending+=k.pend;t.pendingWeeks+=k.pendW;t.loan+=Number(c.loan)||0;t.payable+=k.payable;t.realizedProfit+=Math.max(k.paid*loanProfitRate(c,k),0);if(k.done)t.completed++;var cat=dashboardCategory(k.miss,k.done);t[cat.key]++;return t},{collected:0,pending:0,pendingWeeks:0,loan:0,payable:0,realizedProfit:0,completed:0,prime:0,standard:0,risk:0,healthy:0});
+ var totals=activeDB.reduce(function(t,c){var k=businessCalc(c);t.collected+=k.paid;t.pending+=k.pend;t.pendingWeeks+=k.pendW;t.loan+=Number(c.loan)||0;t.payable+=k.payable;t.realizedProfit+=Math.max(k.paid*loanProfitRate(c,k),0);if(k.done)t.completed++;var cat=dashboardCategory(k.miss,k.done);t[cat.key]++;return t},{collected:0,pending:0,pendingWeeks:0,loan:0,payable:0,realizedProfit:0,completed:0,prime:0,standard:0,risk:0,healthy:0});
  var hp=totalPortfolioHistory();
  var currentProfit=totals.realizedProfit, historicalProfit=hp.profit, currentCollected=totals.collected, historicalCollected=hp.collected;
  /* Business run-rate from the current 12 customer accounts.
     The standard model is ₹2,500 profit on ₹12,000 collection = 20.8333%.
     Use each active loan's own margin so custom cutting/terms are also supported. */
  var weeklyCollection=activeDB.reduce(function(s,c){return s+(Number(c.perWeek)||0)},0);
- /* Expected weekly profit is based on each active loan's own economics, not on
-    the amount already collected. For the standard ₹10,000/₹500-cut/₹12,000 model
-    this is ₹2,500 ÷ ₹12,000 = 20.8333% of every weekly collection. */
- var weeklyProfit=activeDB.reduce(function(s,c){var k=calc(c);return s+(Number(c.perWeek)||0)*loanProfitRate(c,k)},0);
+ var weeklyProfit=activeDB.reduce(function(s,c){var k=businessCalc(c);return s+(Number(c.perWeek)||0)*loanProfitRate(c,k)},0);
  var monthlyRunRate=weeklyCollection*52/12,monthlyProfitRunRate=weeklyProfit*52/12;
- var businessTargetWeekly=21000,weeklyVariance=weeklyCollection-businessTargetWeekly;
  var months=monthlyAnalytics();
  function chart(arr,title,kind){var maxC=Math.max.apply(null,arr.map(function(m){return m.collection}).concat([1]));var maxP=Math.max.apply(null,arr.map(function(m){return m.profit}).concat([1]));return '<div class="monthly-panel"><div class="monthly-panel-head"><div><h3>'+title+'</h3><p>'+ (kind==='current'?'Active/current loans only.':'Completed/old loans only.') +'</p></div><div class="mini-kpi"><b>'+inr(arr.reduce(function(s,m){return s+m.collection},0))+'</b><span>collection</span><b>'+inr(arr.reduce(function(s,m){return s+m.profit},0))+'</b><span>profit</span></div></div><div class="monthly-chart">'+arr.map(function(m){var ch=Math.max(3,Math.round((m.collection/maxC)*145)),ph=Math.max(3,Math.round((m.profit/maxP)*145));return '<div class="month-col"><div class="month-value">'+(m.collection?inr(m.collection):'₹0')+'</div><div class="month-bars"><div class="month-bar collection" style="height:'+ch+'px" title="'+m.label+' collection '+inr(m.collection)+'"></div><div class="month-bar profit" style="height:'+ph+'px" title="'+m.label+' profit '+inr(m.profit)+'"></div></div><div class="month-label">'+m.label+'</div></div>'}).join('')+'</div><div class="month-legend"><span style="--c:#5D9DFF">Collection</span><span style="--c:#24A97E">Realized profit</span></div><div class="monthly-table"><div class="monthly-row head"><span>Month</span><span>Collection</span><span>Profit</span><span>Payments</span></div>'+arr.map(function(m){return '<div class="monthly-row"><b>'+m.label+'</b><b class="collection-num">'+inr(m.collection)+'</b><b class="profit-num">'+inr(m.profit)+'</b><span>'+m.paidWeeks+'</span></div>'}).join('')+'</div></div>'}
- var cards=[['Current Profit',inr(currentProfit),'Realized from active-loan payments'],['Historical Profit',inr(historicalProfit),'Completed/old loans only'],['Current Collected',inr(currentCollected),'Actual active-loan payments'],['Historical Collected',inr(historicalCollected),'Completed/old-loan payments'],['Weekly Collection',inr(weeklyCollection),Math.abs(weeklyVariance)<1?'12 customers · ₹21,000 target':'Check customer weekly amounts · target ₹21,000'],['Weekly Profit',inr(weeklyProfit),'Weekly collection × each loan profit margin'],['Monthly Collection Run-rate',inr(monthlyRunRate),'Weekly collection × 52 ÷ 12'],['Monthly Profit Run-rate',inr(monthlyProfitRunRate),'Weekly profit × 52 ÷ 12'],['Total Pending',inr(totals.pending),'Active/current loans'],['Active Customers',activeDB.length,'Current collection accounts']];
+ var cards=[['Current Profit',inr(currentProfit),'Realized from active-loan payments'],['Historical Profit',inr(historicalProfit),'Completed/old loans only'],['Current Collected',inr(currentCollected),'Actual active-loan payments'],['Historical Collected',inr(historicalCollected),'Completed/old-loan payments'],['Weekly Collection',inr(weeklyCollection),'Current customer run-rate'],['Weekly Profit',inr(weeklyProfit),'Expected profit from current weekly collections'],['Monthly Collection Run-rate',inr(monthlyRunRate),'₹ weekly × 52 ÷ 12'],['Monthly Profit Run-rate',inr(monthlyProfitRunRate),'Expected current-business profit'],['Total Pending',inr(totals.pending),'Active/current loans'],['Active Customers',activeDB.length,'Current collection accounts']];
  var catRows=[['Prime Customers','1–3 pending weeks',totals.prime,'Best-performing active accounts'],['Standard Customers','4–5 pending weeks',totals.standard,'Medium-range accounts'],['At-Risk Customers','6+ pending weeks',totals.risk,'Follow-up required'],['Healthy Customers','0 pending weeks',totals.healthy,'No pending weeks']];
  return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Analytics</div><h1>Business Dashboard</h1><p>Current business profit, historical profit and collection run-rates are shown separately for clear decisions.</p></div><button class="btn" onclick="go(\'\')">← Back to Customers</button></div>'+
  '<div class="grid dashboard-cards">'+cards.map(function(s){return '<div class="stat dashboard-card"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join('')+'</div>'+
- '<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Current vs Historical Performance</h2><p>Current payments and completed/old loans are calculated separately. The business model uses the actual cutting amount on each loan.</p></div><div class="profit-model"><b>Example: ₹10,000 loan − ₹500 cutting = ₹9,500 given</b><br>₹12,000 collection − ₹9,500 given = ₹2,500 profit (20.83% of collection).</div></div><div class="dashboard-split-charts">'+chart(months.current,'Current Loans','current')+chart(months.historical,'Historical / Completed Loans','historical')+'</div></div>'+
+ '<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Current vs Historical Performance</h2><p>Current payments and completed/old loans are calculated separately. The business model uses the actual cutting amount on each loan.</p></div><div class="profit-model"><b>Each loan uses its own cutting-based margin.</b><br>₹10K−₹500 → ₹9.5K given → ₹2.5K profit; Yalamanda: 10 weeks, ₹0 cutting → ₹0 profit.</div></div><div class="dashboard-split-charts">'+chart(months.current,'Current Loans','current')+chart(months.historical,'Historical / Completed Loans','historical')+'</div><div class="monthly-note"><b>Profit formula:</b> Loan profit = Total payable − (Loan amount − cutting). Profit margin = Loan profit ÷ Total payable. Weekly profit = each customer weekly amount × that loan margin. Monthly run-rate = weekly × 52 ÷ 12. Yalamanda is treated as 10 weeks with ₹0 cutting, so its profit is ₹0 when ₹3,000 × 10 = ₹30,000 is repaid on a ₹30,000 loan.</div></div>'+
  '<div class="dashboard-layout"><div class="sec"><div class="dash-title"><div><h2>Customer Categories</h2><p>Active customers only.</p></div></div><div class="category-list">'+catRows.map(function(r){return '<div class="category-row"><div><b>'+r[0]+'</b><small>'+r[1]+' · '+r[3]+'</small></div><strong>'+r[2]+'</strong></div>'}).join('')+'</div></div>'+
  '<div class="sec"><h2>Business Snapshot</h2><p>Separate portfolio view.</p><div class="snapshot"><div><span>Current payable</span><b>'+inr(totals.payable)+'</b></div><div><span>Current collected</span><b>'+inr(currentCollected)+'</b></div><div><span>Current profit</span><b>'+inr(currentProfit)+'</b></div><div><span>Historical collected</span><b>'+inr(historicalCollected)+'</b></div><div><span>Historical profit</span><b>'+inr(historicalProfit)+'</b></div><div><span>Completed loans</span><b>'+hp.loans+'</b></div></div></div></div>'+
  '<div class="sec dashboard-card" style="margin-top:14px"><div class="dash-title"><div><h2>Completed</h2><p>Completed loans are automatically moved here when a current loan reaches its final payable week.</p></div><button class="btn sm" onclick="completedPage()">Open Completed →</button></div><div class="loan-summary-grid"><div><span>Completed loans</span><b>'+hp.loans+'</b></div><div><span>Historical collected</span><b>'+inr(historicalCollected)+'</b></div><div><span>Historical profit</span><b>'+inr(historicalProfit)+'</b></div><div><span>Historical customers</span><b>'+Object.keys(historyCustomerGroups()).length+'</b></div></div></div>'+

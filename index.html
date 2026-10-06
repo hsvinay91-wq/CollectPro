@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CollectPro">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>CollectPro — Cloud v21 Premium</title>
+<title>CollectPro — Cloud v23 Premium</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -532,11 +532,43 @@ body:after{
   body:before,body:after,.brand-mark,.brand-mark i,.hero:after,.portal-page:before{animation:none!important}
 }
 
+
+/* V23 Dashboard + classic CollectPro text logo */
+.brand-word{font:400 34px 'Instrument Serif',Georgia,serif;color:#F5F6FF;letter-spacing:-.7px;text-shadow:0 0 24px rgba(120,151,255,.18)}
+.brand-word i{font-style:normal;color:#B184FF;text-shadow:0 0 18px rgba(177,132,255,.28)}
+.dashboard-nav-btn{border-color:rgba(83,171,255,.38)!important;background:linear-gradient(135deg,rgba(28,52,100,.82),rgba(17,24,56,.82))!important}
+.dashboard-page{animation:dashIn .5s ease both}
+.dashboard-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin:10px 0 18px}
+.dashboard-head h1{font-size:38px;margin:2px 0}.dashboard-head p{margin:0;color:var(--muted)}
+.dash-kicker{font:700 11px Manrope,sans-serif;letter-spacing:1.6px;text-transform:uppercase;color:#70CFFF}
+.dashboard-card{position:relative;overflow:hidden}.dashboard-card:after{content:"";position:absolute;width:110px;height:110px;right:-45px;top:-45px;border-radius:50%;background:rgba(106,113,255,.10)}
+.dashboard-layout{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}
+.dash-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.category-list{display:grid;gap:9px;margin-top:12px}
+.category-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 14px;border:1px solid rgba(104,139,230,.18);border-radius:13px;background:rgba(255,255,255,.035)}
+.category-row b{display:block}.category-row small{display:block;color:var(--muted);margin-top:3px}.category-row strong{font:400 28px 'Instrument Serif',serif;color:#F6F7FF}
+.snapshot{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.snapshot>div{padding:13px;border:1px solid rgba(104,139,230,.18);border-radius:12px;background:rgba(255,255,255,.035)}
+.snapshot span{display:block;color:var(--muted);font-size:11px}.snapshot b{display:block;margin-top:3px;font:400 22px 'Instrument Serif',serif}
+.dash-live{font-size:11px;font-weight:800;color:#25E0AE;padding:6px 10px;border:1px solid rgba(37,224,174,.3);border-radius:99px;background:rgba(37,224,174,.07)}
+.performance-list{display:grid;gap:7px;margin-top:12px}
+.performance-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto auto 16px;align-items:center;gap:10px;padding:10px 8px;border:1px solid transparent;border-radius:13px;cursor:pointer;transition:.2s ease}
+.performance-row:hover{background:rgba(65,99,190,.10);border-color:rgba(101,142,255,.22);transform:translateY(-1px)}
+.perf-avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#3158B7,#8B61E9);font-weight:800;box-shadow:0 0 16px rgba(89,105,236,.18)}
+.perf-main{min-width:0}.perf-main b{display:block}.perf-main small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.perf-cat{font-size:10.5px;font-weight:800;padding:6px 9px;border-radius:99px;white-space:nowrap}
+.perf-cat.prime{color:#39E2B4;background:rgba(32,224,178,.10);border:1px solid rgba(32,224,178,.25)}
+.perf-cat.standard{color:#FFD66B;background:rgba(255,198,72,.10);border:1px solid rgba(255,198,72,.25)}
+.perf-cat.risk{color:#FF9B5A;background:rgba(255,137,66,.10);border:1px solid rgba(255,137,66,.25)}
+.perf-cat.completed{color:#9CA9D5;background:rgba(150,165,210,.10);border:1px solid rgba(150,165,210,.25)}
+.perf-cat.healthy{color:#72C8FF;background:rgba(72,170,255,.10);border:1px solid rgba(72,170,255,.25)}
+.perf-arrow{color:var(--muted);font-size:19px}
+@keyframes dashIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(max-width:760px){.dashboard-head{align-items:flex-start;flex-direction:column}.dashboard-head h1{font-size:31px}.dashboard-layout{grid-template-columns:1fr}.performance-row{grid-template-columns:36px minmax(0,1fr) auto}.performance-row>strong{grid-column:2;justify-self:start}.perf-arrow{grid-column:3;grid-row:1}.perf-cat{grid-column:3;grid-row:1}}
+@media(max-width:480px){.dashboard-head .btn{width:100%}.snapshot{grid-template-columns:1fr}.performance-row{gap:8px}.perf-cat{font-size:9px;padding:5px 7px}}
 </style></head><body>
 <div class="wrap">
  <div class="top"><div class="brand" onclick="go('')" aria-label="CollectPro home">
-  <span class="brand-mark" aria-hidden="true"><b></b><b></b><b></b><i>↗</i></span>
-  <span class="brand-word">Collect<strong>Pro</strong></span>
+  <span class="brand-word">Collect<i>Pro</i></span>
 </div>
   <div class="row" id="topActions"></div></div>
  <div id="app"></div>
@@ -712,13 +744,23 @@ function trackerItems(c){
      else if(p.type==="unpaid"&&base[p.week-1].status!=="paid")base[p.week-1].status="unpaid";
    }
  });
+ /* Carry-over weeks are released one-at-a-time. If Week 13 is unpaid,
+    Week 14 is not added. Once Week 13 is paid, Week 14 can appear when
+    its real collection date arrives. */
  var debt=base.filter(function(x){return x.status==="unpaid"});
- debt.forEach(function(d,i){
-   var cw=c.weeks+i+1;
-   var cp=c.pays.filter(function(p){return +p.week===cw});
-   var paid=cp.some(function(p){return p.type==="paid"||p.type==="hist"});
-   base.push({week:cw,status:paid?"paid":"carry"});
- });
+ if(debt.length){
+   var cw=c.weeks+1,weekday=(c.collectionWeekday==null?4:+c.collectionWeekday);
+   for(var guard=0;guard<20;guard++,cw++){
+     var due=nextWeekDate(c.date,cw,weekday);
+     var today=new Date();today.setHours(0,0,0,0);
+     var dueDate=due?new Date(due+"T00:00:00"):null;
+     if(dueDate && dueDate>today)break;
+     var cp=c.pays.filter(function(p){return +p.week===cw});
+     var paid=cp.some(function(p){return p.type==="paid"||p.type==="hist"});
+     base.push({week:cw,status:paid?"paid":"carry"});
+     if(!paid)break;
+   }
+ }
  return base;
 }
 function strip(c){return trackerItems(c).map(function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""});}
@@ -791,16 +833,77 @@ function topActions(){
    return;
  }
  if(cloudReady && adminSession){
-   t.innerHTML='<button class="btn portal-nav-btn" onclick="portal()">Customer Portal</button><button class="btn logout-nav-btn" onclick="adminLogout()">Logout</button><button class="btn pri add-nav-btn" onclick="custForm()">+ Add customer</button>';
+   t.innerHTML='<button class="btn dashboard-nav-btn" onclick="dashboard()">Dashboard</button><button class="btn portal-nav-btn" onclick="portal()">Customer Portal</button><button class="btn logout-nav-btn" onclick="adminLogout()">Logout</button><button class="btn pri add-nav-btn" onclick="custForm()">+ Add customer</button>';
  }else if(cloudReady){
    t.innerHTML='<button class="btn" onclick="portal()">Customer Portal</button><button class="btn" onclick="adminLogin()">Admin Login</button>';
  }else{
    t.innerHTML='<button class="btn" onclick="portal()">Customer Portal</button>';
  }
 }
+function dashboard(){location.hash="#dashboard"}
+function dashboardCategory(miss,done){
+ if(done)return {name:"Completed",key:"completed"};
+ if(miss>=1&&miss<=3)return {name:"Prime Customers",key:"prime"};
+ if(miss>=4&&miss<=5)return {name:"Standard Customers",key:"standard"};
+ if(miss>5)return {name:"At-Risk Customers",key:"risk"};
+ return {name:"Healthy Customers",key:"healthy"};
+}
+function dashboardView(){
+ var totalCustomers=DB.length;
+ var totals=DB.reduce(function(t,c){
+   var k=calc(c);
+   t.collected+=k.paid;
+   t.pending+=k.pend;
+   t.pendingWeeks+=k.pendW;
+   t.loan+=Number(c.loan)||0;
+   t.payable+=k.payable;
+   t.projectedProfit+=Math.max(k.payable-(Number(c.loan)||0),0);
+   t.realizedProfit+=Math.max(k.paid-(Number(c.loan)||0),0);
+   if(k.done)t.completed++;
+   var cat=dashboardCategory(k.miss,k.done);
+   if(cat.key==="prime")t.prime++;
+   else if(cat.key==="standard")t.standard++;
+   else if(cat.key==="risk")t.risk++;
+   else if(cat.key==="healthy")t.healthy++;
+   return t;
+ },{collected:0,pending:0,pendingWeeks:0,loan:0,payable:0,projectedProfit:0,realizedProfit:0,completed:0,prime:0,standard:0,risk:0,healthy:0});
+ var avg=totalCustomers?Math.round(totals.pending/totalCustomers):0;
+ var cards=[
+  ["Number Customers",totalCustomers,"All collection accounts"],
+  ["Business Profit",inr(totals.projectedProfit),"Projected: total payable − loan principal"],
+  ["Total Collected",inr(totals.collected),"Recorded payments"],
+  ["Total Pending",inr(totals.pending),"Outstanding amount"]
+ ];
+ var catRows=[
+  ["Prime Customers","1–3 pending weeks",totals.prime,"Best-performing active accounts"],
+  ["Standard Customers","4–5 pending weeks",totals.standard,"Medium-range accounts"],
+  ["At-Risk Customers","6+ pending weeks",totals.risk,"Low-range / follow-up accounts"],
+  ["Completed Customers","0 pending balance",totals.completed,"Successfully completed accounts"]
+ ];
+ return '<div class="dashboard-page">'+
+ '<div class="dashboard-head"><div><div class="dash-kicker">CollectPro Analytics</div><h1>Business Dashboard</h1><p>Live analytics based on the current customer and payment data.</p></div><button class="btn" onclick="go(\'\')">← Back to Customers</button></div>'+
+ '<div class="grid dashboard-cards">'+cards.map(function(s){return '<div class="stat dashboard-card"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+ 
+ '<div class="dashboard-layout">'+
+ '<div class="sec"><div class="dash-title"><div><h2>Customer Categories</h2><p>Categories update automatically when customer data changes.</p></div></div><div class="category-list">'+catRows.map(function(r){return '<div class="category-row"><div><b>'+r[0]+'</b><small>'+r[1]+' · '+r[3]+'</small></div><strong>'+r[2]+'</strong></div>'}).join("")+'</div></div>'+ 
+ '<div class="sec"><h2>Business Snapshot</h2><p>Current portfolio overview.</p><div class="snapshot">'+
+ '<div><span>Loan principal</span><b>'+inr(totals.loan)+'</b></div>'+ 
+ '<div><span>Total payable</span><b>'+inr(totals.payable)+'</b></div>'+ 
+ '<div><span>Realized profit</span><b>'+inr(totals.realizedProfit)+'</b></div>'+ 
+ '<div><span>Pending weeks</span><b>'+totals.pendingWeeks+'</b></div>'+ 
+ '<div><span>Avg. pending/customer</span><b>'+inr(avg)+'</b></div>'+ 
+ '<div><span>Completed accounts</span><b>'+totals.completed+'</b></div>'+ 
+ '</div></div></div>'+ 
+ '<div class="sec"><div class="dash-title"><div><h2>Customer Performance</h2><p>Sorted by pending weeks for quick follow-up.</p></div><span class="dash-live">● Live</span></div><div class="performance-list">'+
+ DB.slice().sort(function(a,b){return calc(b).miss-calc(a).miss}).map(function(c){
+   var k=calc(c),cat=dashboardCategory(k.miss,k.done);
+   return '<div class="performance-row" onclick="go(\''+c.id+'\')"><div class="perf-avatar">'+esc((c.name||"?").charAt(0).toUpperCase())+'</div><div class="perf-main"><b>'+esc(c.name)+'</b><small>'+k.miss+' pending week'+(k.miss===1?"":"s")+' · '+k.paidW+'/'+c.weeks+' paid</small></div><span class="perf-cat '+cat.key+'">'+cat.name+'</span><strong>'+inr(k.pend)+'</strong><span class="perf-arrow">›</span></div>';
+ }).join("")+'</div></div></div>';
+}
+
 function render(){
  topActions();
  var a=$("app");
+ if(location.hash==="#dashboard"){a.innerHTML=dashboardView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
  if(cloudReady && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><div class="av" style="width:64px;height:64px;margin:0 auto 16px">CP</div><h1 style="font-size:34px">CollectPro Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
  if(!view){

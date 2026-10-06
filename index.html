@@ -817,8 +817,17 @@ var armed=null;
 
 function loanHistory(c){return Array.isArray(c.loanHistory)?c.loanHistory:[]}
 function loanRecordCalc(h){return calc({perWeek:+h.perWeek||0,weeks:+h.weeks||0,hPaid:+h.hPaid||0,hMiss:+h.hMiss||0,hAmt:h.hAmt==null?"":+h.hAmt,pays:Array.isArray(h.pays)?h.pays:[]})}
-function loanProfit(h,k){return Math.max((k&&k.paid||0)-((Number(h.loanAmount)||0)-(Number(h.cutting)||0)),0)}
-function loanProfitRate(h,k){var payable=k&&k.payable||0;return payable>0?loanProfit(h,k)/payable:0}
+function loanProfitRate(h,k){
+ var payable=Number(k&&k.payable)||0, loan=Number(h&&h.loanAmount)||0, cutting=Number(h&&h.cutting)||0;
+ if(payable<=0)return 0;
+ /* Profit margin includes the initial cutting: net given = loan - cutting.
+    Total loan profit = total payable - net given. */
+ return Math.max((payable-(loan-cutting))/payable,0);
+}
+function loanProfit(h,k){
+ var paid=Number(k&&k.paid)||0;
+ return Math.max(paid*loanProfitRate(h,k),0);
+}
 function makeLoanId(c){return "LN-"+String(c.customerId||c.name||"CUS").replace(/[^A-Za-z0-9]/g,"").slice(0,12).toUpperCase()+"-"+Date.now().toString(36).toUpperCase()}
 function archiveCurrentLoan(c){
  var k=calc(c);
@@ -1114,7 +1123,7 @@ function dashboardView(){
  var totalCustomers=DB.length;
  var totals=DB.reduce(function(t,c){
    var k=calc(c);t.collected+=k.paid;t.pending+=k.pend;t.pendingWeeks+=k.pendW;t.loan+=Number(c.loan)||0;t.payable+=k.payable;
-   t.projectedProfit+=Math.max(k.payable-((Number(c.loan)||0)-(Number(c.cutting)||0)),0);t.realizedProfit+=Math.max(k.paid-((Number(c.loan)||0)-(Number(c.cutting)||0)),0);
+   t.projectedProfit+=Math.max(k.payable*loanProfitRate(c,k),0);t.realizedProfit+=Math.max(k.paid*loanProfitRate(c,k),0);
    if(k.done)t.completed++;var cat=dashboardCategory(k.miss,k.done);t[cat.key]++;return t;
  },{collected:0,pending:0,pendingWeeks:0,loan:0,payable:0,projectedProfit:0,realizedProfit:0,completed:0,prime:0,standard:0,risk:0,healthy:0});
  var hp=totalPortfolioHistory();
@@ -1133,11 +1142,11 @@ function dashboardView(){
  return '<div class="dashboard-page">'+
  '<div class="dashboard-head"><div><div class="dash-kicker">CollectPro Analytics</div><h1>Business Dashboard</h1><p>Live analytics based on the current customer and payment data.</p></div><button class="btn" onclick="go(\'\')">← Back to Customers</button></div>'+
  '<div class="grid dashboard-cards">'+cards.map(function(s){return '<div class="stat dashboard-card"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+ 
- '<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Monthly Collection &amp; Profit</h2><p>Actual paid collections by payment date. Profit follows your current ₹10,000 chitti model.</p></div><div class="profit-model"><b>₹1,000 collection → ₹208.33 profit</b><br>Profit rate: <b>20.83%</b></div></div>'+ 
+ '<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Monthly Collection &amp; Profit</h2><p>Actual paid collections by payment date. Profit is calculated separately for each loan using its cutting amount.</p></div><div class="profit-model"><b>Profit = Collection × Loan Profit Margin</b><br>Margin includes the <b>initial cutting</b>.</div></div>'+ 
  '<div class="monthly-chart">'+months.map(function(m){var ch=Math.max(3,Math.round((m.collection/maxCollection)*145)),ph=Math.max(3,Math.round((m.profit/maxProfit)*145));return '<div class="month-col"><div class="month-value">'+(m.collection?inr(m.collection):"₹0")+'</div><div class="month-bars"><div class="month-bar collection" style="height:'+ch+'px" title="'+m.label+' collection '+inr(m.collection)+'"></div><div class="month-bar profit" style="height:'+ph+'px" title="'+m.label+' profit '+inr(m.profit)+'"></div></div><div class="month-label">'+m.label+'</div></div>'}).join("")+'</div>'+ 
  '<div class="month-legend"><span style="--c:#5D9DFF">Collection</span><span style="--c:#24A97E">Estimated profit</span></div>'+ 
  '<div class="monthly-table"><div class="monthly-row head"><span>Month</span><span>Collection</span><span>Profit</span><span>Paid weeks</span></div>'+months.map(function(m){return '<div class="monthly-row"><b>'+m.label+'</b><b class="collection-num">'+inr(m.collection)+'</b><b class="profit-num">'+inr(m.profit)+'</b><span>'+m.paidWeeks+'</span></div>'}).join("")+'</div>'+ 
- '<div class="monthly-note">Logic: every ₹10,000 loan gives ₹9,500 to the customer after ₹500 initial cutting, while total repayment is ₹12,000. Therefore profit = ₹2,500 per ₹12,000 collected = <b>20.83% of collection</b>. Monthly profit = that month’s actual paid collection × 20.83%. Unpaid weeks produce no collection/profit for that month. Historical setup amounts without dated payment rows are not assigned to a month.</div>'+ 
+ '<div class="monthly-note">Logic: <b>Net given = Loan amount − Initial cutting</b>. Total loan profit = <b>Total payable − Net given</b>. The profit margin is calculated separately for each loan, then applied to that loan’s actual collected payments. Example: ₹10,000 loan, ₹500 cutting and ₹12,000 payable gives ₹2,500 profit, or <b>20.83% of collections</b>. This prevents loans with different cutting amounts from using the wrong profit rate. Unpaid weeks produce no collection/profit for that month.</div>'+ 
  '<div class="note" style="margin-top:10px">Current month: <b>'+inr(current.collection)+'</b> collected → approximately <b style="color:var(--profit)">'+inr(current.profit)+'</b> gross profit.</div></div>'+ 
  '<div class="dashboard-layout">'+
  '<div class="sec"><div class="dash-title"><div><h2>Customer Categories</h2><p>Categories update automatically when customer data changes.</p></div></div><div class="category-list">'+catRows.map(function(r){return '<div class="category-row"><div><b>'+r[0]+'</b><small>'+r[1]+' · '+r[3]+'</small></div><strong>'+r[2]+'</strong></div>'}).join("")+'</div></div>'+ 
@@ -1221,11 +1230,17 @@ function historyGroupTotals(g){
 }
 function completedCustomerCard(g){
  var t=historyGroupTotals(g);
+ var standalone=g.loans.filter(function(x){return x.type==="standalone"});
+ var actions='<div class="row" style="gap:6px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end">'+
+   '<button class="btn sm" onclick="event.stopPropagation();completedPage(\''+encodeURIComponent(g.key)+'\')">View</button>'+
+   (standalone.length===1?'<button class="btn sm" onclick="event.stopPropagation();historicalLoanForm(\''+esc(standalone[0].h.id)+'\')">Edit</button>':'<button class="btn sm" onclick="event.stopPropagation();completedPage(\''+encodeURIComponent(g.key)+'\')">Manage</button>')+
+   (standalone.length?'<button class="btn sm del" onclick="event.stopPropagation();deleteHistoricalCustomer(\''+encodeURIComponent(g.key)+'\',this)">Delete old data</button>':'')+
+   '</div>';
  return '<div class="cust" onclick="completedPage(\''+encodeURIComponent(g.key)+'\')">'+
    '<div class="ring" style="--p:100%"><div class="av">'+esc(String(g.name||"?").charAt(0).toUpperCase())+'</div></div>'+
    '<div class="m"><b>'+esc(g.name||"Unknown customer")+'</b><small>'+esc(g.customerId||"Old customer")+' · '+esc(g.phone||"No contact")+' · '+t.loans+' completed loan'+(t.loans===1?'':'s')+'</small>'+
    '<small style="color:var(--profit);font-weight:700">Collected '+inr(t.collected)+' · Profit '+inr(t.profit)+'</small></div>'+
-   '<div class="amt">'+inr(t.collected)+'<small>Completed</small></div></div>';
+   '<div class="amt">'+inr(t.collected)+'<small>Completed</small></div>'+actions+'</div>';
 }
 function completedCustomerView(g){
  var t=historyGroupTotals(g);
@@ -1236,7 +1251,7 @@ function completedCustomerView(g){
  '<div class="grid"><div class="stat"><div class="l">Completed loans</div><div class="v">'+t.loans+'</div><div class="s">Past loans stored separately</div></div>'+
  '<div class="stat"><div class="l">Total principal</div><div class="v">'+inr(t.loan)+'</div><div class="s">Original loan amounts</div></div>'+
  '<div class="stat"><div class="l">Total collected</div><div class="v">'+inr(t.collected)+'</div><div class="s">Historical payments</div></div>'+
- '<div class="stat"><div class="l">Total profit</div><div class="v">'+inr(t.profit)+'</div><div class="s">Collected − principal</div></div></div>'+
+ '<div class="stat"><div class="l">Total profit</div><div class="v">'+inr(t.profit)+'</div><div class="s">Collected × loan margin, including cutting</div></div></div>'+
  '<div class="sec"><div class="ph-head"><div><h2>Completed Loan Details</h2><p style="margin-bottom:0">Each old loan is a separate record. Click a loan to see its payment history.</p></div><span class="loan-history-badge">'+t.loans+' records</span></div>'+
  '<div class="loan-history-list">'+g.loans.map(function(x){
    var h=x.h,k=loanRecordCalc(h),tag=x.type==="standalone"?"Old data":"Archived";
@@ -1255,7 +1270,7 @@ function completedView(){
  var keys=Object.keys(groups).sort(function(a,b){return groups[a].name.localeCompare(groups[b].name)});
  var totalLoans=0,totalCollected=0,totalProfit=0;
  keys.forEach(function(k){var t=historyGroupTotals(groups[k]);totalLoans+=t.loans;totalCollected+=t.collected;totalProfit+=t.profit});
- return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>Completed Customers</h1><p>Old customers are listed separately. Opening a customer shows only their completed loan history — the current account is never changed.</p></div><div class="row"><button class="btn" onclick="go(\'\')">← Current Customers</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+
+ return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>Completed Customers</h1><p>Old customers are listed separately. Opening a customer shows only their completed loan history — the current account is never changed. Use <b>Edit</b> or <b>Delete old data</b> to manage historical records.</p></div><div class="row"><button class="btn" onclick="go(\'\')">← Current Customers</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+
  '<div class="grid dashboard-cards"><div class="stat dashboard-card"><div class="l">Completed customers</div><div class="v">'+keys.length+'</div><div class="s">Unique historical customers</div></div><div class="stat dashboard-card"><div class="l">Completed loans</div><div class="v">'+totalLoans+'</div><div class="s">All historical loans</div></div><div class="stat dashboard-card"><div class="l">Historical collected</div><div class="v">'+inr(totalCollected)+'</div><div class="s">Completed loan collections</div></div><div class="stat dashboard-card"><div class="l">Historical profit</div><div class="v">'+inr(totalProfit)+'</div><div class="s">Business analytics</div></div></div>'+
  '<div class="sec"><div class="ph-head"><div><h2>Old Customer List</h2><p style="margin-bottom:0">Click a customer to open all of their past loans.</p></div><span class="loan-history-badge">'+keys.length+' customers</span></div>'+
  (keys.length?'<div id="completedCustomerList">'+keys.map(function(k){return completedCustomerCard(groups[k])}).join("")+'</div>':'<div class="empty">No completed/old customers yet.<br><br><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div>')+
@@ -1295,6 +1310,19 @@ function historicalLoanDetail(id){
  var list=rows.length?'<div class="ph-list">'+rows.map(function(p){return paymentRowHtml({name:h.name},p,false)}).join('')+'</div>':'<div class="ph-empty">No dated payment rows were saved for this old loan.</div>';
  open_('<div class="row"><div><h2>'+esc(h.name)+'</h2><p style="color:var(--muted);font-size:13px;margin:4px 0 0">'+esc(h.loanId)+' · Old completed loan</p></div><div class="row"><button class="btn sm" onclick="historicalLoanForm(&quot;'+esc(h.id)+'&quot;)">Edit</button><button class="btn sm sp" onclick="close_()">Close</button></div></div><div class="loan-summary-grid"><div><span>Loan amount</span><b>'+inr(h.loanAmount)+'</b></div><div><span>Initial cutting</span><b>'+inr(h.cutting)+'</b></div><div><span>Net given</span><b>'+inr(Math.max((Number(h.loanAmount)||0)-(Number(h.cutting)||0),0))+'</b></div><div><span>Total payable</span><b>'+inr(k.payable)+'</b></div><div><span>Total paid</span><b>'+inr(k.paid)+'</b></div><div><span>Profit</span><b>'+inr(loanProfit(h,k))+'</b></div></div><div class="note" style="margin-top:12px">Customer ID: <b>'+esc(h.customerId)+'</b> · Loan date: <b>'+fmt(h.loanDate)+'</b> · Completed: <b>'+fmt(String(h.completedAt||'').slice(0,10))+'</b> · '+k.paidW+'/'+h.weeks+' weeks.</div><div class="sec" style="margin-top:14px"><h2>Old Loan Payment History</h2>'+list+'</div><div class="row" style="margin-top:12px"><button class="btn del sp" onclick="deleteHistoricalLoan(\''+esc(h.id)+'\',this)">Delete old loan record</button></div>');
 }
+async function deleteHistoricalCustomer(encodedKey,b){
+ if(!arm("customer:"+encodedKey,b))return;
+ var key=decodeURIComponent(encodedKey||"");
+ var rows=HIST.filter(function(h){return historyCustomerKey(h)===key});
+ if(!rows.length){armed=null;return}
+ if(sb){
+   var ids=rows.map(function(h){return h.id}).filter(Boolean);
+   for(var i=0;i<ids.length;i++){var ok=await cloudDeleteHistorical(ids[i]);if(!ok){armed=null;return}}
+ }
+ HIST=HIST.filter(function(h){return historyCustomerKey(h)!==key});
+ save();armed=null;location.hash="#completed";render();
+}
+
 async function deleteHistoricalLoan(id,b){
  if(!arm(id,b))return;
  if(sb){var ok=await cloudDeleteHistorical(id);if(!ok)return}

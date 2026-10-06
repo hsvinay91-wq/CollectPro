@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CollectPro">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>CollectPro — Cloud v26 Customer Friendly</title>
+<title>CollectPro — Cloud v24 Premium</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -611,18 +611,14 @@ body:after{
 @media(prefers-reduced-motion:reduce){.dashboard-page:before,.dashboard-page:after,.profit-model{animation:none}.dashboard-card,.monthly-row,.category-row,.snapshot>div{transition:none}}
 
 
-/* V25 Customer-first portal UX */
-.portal-action-wrap{margin:14px 0 0}
-.portal-action-card{display:flex;align-items:center;gap:13px;padding:15px 17px;border-radius:17px;border:1px solid rgba(90,137,255,.25);background:linear-gradient(135deg,rgba(46,72,145,.28),rgba(18,27,63,.72));box-shadow:0 12px 28px rgba(0,0,0,.14);animation:customerCardIn .55s ease both}
-.portal-action-card.overdue{border-color:rgba(255,154,61,.38);background:linear-gradient(135deg,rgba(110,57,28,.26),rgba(35,25,52,.72))}
-.portal-action-card.done{border-color:rgba(25,214,160,.3);background:linear-gradient(135deg,rgba(22,104,83,.23),rgba(18,27,63,.72))}
-.portal-action-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.07);font-size:22px;flex:none}
-.portal-action-main{display:grid;gap:1px}.portal-action-main b{font-size:12px;color:#B9C8EE;text-transform:uppercase;letter-spacing:.5px}.portal-action-main strong{font:400 25px 'Instrument Serif',serif;color:#F8F9FF}.portal-action-main small,.portal-action-card small{color:var(--muted);font-size:11px}
-.portal-simple-status{display:flex;align-items:center;gap:10px;margin:12px 0;padding:11px 13px;border-radius:13px;background:rgba(255,255,255,.035);border:1px solid rgba(112,145,220,.16);animation:customerCardIn .65s .06s ease both}.portal-simple-status>span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:900}.portal-simple-status.good>span{background:rgba(25,214,160,.13);color:#25E0AE}.portal-simple-status.warn>span{background:rgba(255,154,61,.14);color:#FFAA60}.portal-simple-status b{display:block;font-size:12px}.portal-simple-status small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
-.portal-help{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding:15px;border-radius:16px;border:1px solid rgba(177,132,255,.2);background:linear-gradient(135deg,rgba(97,66,160,.12),rgba(255,255,255,.025));animation:customerCardIn .7s .12s ease both}.portal-help-title{font-weight:800}.portal-help small{color:var(--muted);font-size:11px}.portal-simple-toggle{display:flex;align-items:center;gap:8px;margin-top:10px;padding:9px 2px;color:#D9DDF0}.portal-simple-toggle small{color:var(--muted);flex:1;font-size:10.5px}.portal-simple-toggle .btn{padding:6px 10px;font-size:10px}
-@keyframes customerCardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@media(max-width:560px){.portal-action-card{padding:14px}.portal-help{align-items:flex-start;flex-direction:column}.portal-help .row{width:100%}.portal-help .btn{flex:1;text-align:center}.portal-simple-toggle{flex-wrap:wrap}.portal-simple-toggle small{flex-basis:100%;order:3}.portal-info-grid{grid-template-columns:repeat(2,1fr)!important}}
-@media(prefers-reduced-motion:reduce){.portal-action-card,.portal-simple-status,.portal-help{animation:none}}
+/* V24 Customer Help + Next Payment */
+.portal-next-payment{margin-top:18px;display:flex;align-items:center;gap:14px;padding:13px 15px;border:1px solid rgba(105,137,255,.30);border-radius:17px;background:linear-gradient(135deg,rgba(32,47,102,.72),rgba(10,18,45,.78));box-shadow:0 12px 30px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.04);animation:portalRise .65s .35s ease both}
+.portal-calendar{width:46px;height:56px;object-fit:contain;flex:none;filter:drop-shadow(0 5px 10px rgba(73,116,255,.18))}
+.portal-next-main{min-width:0;flex:1}.portal-next-label{font-size:11px;color:#AEB7D8;font-weight:700;text-transform:uppercase;letter-spacing:.7px}.portal-next-date{font:400 24px/1.15 'Instrument Serif',Georgia,serif;color:#F7F8FF;margin-top:2px}.portal-next-meta{font-size:11px;color:#AEB7D8;margin-top:3px}.portal-next-badge{font-size:10.5px;font-weight:800;padding:6px 9px;border-radius:99px;background:rgba(255,200,74,.10);color:#FFD76C;border:1px solid rgba(255,200,74,.25);white-space:nowrap}.portal-next-badge.overdue{background:rgba(255,154,61,.10);color:#FFB064;border-color:rgba(255,154,61,.28)}
+.portal-help-card{margin-top:14px;padding:16px;border:1px solid rgba(141,107,255,.26);border-radius:17px;background:linear-gradient(135deg,rgba(36,35,91,.62),rgba(11,18,47,.76));box-shadow:0 12px 30px rgba(0,0,0,.16);animation:portalRise .65s .42s ease both}
+.portal-help-title{font-size:16px;font-weight:800}.portal-help-sub{font-size:11.5px;color:var(--muted);margin-top:3px}.portal-help-number{font-size:15px;font-weight:800;color:#F4F6FF;margin-top:9px;letter-spacing:.2px}.portal-help-actions{display:flex;gap:8px;margin-top:10px}.portal-help-actions .btn{flex:1;text-align:center;text-decoration:none}.portal-help-call{border-color:rgba(32,224,178,.34)!important;color:#6FE8C5!important;background:rgba(32,224,178,.07)!important}.portal-help-wa{border-color:rgba(83,171,255,.34)!important;color:#83C8FF!important;background:rgba(83,171,255,.07)!important}
+@media(max-width:560px){.portal-next-payment{padding:12px 13px;gap:11px}.portal-calendar{width:42px;height:52px}.portal-next-date{font-size:22px}.portal-next-badge{font-size:9.5px;padding:5px 7px}.portal-help-card{padding:14px}.portal-help-actions{flex-direction:column}.portal-help-actions .btn{width:100%}}
+@media(prefers-reduced-motion:reduce){.portal-next-payment,.portal-help-card{animation:none}}
 
 </style></head><body>
 <div class="wrap">
@@ -687,7 +683,15 @@ var PT={
   status:"Status",
   amount:"Amount",
   historical:"Historical",
-  unpaid:"Unpaid"
+  unpaid:"Unpaid",
+  nextPayment:"Next Payment",
+  overdue:"Overdue",
+  today:"Today",
+  tomorrow:"Tomorrow",
+  needHelp:"Need Help?",
+  contactUs:"For help with your collection account, contact us.",
+  callNow:"Call Now",
+  whatsapp:"WhatsApp"
  },
  te:{
   welcome:"స్వాగతం",
@@ -733,7 +737,15 @@ var PT={
   status:"స్థితి",
   amount:"మొత్తం",
   historical:"చరిత్ర",
-  unpaid:"చెల్లించలేదు"
+  unpaid:"చెల్లించలేదు",
+  nextPayment:"తదుపరి చెల్లింపు",
+  overdue:"గడువు దాటింది",
+  today:"ఈ రోజు",
+  tomorrow:"రేపు",
+  needHelp:"సహాయం కావాలా?",
+  contactUs:"మీ కలెక్షన్ ఖాతా గురించి సహాయం కోసం మమ్మల్ని సంప్రదించండి.",
+  callNow:"కాల్ చేయండి",
+  whatsapp:"వాట్సాప్"
  }
 };
 function pt(k){return PT[portalLang][k]||PT.en[k]||k}
@@ -827,69 +839,58 @@ function portal(){location.hash="#portal"}
 function portalAdmin(){location.hash="#"}
 async function portalLogin(){var cid=$("portal_cid").value.trim(),pin=$("portal_pin").value.trim();if(!cid||!pin){$("perr").textContent=pt("enter");return}if(!sb){$("perr").textContent=pt("cloud");return}var r=await sb.rpc("collectpro_customer_login",{p_customer_id:cid,p_pin:pin});if(r.error){$("perr").textContent=r.error.message;return}if(!r.data||!r.data.length){$("perr").textContent=pt("invalid");return}portalData=mapRow(r.data[0]);portalError="";render()}
 function portalLogout(){portalData=null;portalError="";render()}
-async function portalLogin(){var cid=$("portal_cid").value.trim(),pin=$("portal_pin").value.trim();if(!cid||!pin){$("perr").textContent=pt("enter");return}if(!sb){$("perr").textContent=pt("cloud");return}var r=await sb.rpc("collectpro_customer_login",{p_customer_id:cid,p_pin:pin});if(r.error){$("perr").textContent=r.error.message;return}if(!r.data||!r.data.length){$("perr").textContent=pt("invalid");return}portalData=mapRow(r.data[0]);portalError="";render()}
-function portalLogout(){portalData=null;portalError="";render()}
-var portalSimple=false;
-function nextCustomerDue(c,k){
+
+function portalNextPayment(c){
  var today=new Date(); today.setHours(0,0,0,0);
  var weekday=(c.collectionWeekday==null?4:+c.collectionWeekday);
- if(k.done)return null;
- var paidWeeks=Math.max(0,Number(k.paidW)||0);
- var missWeeks=Math.max(0,Number(k.miss)||0);
- var candidate=Math.min(Math.max(paidWeeks+missWeeks+1,1),Math.max(Number(c.weeks)||1,1));
- var d=nextWeekDate(c.date,candidate,weekday);
- if(!d)return null;
- var dt=new Date(d+'T00:00:00');
- return {week:candidate,date:d,dt:dt,amount:+c.perWeek||0};
+ var max=Math.max(Number(c.weeks)||0,1)+20;
+ for(var w=1;w<=max;w++){
+   var paid=c.pays.some(function(p){return +p.week===w&&(p.type==="paid"||p.type==="hist")});
+   if(paid)continue;
+   var ds=nextWeekDate(c.date,w,weekday);
+   if(!ds)continue;
+   var dt=new Date(ds+"T00:00:00");
+   var diff=Math.round((dt-today)/86400000);
+   var dateText=dt.toLocaleDateString(portalLang==="te"?"te-IN":"en-IN",{day:"2-digit",month:"short",year:"numeric"});
+   var label=diff<0?pt("overdue"):diff===0?pt("today"):diff===1?pt("tomorrow"):"";
+   return {week:w,date:ds,dateText:dateText,diff:diff,label:label,amount:+c.perWeek||0};
+ }
+ return null;
 }
-function portalDueText(d){
- if(!d)return {en:'Account completed',te:'ఖాతా పూర్తైంది'};
- var dt=d.dt, today=new Date(); today.setHours(0,0,0,0);
- var diff=Math.round((dt-today)/86400000);
- var dateEn=dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
- var dateTe=dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
- if(diff<0)return {en:'Overdue · '+dateEn,te:'గడువు దాటింది · '+dateTe};
- if(diff===0)return {en:'Today · '+dateEn,te:'ఈ రోజు · '+dateTe};
- if(diff===1)return {en:'Tomorrow · '+dateEn,te:'రేపు · '+dateTe};
- return {en:dateEn,te:dateTe};
-}
-
 function portalView(){
  if(portalData){
-  var c=portalData,k=calc(c),st=strip(c),due=nextCustomerDue(c,k),dueTxt=portalDueText(due);
+  var c=portalData,k=calc(c),st=strip(c),np=portalNextPayment(c);
   var status=k.done?pt("completed"):pt("active");
   var paidTarget=Math.round(Number(k.paid)||0), pendTarget=Math.round(Number(k.pend)||0);
   var completion=k.done?'<div class="completion-card"><div class="completion-icon">🎉</div><div><b>'+pt("completed")+'</b><div style="font-size:12px;color:var(--muted);margin-top:2px">'+(portalLang==="te"?"అభినందనలు! ఈ లోన్‌లో అన్ని వారాలు పూర్తయ్యాయి.":"Congratulations! All payable weeks are completed.")+'</div></div></div>':'';
-  var actionHtml=k.done?
-    '<div class="portal-action-card done"><div class="portal-action-icon">🎉</div><div><b>'+(portalLang==="te"?'అభినందనలు!':'Congratulations!')+'</b><small>'+(portalLang==="te"?'మీ అన్ని వారాలు పూర్తయ్యాయి.':'All your payable weeks are completed.')+'</small></div></div>':
-    '<div class="portal-action-card '+(due&&due.dt<new Date(new Date().setHours(0,0,0,0))?'overdue':'')+'"><div class="portal-action-icon">'+(due&&due.dt<new Date(new Date().setHours(0,0,0,0))?'⚠️':'📅')+'</div><div class="portal-action-main"><b>'+(portalLang==="te"?'తదుపరి చెల్లింపు':'Next Payment')+'</b><strong>'+inr(due?due.amount:0)+'</strong><small>Week '+(due?due.week:'-')+' · '+(portalLang==="te"?dueTxt.te:dueTxt.en)+'</small></div></div>';
-  var simpleStatus=k.done?
-    '<div class="portal-simple-status good"><span>✓</span><div><b>'+(portalLang==="te"?'మీ ఖాతా పూర్తైంది':'Account completed')+'</b><small>'+(portalLang==="te"?'అన్ని చెల్లింపులు పూర్తయ్యాయి.':'All payable weeks are completed.')+'</small></div></div>':
-    ((k.miss>0)?'<div class="portal-simple-status warn"><span>!</span><div><b>'+(portalLang==="te"?'చెల్లింపు పెండింగ్‌లో ఉంది':'Payment pending')+'</b><small>'+(portalLang==="te"?k.miss+' వారం'+(k.miss===1?'':'లు')+' ఇంకా చెల్లించలేదు.':k.miss+' pending week'+(k.miss===1?'':'s')+'.')+'</small></div></div>':'<div class="portal-simple-status good"><span>✓</span><div><b>'+(portalLang==="te"?'మీరు సరైన మార్గంలో ఉన్నారు':'You are on track')+'</b><small>'+(portalLang==="te"?'తదుపరి చెల్లింపు తేదీని గమనించండి.':'Keep your next payment date in mind.')+'</small></div></div>');
+  var nextHtml=np?'<div class="portal-next-payment"><img class="portal-calendar" src="'+data_uri+'" alt="Calendar"><div class="portal-next-main"><div class="portal-next-label">'+pt("nextPayment")+'</div><div class="portal-next-date">'+np.dateText+'</div><div class="portal-next-meta">'+pt("week")+' '+np.week+' · '+inr(np.amount)+'</div></div>'+(np.label?'<span class="portal-next-badge'+(np.diff<0?' overdue':'')+'">'+np.label+'</span>':'')+'</div>':'';
+  var helpHtml='<div class="portal-help-card"><div class="portal-help-title">🆘 '+pt("needHelp")+'</div><div class="portal-help-sub">'+pt("contactUs")+'</div><div class="portal-help-number">📱 +91 8106611452</div><div class="portal-help-actions"><a class="btn portal-help-call" href="tel:+918106611452">☎ '+pt("callNow")+'</a><a class="btn portal-help-wa" href="https://wa.me/918106611452" target="_blank" rel="noopener">💬 '+pt("whatsapp")+'</a></div></div>';
   return '<div class="portal-page">'+
-  '<div class="hero portal-hero"><div class="row"><div>'+ 
-  '<div class="portal-welcome">'+pt("welcome")+' 👋</div>'+ 
-  '<h1 class="portal-name">'+esc(c.name)+'</h1>'+ 
-  '<div class="portal-subtitle">'+pt("subtitle")+'</div>'+ 
-  '</div><div class="row sp" style="align-self:flex-start">'+ 
-  '<button class="btn portal-lang" onclick="togglePortalLang()">'+pt("language")+'</button>'+ 
-  '<span class="badge sp'+(k.done?' o':'')+'">'+status+'</span></div></div>'+ 
-  '<div class="portal-big big"><div><div class="n g countup-ready" data-count="'+pendTarget+'">'+inr(0)+'</div><div class="l">'+(portalLang==="te"?'ఇంకా కట్టాల్సింది':'Amount Left')+'</div></div><div><div class="n countup-ready" data-count="'+paidTarget+'">'+inr(0)+'</div><div class="l">'+(portalLang==="te"?'ఇప్పటికే కట్టింది':'Amount Paid')+'</div></div></div>'+ 
-  '<div class="bar portal-progress"><b style="width:0%" data-progress="'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' / '+c.weeks+' '+(portalLang==="te"?'వారాలు పూర్తయ్యాయి':'Weeks Completed')+'</span><span class="sp">'+k.pct+'%</span></div>'+ 
-  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+'</div>'+completion+'</div>'+ 
-  '<div class="portal-action-wrap">'+actionHtml+'</div>'+ 
-  simpleStatus+
-  '<div class="grid portal-info-grid">'+[[pt("loanAmount"),inr(c.loan),pt("originalLoan")],[pt("weeklyAmount"),inr(c.perWeek),pt("eachWeek")],[pt("totalPayable"),inr(k.payable),pt("perWeekWeeks")],[pt("weeksRemaining"),k.pendW,pt("remainingWord")]].map(function(x){return '<div class="stat portal-stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join('')+'</div>'+ 
-  '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join('')+'</div><div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+ 
+  '<div class="hero portal-hero"><div class="row"><div>'+
+  '<div class="portal-welcome">'+pt("welcome")+' 👋</div>'+
+  '<h1 class="portal-name">'+esc(c.name)+'</h1>'+
+  '<div class="portal-subtitle">'+pt("subtitle")+'</div>'+
+  '</div><div class="row sp" style="align-self:flex-start">'+
+  '<button class="btn portal-lang" onclick="togglePortalLang()">'+pt("language")+'</button>'+
+  '<span class="badge sp'+(k.done?' o':'')+'">'+status+'</span></div></div>'+
+  '<div class="portal-big big"><div><div class="n g countup-ready" data-count="'+pendTarget+'">'+inr(0)+'</div><div class="l">'+pt("remaining")+'</div></div><div><div class="n countup-ready" data-count="'+paidTarget+'">'+inr(0)+'</div><div class="l">'+pt("paidAmount")+'</div></div></div>'+
+  nextHtml+
+  '<div class="bar portal-progress"><b style="width:0%" data-progress="'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' '+pt("weeksPaid")+' / '+c.weeks+'</span><span class="sp">'+k.pct+'%</span></div>'+
+  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+'</div>'+completion+'</div>'+
+  '<div class="grid">'+[
+   [pt("loanAmount"),inr(c.loan),pt("originalLoan")],
+   [pt("weeklyAmount"),inr(c.perWeek),pt("eachWeek")],
+   [pt("totalPayable"),inr(k.payable),pt("perWeekWeeks")],
+   [pt("weeksRemaining"),k.pendW,pt("remainingWord")]
+  ].map(function(x){return '<div class="stat portal-stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
+  '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+
   paymentHistoryHtml(c,false)+
-  '<div class="portal-help"><div><div class="portal-help-title">'+(portalLang==="te"?'❓ సహాయం కావాలా?':'❓ Need Help?')+'</div><small>'+(portalLang==="te"?'మీ కలెక్షన్ గురించి సహాయం కోసం Admin ను సంప్రదించండి.':'Contact Admin if you need help with your collection.')+'</small></div><div class="row"><a class="btn" href="tel:'+esc(c.phone||'')+'">📞 '+(portalLang==="te"?'కాల్':'Call')+'</a>'+(c.phone?'<a class="btn" target="_blank" rel="noopener" href="'+wa(c,k)+'">💬 WhatsApp</a>':'')+'</div></div>'+ 
-  '<div class="portal-simple-toggle"><span>✨ '+(portalLang==="te"?'సింపుల్ మోడ్':'Simple Mode')+'</span><small>'+(portalLang==="te"?'ముఖ్యమైన వివరాలు మాత్రమే':'Show only the most important details')+'</small><button class="btn sm" onclick="togglePortalSimple()">'+(portalSimple?'ON':'OFF')+'</button></div>'+ 
-  '<div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button></div>'+ 
+  helpHtml+
+  '<div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button></div>'+
   '</div>';
  }
  return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="row" style="justify-content:space-between"><div class="av" style="width:64px;height:64px;font-size:20px">CP</div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid","Customer ID","text","")+F("portal_pin","PIN","password","")+'</div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
 }
-function togglePortalSimple(){portalSimple=!portalSimple;render()}
 function animateCustomerPortal(){
   if(!portalData)return;
   document.querySelectorAll(".countup-ready").forEach(function(el){

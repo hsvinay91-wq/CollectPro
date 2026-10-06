@@ -1254,9 +1254,42 @@ async function saveC(id){
  var pin=g("f_pin");
  var e=!o.name?"Enter the customer name.":!o.customerId?"Enter a Customer ID.":(!id&&!pin)?"Set a 4-digit PIN for this customer.":(pin&&!/^\d{4}$/.test(pin))?"PIN must be exactly 4 digits.":!(o.perWeek>0)?"Enter the per week amount.":!(o.weeks>0)?"Enter the total payable weeks.":(o.hPaid+o.hMiss>o.weeks)?"Paid + missed weeks cannot exceed total weeks.":"";
  if(e){$("err").textContent=e;return}
- if(id){var c=DB.filter(function(x){return x.id===id})[0];for(var k in o)c[k]=o[k];if(pin)c._newPin=pin}
- else{o.id=null;o.pays=[];o.loanHistory=[];o._newPin=pin;DB.push(o)}
- if(sb){var c2=id?DB.filter(function(x){return x.id===id})[0]:DB[DB.length-1];var ok=await cloudSaveCustomer(c2,pin||null);if(!ok)return;await cloudLoad();var match=DB.filter(function(x){return x.customerId.toLowerCase()===o.customerId.toLowerCase()})[0];if(match)id=match.id}
+
+ // FIX: When adding old/existing customer data, reuse the existing customer row
+ // instead of attempting a second INSERT with the same Customer ID.
+ if(!id && sb){
+   var dup=await sb.from("collectpro_customers").select("*").eq("customer_id",o.customerId).maybeSingle();
+   if(dup.error){
+     $("err").textContent="Unable to check existing Customer ID: "+dup.error.message;
+     return;
+   }
+   if(dup.data){
+     id=dup.data.id;
+     var local=DB.filter(function(x){return x.id===id})[0];
+     if(!local){local=mapRow(dup.data);DB.push(local)}
+   }
+ }
+
+ var c;
+ if(id){
+   c=DB.filter(function(x){return x.id===id})[0];
+   if(!c){c=mapRow(dup&&dup.data?dup.data:{});c.id=id;DB.push(c)}
+   // Preserve payment history and loan history when editing/re-entering an existing customer.
+   for(var k in o)c[k]=o[k];
+   if(!Array.isArray(c.pays))c.pays=[];
+   if(!Array.isArray(c.loanHistory))c.loanHistory=[];
+   if(pin)c._newPin=pin;
+ }else{
+   o.id=null;o.pays=[];o.loanHistory=[];o._newPin=pin;DB.push(o);c=o;
+ }
+
+ if(sb){
+   var ok=await cloudSaveCustomer(c,pin||null);
+   if(!ok)return;
+   await cloudLoad();
+   var match=DB.filter(function(x){return x.customerId.toLowerCase()===o.customerId.toLowerCase()})[0];
+   if(match)id=match.id;
+ }
  save();close_();go(id||"");
 }
 function payForm(cid,pid){

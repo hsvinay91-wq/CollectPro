@@ -1075,8 +1075,7 @@ function dashboardView(){
  '</div>';
 }
 
-function render(){if(!portalData&&!portalError&&!window.__portalSessionChecked){window.__portalSessionChecked=true;if(loadPortalSession()){setTimeout(function(){render()},0);return}}
-
+function render(){
  topActions();
  var a=$("app");
  if(location.hash==="#dashboard"){a.innerHTML=dashboardView();return}
@@ -1216,7 +1215,7 @@ var deferredInstallPrompt=null;
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferredInstallPrompt=e;var b=$("installBtn");if(b)b.style.display="inline-block"});
 async function installApp(){if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;var b=$("installBtn");if(b)b.style.display="none"}
 window.addEventListener("appinstalled",function(){var b=$("installBtn");if(b)b.style.display="none"});
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(e){console.warn("PWA service worker:",e)})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})}).catch(function(){})})}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")close_()});
 
 (function(){

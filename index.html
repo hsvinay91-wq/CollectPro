@@ -624,6 +624,8 @@ body:after{
 .need-help-phone{margin-top:11px;font-weight:800;letter-spacing:.2px}.need-help-actions{display:flex;gap:8px;margin-top:10px}.need-help-actions a{flex:1;text-align:center;text-decoration:none}
 @media(max-width:560px){.next-payment-card{padding:13px}.next-payment-cal{width:48px;height:48px}.next-payment-main .d{font-size:20px}.next-payment-amt b{font-size:20px}.need-help-actions .btn{padding:9px 8px;font-size:11px}}
 
+<style>
+.portal-remember-row{margin:10px 0 2px}.portal-check{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:12px;cursor:pointer;user-select:none}.portal-check input{width:16px;height:16px;accent-color:#FFC84A;cursor:pointer}
 </style></head><body>
 <div class="wrap">
  <div class="top"><div class="brand" onclick="go(\'\')" aria-label="CollectPro home">
@@ -634,7 +636,7 @@ body:after{
 </div>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <script>
-var KEY="collectpro_v19",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en";
+var KEY="collectpro_v19",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en",portalRemember=false;
 var SUPABASE_URL="https://haqjtrcwhuoqwqpoanij.supabase.co";
 var SUPABASE_PUBLISHABLE_KEY="sb_publishable_ASbs_DhL_rRfPWd1grUq6Q_7-I87djF";
 var sb=null;
@@ -825,22 +827,29 @@ function trackerItems(c){
 function strip(c){return trackerItems(c).map(function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""});}
 function portal(){location.hash="#portal"}
 function portalAdmin(){location.hash="#"}
+var PORTAL_SESSION_KEY="collectpro_portal_session_v1";
+function savePortalSession(){if(!portalRemember||!portalData)return;try{localStorage.setItem(PORTAL_SESSION_KEY,JSON.stringify({customerId:portalData.customerId||"",name:portalData.name||"",savedAt:Date.now()}))}catch(e){}}
+function clearPortalSession(){try{localStorage.removeItem(PORTAL_SESSION_KEY)}catch(e){}portalRemember=false}
+function loadPortalSession(){try{var raw=localStorage.getItem(PORTAL_SESSION_KEY);if(!raw)return false;var s=JSON.parse(raw);if(!s||!s.customerId||!s.savedAt)return false;if(Date.now()-Number(s.savedAt)>30*24*60*60*1000){localStorage.removeItem(PORTAL_SESSION_KEY);return false}var c=DB.filter(function(x){return String(x.customerId||"").toLowerCase()===String(s.customerId).toLowerCase()})[0];if(c){portalData=c;portalRemember=true;return true}}catch(e){}return false}
+function forgetPortalDevice(){clearPortalSession();portalData=null;portalError="";render()}
+
 async function portalLogin(){
- var cid=$("portal_cid").value.trim(),pin=$("portal_pin").value.trim();
- if(!cid||!pin){$("perr").textContent=pt("enter");return}
+ var name=$("portal_cid").value.trim(),pin=$("portal_pin").value.trim();
+ if(!name||!pin){$("perr").textContent=pt("enter");return}
+ if(!/^\d{4}$/.test(pin)){$("perr").textContent=portalLang==="te"?"PIN 4 అంకెలుగా ఉండాలి.":"PIN must be exactly 4 digits.";return}
  if(!sb){$("perr").textContent=pt("cloud");return}
  try{
-   var r=await sb.rpc("collectpro_customer_login",{p_customer_id:cid,p_pin:pin});
-   if(r.error){$("perr").textContent=r.error.message;return}
-   var row=Array.isArray(r.data)?r.data[0]:r.data;
-   if(!row){$("perr").textContent=pt("invalid");return}
-   portalData=mapRow(row);portalError="";render();
- }catch(e){
-   console.error("CollectPro customer login:",e);
-   $("perr").textContent="Unable to connect to the cloud right now. Please check your connection and try again.";
- }
+  var r=await sb.rpc("collectpro_customer_login",{p_customer_id:name,p_pin:pin});
+  if(r.error){$("perr").textContent=r.error.message;return}
+  var row=Array.isArray(r.data)?r.data[0]:r.data;
+  if(!row){$("perr").textContent=pt("invalid");return}
+  portalData=mapRow(row);portalError="";
+  portalRemember=!!$("portal_remember").checked;
+  if(portalRemember)savePortalSession();else clearPortalSession();
+  render();
+ }catch(err){console.error("CollectPro customer login:",err);$("perr").textContent="Unable to connect to the cloud right now. Please check your connection and try again."}
 }
-function portalLogout(){portalData=null;portalError="";render()}
+function portalLogout(){clearPortalSession();portalData=null;portalError="";render()}
 
 function portalNextPayment(c){
   var today=new Date(); today.setHours(0,0,0,0);
@@ -910,10 +919,10 @@ function portalView(){
   ].map(function(x){return '<div class="stat portal-stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
   '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+
   paymentHistoryHtml(c,false)+helpHtml()+
-  '<div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button></div>'+
+  '<div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button></div>'+
   '</div>';
  }
- return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="row" style="justify-content:space-between"><div class="av" style="width:64px;height:64px;font-size:20px">CP</div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid","Customer ID","text","")+F("portal_pin","PIN","password","")+'</div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
+ return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="row" style="justify-content:space-between"><div class="av" style="width:64px;height:64px;font-size:20px">CP</div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid",portalLang==="te"?"మీ పేరు":"Your Name","text","",'autocomplete="name"')+F("portal_pin",portalLang==="te"?"4-Digit PIN":"4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="current-password"')+'</div><div class="portal-remember-row"><label class="portal-check"><input id="portal_remember" type="checkbox" '+(portalRemember?"checked":"")+'><span>'+(portalLang==="te"?"ఈ పరికరంలో నన్ను గుర్తుంచుకో":"Remember me on this device")+'</span></label></div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
 }
 function animateCustomerPortal(){
   if(!portalData)return;
@@ -1035,7 +1044,8 @@ function dashboardView(){
  '</div>';
 }
 
-function render(){
+function render(){if(!portalData&&!portalError&&!window.__portalSessionChecked){window.__portalSessionChecked=true;if(loadPortalSession()){setTimeout(function(){render()},0);return}}
+
  topActions();
  var a=$("app");
  if(location.hash==="#dashboard"){a.innerHTML=dashboardView();return}
@@ -1128,7 +1138,7 @@ function selDay(id,label,v){
 function custForm(id){
  var c=id?DB.filter(function(x){return x.id===id})[0]:{name:"",customerId:"",phone:"",loan:"",perWeek:"",weeks:"",date:new Date().toISOString().slice(0,10),hPaid:0,hMiss:0,hAmt:""};
  open_('<h2>'+(id?"Edit customer":"Add customer / existing customer")+'</h2><div class="fg">'+
- F("f_name","Customer name","text",c.name)+F("f_cid","Customer ID","text",c.customerId||"")+F("f_pin","PIN","password","")+F("f_phone","Contact no","tel",c.phone)+
+ F("f_name","Customer name","text",c.name)+F("f_cid","Customer ID","text",c.customerId||"")+F("f_pin","4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="new-password"')+F("f_phone","Contact no","tel",c.phone)+
  F("f_loan","Loan amount (₹)","number",c.loan,'min="0"')+F("f_pw","Per week (₹)","number",c.perWeek,'min="1"')+
  F("f_wk","Total payable weeks","number",c.weeks,'min="1"')+F("f_date","Date loan taken","date",c.date)+
  '<div class="hd">Old customer? Enter what was already paid</div>'+
@@ -1141,7 +1151,7 @@ async function saveC(id){
  var g=function(i){return $(i).value.trim()};
  var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),collectionWeekday:(id?((DB.filter(function(x){return x.id===id})[0].collectionWeekday==null)?4:+DB.filter(function(x){return x.id===id})[0].collectionWeekday):4),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
  var pin=g("f_pin");
- var e=!o.name?"Enter the customer name.":!o.customerId?"Enter a Customer ID.":(!id&&!pin)?"Set a PIN for this customer.":!(o.perWeek>0)?"Enter the per week amount.":!(o.weeks>0)?"Enter the total payable weeks.":(o.hPaid+o.hMiss>o.weeks)?"Paid + missed weeks cannot exceed total weeks.":"";
+ var e=!o.name?"Enter the customer name.":!o.customerId?"Enter a Customer ID.":(!id&&!pin)?"Set a 4-digit PIN for this customer.":(pin&&!/^\d{4}$/.test(pin))?"PIN must be exactly 4 digits.":!(o.perWeek>0)?"Enter the per week amount.":!(o.weeks>0)?"Enter the total payable weeks.":(o.hPaid+o.hMiss>o.weeks)?"Paid + missed weeks cannot exceed total weeks.":"";
  if(e){$("err").textContent=e;return}
  if(id){var c=DB.filter(function(x){return x.id===id})[0];for(var k in o)c[k]=o[k];if(pin)c._newPin=pin}
  else{o.id=null;o.pays=[];o._newPin=pin;DB.push(o)}

@@ -616,7 +616,7 @@ body:after{
 .next-payment-cal{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#fff,#eef1fb);color:#27335F;position:relative;flex:none;box-shadow:0 7px 18px rgba(0,0,0,.2);overflow:hidden}
 .next-payment-cal:before{content:"";position:absolute;left:0;right:0;top:0;height:12px;background:#D7A83F}
 .next-payment-cal:after{content:"";position:absolute;left:10px;right:10px;bottom:9px;height:18px;background:repeating-linear-gradient(90deg,rgba(39,51,95,.35) 0 3px,transparent 3px 8px);opacity:.65}
-.next-payment-cal b{position:relative;z-index:2;font:700 18px Manrope,sans-serif;margin-top:8px}
+.next-payment-cal span{position:absolute;top:1px;z-index:2;font:800 8px Manrope,sans-serif;color:#fff;text-transform:uppercase}.next-payment-cal b{position:relative;z-index:2;font:700 18px Manrope,sans-serif;margin-top:9px}
 .next-payment-main{min-width:0;flex:1}.next-payment-main .k{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#AEB9DA}.next-payment-main .d{font:400 23px 'Instrument Serif',serif;color:#F8F9FF;margin-top:1px}.next-payment-main .s{font-size:11px;color:#9FAAC9;margin-top:1px}
 .next-payment-amt{text-align:right;white-space:nowrap}.next-payment-amt b{display:block;font:400 23px 'Instrument Serif',serif;color:#FFC84A}.next-payment-amt small{font-size:10px;color:#9FAAC9}
 .need-help{margin-top:14px;padding:15px 16px;border:1px solid rgba(177,132,255,.24);border-radius:17px;background:linear-gradient(135deg,rgba(67,48,125,.22),rgba(13,21,51,.88));box-shadow:0 12px 30px rgba(0,0,0,.16)}
@@ -843,28 +843,42 @@ async function portalLogin(){
 function portalLogout(){portalData=null;portalError="";render()}
 
 function portalNextPayment(c){
-  var today=new Date();today.setHours(0,0,0,0);
+  var today=new Date(); today.setHours(0,0,0,0);
   var weekday=(c.collectionWeekday==null?4:+c.collectionWeekday);
-  var max=Math.max(Number(c.weeks)||0,1)+20;
+  var originalWeeks=Math.max(Number(c.weeks)||0,1);
+  var debt=calc(c).miss>0;
+  var max=originalWeeks+(debt?20:0);
+
   for(var w=1;w<=max;w++){
-    var paid=c.pays.some(function(p){return +p.week===w&&(p.type==="paid"||p.type==="hist")});
-    if(paid)continue;
     var ds=nextWeekDate(c.date,w,weekday);
     if(!ds)continue;
-    var dt=new Date(ds+"T00:00:00"),diff=Math.round((dt-today)/86400000);
-    var dateText=dt.toLocaleDateString(portalLang==="te"?"te-IN":"en-IN",{day:"2-digit",month:"short",year:"numeric"});
-    var label=diff<0?pt("overdue"):diff===0?pt("today"):diff===1?pt("tomorrow"):"";
-    return {week:w,date:ds,dateText:dateText,diff:diff,label:label,amount:+c.perWeek||0};
+    var dt=new Date(ds+"T00:00:00");
+    if(dt<today)continue;
+
+    var paid=c.pays.some(function(p){
+      return +p.week===w&&(p.type==="paid"||p.type==="hist");
+    });
+    if(paid)continue;
+
+    var dateText=dt.toLocaleDateString(
+      portalLang==="te"?"te-IN":"en-IN",
+      {day:"2-digit",month:"short",year:"numeric"}
+    );
+    return {week:w,date:ds,dateText:dateText,amount:+c.perWeek||0};
   }
   return null;
 }
 function nextPaymentHtml(c){
   var n=portalNextPayment(c);
-  if(!n)return '<div class="next-payment-card"><div class="next-payment-cal"><b>✓</b></div><div class="next-payment-main"><div class="k">'+(portalLang==="te"?"తదుపరి చెల్లింపు":"Next Payment")+'</div><div class="d">'+(portalLang==="te"?"ఖాతా పూర్తైంది":"Account completed")+'</div><div class="s">'+(portalLang==="te"?"అన్ని వారాలు పూర్తయ్యాయి":"All payable weeks are completed")+'</div></div></div>';
-  var calDay=new Date(n.date+"T00:00:00").getDate();
-  var due=n.label?(" · "+n.label):"";
-  return '<div class="next-payment-card"><div class="next-payment-cal"><b>'+calDay+'</b></div><div class="next-payment-main"><div class="k">'+(portalLang==="te"?"తదుపరి చెల్లింపు":"Next Payment")+'</div><div class="d">'+esc(n.dateText)+esc(due)+'</div><div class="s">'+(portalLang==="te"?"వారం ":"Week ")+n.week+(portalLang==="te"?" · చెల్లించాల్సిన మొత్తం":" · Amount due")+'</div></div><div class="next-payment-amt"><b>'+inr(n.amount)+'</b><small>'+pt("weeklyAmount")+'</small></div></div>';
+  if(!n){
+    return '<div class="next-payment-card"><div class="next-payment-cal"><b>✓</b></div><div class="next-payment-main"><div class="k">'+(portalLang==="te"?"తదుపరి చెల్లింపు":"Next Payment")+'</div><div class="d">'+(portalLang==="te"?"ఖాతా పూర్తైంది":"Account completed")+'</div><div class="s">'+(portalLang==="te"?"అన్ని వారాలు పూర్తయ్యాయి":"All payable weeks are completed")+'</div></div></div>';
+  }
+  var dt=new Date(n.date+"T00:00:00");
+  var calDay=dt.getDate();
+  var monthShort=dt.toLocaleDateString(portalLang==="te"?"te-IN":"en-IN",{month:"short"});
+  return '<div class="next-payment-card"><div class="next-payment-cal"><span>'+monthShort+'</span><b>'+calDay+'</b></div><div class="next-payment-main"><div class="k">'+(portalLang==="te"?"తదుపరి చెల్లింపు":"Next Payment")+'</div><div class="d">'+esc(n.dateText)+'</div><div class="s">'+(portalLang==="te"?"వారం ":"Week ")+n.week+(portalLang==="te"?" · ప్రతి వారం చెల్లింపు":" · Your scheduled weekly payment")+'</div></div><div class="next-payment-amt"><b>'+inr(n.amount)+'</b><small>'+pt("weeklyAmount")+'</small></div></div>';
 }
+
 function helpHtml(){
   var te=portalLang==="te";
   return '<div class="need-help"><div class="need-help-head"><div class="need-help-icon">🆘</div><div><b>'+(te?"సహాయం కావాలా?":"Need Help?")+'</b><small>'+(te?"మా సపోర్ట్ టీమ్‌ను సంప్రదించండి":"Contact our support team")+'</small></div></div><div class="need-help-phone">📞 +91 8106611452</div><div class="need-help-actions"><a class="btn pri" href="tel:+918106611452">'+(te?"కాల్ చేయండి":"Call Now")+'</a><a class="btn" target="_blank" rel="noopener" href="https://wa.me/918106611452">'+(te?"WhatsApp":"WhatsApp")+'</a></div></div>';
@@ -887,6 +901,7 @@ function portalView(){
   '<div class="portal-big big"><div><div class="n g countup-ready" data-count="'+pendTarget+'">'+inr(0)+'</div><div class="l">'+pt("remaining")+'</div></div><div><div class="n countup-ready" data-count="'+paidTarget+'">'+inr(0)+'</div><div class="l">'+pt("paidAmount")+'</div></div></div>'+
   '<div class="bar portal-progress"><b style="width:0%" data-progress="'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' '+pt("weeksPaid")+' / '+c.weeks+'</span><span class="sp">'+k.pct+'%</span></div>'+
   '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+'</div>'+completion+'</div>'+
+  nextPaymentHtml(c)+
   '<div class="grid">'+[
    [pt("loanAmount"),inr(c.loan),pt("originalLoan")],
    [pt("weeklyAmount"),inr(c.perWeek),pt("eachWeek")],
@@ -894,7 +909,7 @@ function portalView(){
    [pt("weeksRemaining"),k.pendW,pt("remainingWord")]
   ].map(function(x){return '<div class="stat portal-stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
   '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+
-  paymentHistoryHtml(c,false)+nextPaymentHtml(c)+helpHtml()+
+  paymentHistoryHtml(c,false)+helpHtml()+
   '<div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button></div>'+
   '</div>';
  }

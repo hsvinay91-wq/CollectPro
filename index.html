@@ -1035,7 +1035,7 @@ function go(v){var h=v?"#customer/"+v:"";if(location.hash===h||(!v&&(location.ha
 window.addEventListener("hashchange",route);
 var q="",flt="all";
 function wa(c,k){var d=(c.phone||"").replace(/\D/g,"");if(d.length===10)d="91"+d;return "https://wa.me/"+d+"?text="+encodeURIComponent("Hi "+c.name+", reminder for your weekly collection of "+inr(c.perWeek)+". Pending balance: "+inr(k.pend)+". Thank you!")}
-function row(c){var k=calc(c),hc=loanHistory(c).length;return '<div class="cust" onclick="go(\''+c.id+'\')"><div class="ring" style="--p:'+k.pct+'%"><div class="av">'+esc(c.name.charAt(0).toUpperCase())+'</div></div><div class="m"><b>'+esc(c.name)+'</b><small>'+esc(c.phone||"No contact")+' · '+k.paidW+'/'+c.weeks+' weeks'+(hc?' · '+hc+' past loan'+(hc===1?'':'s'):'')+'</small>'+(k.miss&&!k.done?'<small style="color:var(--miss);font-weight:600"> · '+k.miss+' unpaid</small>':'')+'</div><div class="amt">'+inr(k.pend)+'<small>'+(k.done?"Completed":"pending")+'</small></div></div>'}
+function row(c){var k=calc(c);return '<div class="cust" onclick="go(\''+c.id+'\')"><div class="ring" style="--p:'+k.pct+'%"><div class="av">'+esc(c.name.charAt(0).toUpperCase())+'</div></div><div class="m"><b>'+esc(c.name)+'</b><small>'+esc(c.phone||"No contact")+' · '+k.paidW+'/'+c.weeks+' weeks</small>'+(k.miss&&!k.done?'<small style="color:var(--miss);font-weight:600"> · '+k.miss+' unpaid</small>':'')+'</div><div class="amt">'+inr(k.pend)+'<small>'+(k.done?"Completed":"pending")+'</small></div></div>'}
 function list(){
  var L=DB.filter(function(c){var k=calc(c);return(!q||(c.name+" "+c.phone).toLowerCase().indexOf(q)>=0)&&(flt==="all"||(flt==="over"&&k.miss>0&&!k.done)||(flt==="act"&&!k.done)||(flt==="done"&&k.done))});
  $("lst").innerHTML=L.length?L.map(row).join(""):'<div class="empty">'+(DB.length?"No customers match this filter.":'No customers yet. Add your first customer, or enter an old customer with their past paid weeks.<br><br><button class="btn pri" onclick="custForm()">+ Add customer</button>')+'</div>';
@@ -1050,7 +1050,7 @@ function topActions(){
    return;
  }
  if(cloudReady && adminSession){
-   t.innerHTML='<button class="btn dashboard-nav-btn" onclick="dashboard()">Dashboard</button><button class="btn dashboard-nav-btn" onclick="loanHistoryPage()">Loan History</button><button class="btn portal-nav-btn" onclick="portal()">Customer Portal</button><button class="btn logout-nav-btn" onclick="adminLogout()">Logout</button><button class="btn pri add-nav-btn" onclick="custForm()">+ Add customer</button>';
+   t.innerHTML='<button class="btn dashboard-nav-btn" onclick="dashboard()">Dashboard</button><button class="btn dashboard-nav-btn" onclick="completedPage()">Completed</button><button class="btn portal-nav-btn" onclick="portal()">Customer Portal</button><button class="btn logout-nav-btn" onclick="adminLogout()">Logout</button><button class="btn pri add-nav-btn" onclick="custForm()">+ Add customer</button>';
  }else if(cloudReady){
    t.innerHTML='<button class="btn" onclick="portal()">Customer Portal</button><button class="btn" onclick="adminLogin()">Admin Login</button>';
  }else{
@@ -1125,7 +1125,7 @@ function dashboardView(){
   ["Number Customers",totalCustomers,"Unique customer accounts"],
   ["Business Profit",inr(totals.allProfit),"Current + completed loans"],
   ["Total Collected",inr(totals.allCollected),"Current + completed loans"],
-  ["Total Pending",inr(totals.pending),"Current active loans"]
+  ["Total Pending",inr(totals.pending),"Current active loans"],["Completed",totals.completedLoans,"Past + completed loans"]
  ];
  var catRows=[["Prime Customers","1–3 pending weeks",totals.prime,"Best-performing active accounts"],["Standard Customers","4–5 pending weeks",totals.standard,"Medium-range accounts"],["At-Risk Customers","6+ pending weeks",totals.risk,"Low-range / follow-up accounts"],["Completed Customers","0 pending balance",totals.completed,"Successfully completed accounts"]];
  return '<div class="dashboard-page">'+
@@ -1140,7 +1140,7 @@ function dashboardView(){
  '<div class="dashboard-layout">'+
  '<div class="sec"><div class="dash-title"><div><h2>Customer Categories</h2><p>Categories update automatically when customer data changes.</p></div></div><div class="category-list">'+catRows.map(function(r){return '<div class="category-row"><div><b>'+r[0]+'</b><small>'+r[1]+' · '+r[3]+'</small></div><strong>'+r[2]+'</strong></div>'}).join("")+'</div></div>'+ 
  '<div class="sec"><h2>Business Snapshot</h2><p>Current portfolio overview.</p><div class="snapshot"><div><span>All loan principal</span><b>'+inr(totals.allLoan)+'</b></div><div><span>All payable</span><b>'+inr(totals.allPayable)+'</b></div><div><span>All realized profit</span><b>'+inr(totals.allProfit)+'</b></div><div><span>Pending weeks</span><b>'+totals.pendingWeeks+'</b></div><div><span>Avg. pending/customer</span><b>'+inr(avg)+'</b></div><div><span>Completed loans</span><b>'+totals.completedLoans+'</b></div></div></div></div>'+ 
- '<div class="sec dashboard-card" style="margin-top:14px"><div class="dash-title"><div><h2>Loan Portfolio History</h2><p>Completed loans are retained separately and included in business totals.</p></div><button class="btn sm" onclick="loanHistoryPage()">Open Loan History →</button></div><div class="loan-summary-grid"><div><span>Completed loans</span><b>'+totals.completedLoans+'</b></div><div><span>Historical collected</span><b>'+inr(hp.collected)+'</b></div><div><span>Historical profit</span><b>'+inr(hp.profit)+'</b></div><div><span>Unique customers</span><b>'+totalCustomers+'</b></div></div></div><div class="sec"><div class="dash-title"><div><h2>Customer Performance</h2><p>Sorted by pending weeks for quick follow-up.</p></div><span class="dash-live">● Live</span></div><div class="performance-list">'+
+ '<div class="sec dashboard-card" style="margin-top:14px"><div class="dash-title"><div><h2>Completed</h2><p>Past loans are stored separately for business analytics and never overwrite current customer data.</p></div><button class="btn sm" onclick="completedPage()">Open Completed →</button></div><div class="loan-summary-grid"><div><span>Completed loans</span><b>'+totals.completedLoans+'</b></div><div><span>Historical collected</span><b>'+inr(hp.collected)+'</b></div><div><span>Historical profit</span><b>'+inr(hp.profit)+'</b></div><div><span>Customers with history</span><b>'+Object.keys(historyCustomerGroups()).length+'</b></div></div></div><div class="sec"><div class="dash-title"><div><h2>Customer Performance</h2><p>Sorted by pending weeks for quick follow-up.</p></div><span class="dash-live">● Live</span></div><div class="performance-list">'+
  DB.slice().sort(function(a,b){return calc(b).miss-calc(a).miss}).map(function(c){var k=calc(c),cat=dashboardCategory(k.miss,k.done);return '<div class="performance-row" onclick="go(\''+c.id+'\')"><div class="perf-avatar">'+esc((c.name||"?").charAt(0).toUpperCase())+'</div><div class="perf-main"><b>'+esc(c.name)+'</b><small>'+k.miss+' pending week'+(k.miss===1?"":"s")+' · '+k.paidW+'/'+c.weeks+' paid</small></div><span class="perf-cat '+cat.key+'">'+cat.name+'</span><strong>'+inr(k.pend)+'</strong><span class="perf-arrow">›</span></div>'}).join("")+'</div></div></div>'+
  '</div>';
 }
@@ -1150,7 +1150,7 @@ function render(){
  var a=$("app");
  if(CUSTOMER_MODE){a.innerHTML=portalView();return}
  if(location.hash==="#dashboard"){a.innerHTML=dashboardView();return}
- if(location.hash==="#loan-history"||location.hash.indexOf("#loan-history/")===0){a.innerHTML=loanHistoryView();return}
+ if(location.hash==="#completed"||location.hash.indexOf("#completed/")===0){a.innerHTML=completedView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
  if(cloudReady && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><div class="av" style="width:64px;height:64px;margin:0 auto 16px">CP</div><h1 style="font-size:34px">CollectPro Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
  if(!view){
@@ -1174,42 +1174,92 @@ function render(){
  '<div class="grid">'+[["Loan amount",inr(c.loan),"Original principal"],["Total payable",inr(k.payable),inr(c.perWeek)+" × "+c.weeks+" weeks"],["Missed weeks",k.miss,inr(k.miss*c.perWeek)+" overdue"],["Weeks remaining",k.pendW,"Until account closes"]].map(function(s,i){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v"'+(i===2&&k.miss?' '+R:'')+'>'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
  '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = paid. Orange = missed or carried over beyond the original payable weeks.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
 
- loanHistoryHtml(c,true)+paymentHistoryHtml(c,true)+((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
+ paymentHistoryHtml(c,true)+((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
 }
 
 
-function loanHistoryHtml(c,compact){
- var hs=loanHistory(c);
- if(!hs.length)return '<div class="sec"><div class="ph-head"><div><h2>Loan History</h2><p style="margin-bottom:0">No completed loans for this customer yet.</p></div></div></div>';
- return '<div class="sec"><div class="ph-head"><div><h2>Loan History</h2><p style="margin-bottom:0">'+hs.length+' completed loan'+(hs.length===1?'':'s')+' for '+esc(c.name)+'.</p></div><span class="loan-history-badge">Past loans</span></div><div class="loan-history-list">'+hs.slice(0,compact?4:hs.length).map(function(h){var k=loanRecordCalc(h);return '<div class="loan-history-row" onclick="loanHistoryDetail(\''+esc(c.id)+'\',\''+esc(h.loanId)+'\')"><div class="loan-history-icon">✓</div><div class="loan-history-main"><b>'+esc(h.loanId)+'</b><small>'+fmt(h.loanDate)+' · '+inr(h.loanAmount)+' loan · '+k.paidW+'/'+h.weeks+' weeks</small></div><div class="loan-history-money"><b>'+inr(k.paid)+'</b><small>Profit '+inr(Math.max(k.paid-(Number(h.loanAmount)||0),0))+'</small></div><div class="loan-history-arrow">›</div></div>'}).join('')+'</div>'+(hs.length>4?'<button class="ph-view" onclick="loanHistoryPage(\''+esc(c.id)+'\')">View all loan history <span class="arr">›</span></button>':'')+'</div>';
+function completedPage(customerKey){location.hash=customerKey?'#completed/'+encodeURIComponent(customerKey):'#completed'}
+
+function historyCustomerKey(h){
+ var cid=String(h.customerId||"").trim();
+ if(cid)return "id:"+cid.toLowerCase();
+ var phone=String(h.phone||"").replace(/\D/g,"");
+ return "name:"+String(h.name||"").trim().toLowerCase()+"|"+phone;
 }
-function loanHistoryPage(customerId){location.hash=customerId?'#loan-history/'+encodeURIComponent(customerId):'#loan-history'}
-function loanHistoryView(){
- var m=location.hash.match(/^#loan-history(?:\/(.+))?$/),customerId=m?decodeURIComponent(m[1]||''):'';
- var list=[];
+function historyCustomerGroups(){
+ var groups={};
  DB.forEach(function(c){
-   if(customerId&&c.id!==customerId)return;
-   loanHistory(c).forEach(function(h){list.push({type:"embedded",c:c,h:h})});
+   loanHistory(c).forEach(function(h){
+     var rec={customerId:h.customerId||c.customerId,name:h.name||c.name,phone:h.phone||c.phone};
+     var key=historyCustomerKey(rec);
+     if(!groups[key])groups[key]={key:key,name:rec.name||"Unknown customer",customerId:rec.customerId||"",phone:rec.phone||"",loans:[]};
+     groups[key].loans.push({type:"embedded",c:c,h:h});
+   });
  });
  HIST.forEach(function(h){
-   if(customerId&&String(h.customerId)!==String((DB.filter(function(c){return c.id===customerId})[0]||{}).customerId))return;
-   list.push({type:"standalone",h:h});
+   var key=historyCustomerKey(h);
+   if(!groups[key])groups[key]={key:key,name:h.name||"Unknown customer",customerId:h.customerId||"",phone:h.phone||"",loans:[]};
+   groups[key].loans.push({type:"standalone",h:h});
  });
- list.sort(function(a,b){return String(b.h.completedAt||b.h.loanDate||'').localeCompare(String(a.h.completedAt||a.h.loanDate||''))});
- var hp=totalPortfolioHistory();
- var unique={};
- list.forEach(function(x){unique[String(x.h.customerId||x.h.name||"").toLowerCase()]=1});
- return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>Completed Loan History</h1><p>Old/completed loans are stored separately. Adding an old loan never rewrites the customer’s current loan.</p></div><div class="row"><button class="btn" onclick="go(\'\')">← Back to Customers</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+
- '<div class="grid dashboard-cards"><div class="stat dashboard-card"><div class="l">Completed loans</div><div class="v">'+hp.loans+'</div><div class="s">Current archived + old records</div></div><div class="stat dashboard-card"><div class="l">Historical collected</div><div class="v">'+inr(hp.collected)+'</div><div class="s">Completed loans only</div></div><div class="stat dashboard-card"><div class="l">Historical profit</div><div class="v">'+inr(hp.profit)+'</div><div class="s">Collected − principal</div></div><div class="stat dashboard-card"><div class="l">Customers with history</div><div class="v">'+Object.keys(unique).length+'</div><div class="s">Old / repeat-loan records</div></div></div>'+
- '<div class="sec"><div class="ph-head"><div><h2>All Completed Loans</h2><p style="margin-bottom:0">Click any loan to see its payment history and original details.</p></div><span class="loan-history-badge">'+list.length+' records</span></div>'+
- (list.length?'<div class="loan-history-list">'+list.map(function(x){
+ Object.keys(groups).forEach(function(k){
+   groups[k].loans.sort(function(a,b){return String(b.h.completedAt||b.h.loanDate||"").localeCompare(String(a.h.completedAt||a.h.loanDate||""))});
+ });
+ return groups;
+}
+function historyGroupTotals(g){
+ var out={loans:0,loan:0,collected:0,profit:0};
+ g.loans.forEach(function(x){
    var h=x.h,k=loanRecordCalc(h);
+   out.loans++;
+   out.loan+=Number(h.loanAmount)||0;
+   out.collected+=k.paid;
+   out.profit+=Math.max(k.paid-(Number(h.loanAmount)||0),0);
+ });
+ return out;
+}
+function completedCustomerCard(g){
+ var t=historyGroupTotals(g);
+ return '<div class="cust" onclick="completedPage(\''+encodeURIComponent(g.key)+'\')">'+
+   '<div class="ring" style="--p:100%"><div class="av">'+esc(String(g.name||"?").charAt(0).toUpperCase())+'</div></div>'+
+   '<div class="m"><b>'+esc(g.name||"Unknown customer")+'</b><small>'+esc(g.customerId||"Old customer")+' · '+esc(g.phone||"No contact")+' · '+t.loans+' completed loan'+(t.loans===1?'':'s')+'</small>'+
+   '<small style="color:var(--profit);font-weight:700">Collected '+inr(t.collected)+' · Profit '+inr(t.profit)+'</small></div>'+
+   '<div class="amt">'+inr(t.collected)+'<small>Completed</small></div></div>';
+}
+function completedCustomerView(g){
+ var t=historyGroupTotals(g);
+ return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>'+esc(g.name)+'</h1><p>All completed/old loans for this customer are stored separately from the current customer account.</p></div><div class="row"><button class="btn" onclick="completedPage()">← Completed customers</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+
+ '<div class="hero"><div class="row"><div><h1>'+esc(g.name)+'</h1><small>'+esc(g.customerId||"Old customer")+' · '+esc(g.phone||"No contact")+'</small></div><span class="badge o">Completed history</span></div>'+
+ '<div class="big"><div><div class="n">'+inr(t.collected)+'</div><div class="l">Historical collected</div></div><div><div class="n g">'+inr(t.profit)+'</div><div class="l">Historical profit</div></div></div>'+
+ '<div class="l" style="margin-top:12px;font-size:12.5px;color:#B9B6C8">'+t.loans+' completed loan'+(t.loans===1?'':'s')+' · Total principal '+inr(t.loan)+'</div></div>'+
+ '<div class="grid"><div class="stat"><div class="l">Completed loans</div><div class="v">'+t.loans+'</div><div class="s">Past loans stored separately</div></div>'+
+ '<div class="stat"><div class="l">Total principal</div><div class="v">'+inr(t.loan)+'</div><div class="s">Original loan amounts</div></div>'+
+ '<div class="stat"><div class="l">Total collected</div><div class="v">'+inr(t.collected)+'</div><div class="s">Historical payments</div></div>'+
+ '<div class="stat"><div class="l">Total profit</div><div class="v">'+inr(t.profit)+'</div><div class="s">Collected − principal</div></div></div>'+
+ '<div class="sec"><div class="ph-head"><div><h2>Completed Loan Details</h2><p style="margin-bottom:0">Each old loan is a separate record. Click a loan to see its payment history.</p></div><span class="loan-history-badge">'+t.loans+' records</span></div>'+
+ '<div class="loan-history-list">'+g.loans.map(function(x){
+   var h=x.h,k=loanRecordCalc(h),tag=x.type==="standalone"?"Old data":"Archived";
    var onclick=x.type==="standalone"?"historicalLoanDetail(\'"+esc(h.id)+"\')":"loanHistoryDetail(\'"+esc(x.c.id)+"\',\'"+esc(h.loanId)+"\')";
-   var tag=x.type==="standalone"?"Old data":"Archived";
-   return '<div class="loan-history-row" onclick="'+onclick+'"><div class="loan-history-icon">✓</div><div class="loan-history-main"><b>'+esc(x.type==="standalone"?h.name:h.c.name)+' · '+esc(h.loanId)+'</b><small>'+esc(h.customerId||"")+' · '+fmt(h.loanDate)+' · '+inr(h.loanAmount)+' loan · '+k.paidW+'/'+h.weeks+' weeks · '+tag+'</small></div><div class="loan-history-money"><b>'+inr(k.paid)+'</b><small>Profit '+inr(Math.max(k.paid-(Number(h.loanAmount)||0),0))+'</small></div><div class="loan-history-arrow">›</div></div>';
- }).join('')+'</div>':'<div class="empty">No completed loan history yet.</div>')+
+   return '<div class="loan-history-row" onclick="'+onclick+'"><div class="loan-history-icon">✓</div><div class="loan-history-main"><b>'+esc(h.loanId)+'</b><small>'+fmt(h.loanDate)+' · '+inr(h.loanAmount)+' loan · '+k.paidW+'/'+h.weeks+' weeks · '+tag+'</small></div><div class="loan-history-money"><b>'+inr(k.paid)+'</b><small>Profit '+inr(Math.max(k.paid-(Number(h.loanAmount)||0),0))+'</small></div><div class="loan-history-arrow">›</div></div>';
+ }).join("")+'</div></div></div>';
+}
+function completedView(){
+ var m=location.hash.match(/^#completed(?:\/(.+))?$/),key=m?decodeURIComponent(m[1]||""):"";
+ var groups=historyCustomerGroups();
+ if(key){
+   var g=groups[key];
+   if(!g){location.hash="#completed";return "";}
+   return completedCustomerView(g);
+ }
+ var keys=Object.keys(groups).sort(function(a,b){return groups[a].name.localeCompare(groups[b].name)});
+ var totalLoans=0,totalCollected=0,totalProfit=0;
+ keys.forEach(function(k){var t=historyGroupTotals(groups[k]);totalLoans+=t.loans;totalCollected+=t.collected;totalProfit+=t.profit});
+ return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>Completed Customers</h1><p>Old customers are listed separately. Opening a customer shows only their completed loan history — the current account is never changed.</p></div><div class="row"><button class="btn" onclick="go(\'\')">← Current Customers</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+
+ '<div class="grid dashboard-cards"><div class="stat dashboard-card"><div class="l">Completed customers</div><div class="v">'+keys.length+'</div><div class="s">Unique historical customers</div></div><div class="stat dashboard-card"><div class="l">Completed loans</div><div class="v">'+totalLoans+'</div><div class="s">All historical loans</div></div><div class="stat dashboard-card"><div class="l">Historical collected</div><div class="v">'+inr(totalCollected)+'</div><div class="s">Completed loan collections</div></div><div class="stat dashboard-card"><div class="l">Historical profit</div><div class="v">'+inr(totalProfit)+'</div><div class="s">Business analytics</div></div></div>'+
+ '<div class="sec"><div class="ph-head"><div><h2>Old Customer List</h2><p style="margin-bottom:0">Click a customer to open all of their past loans.</p></div><span class="loan-history-badge">'+keys.length+' customers</span></div>'+
+ (keys.length?'<div id="completedCustomerList">'+keys.map(function(k){return completedCustomerCard(groups[k])}).join("")+'</div>':'<div class="empty">No completed/old customers yet.<br><br><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div>')+
  '</div></div>';
 }
+
 function loanHistoryDetail(cid,loanId){
  var c=DB.filter(function(x){return x.id===cid})[0];if(!c)return;var h=loanHistory(c).filter(function(x){return x.loanId===loanId})[0];if(!h)return;var k=loanRecordCalc(h),rows=paymentRows({pays:h.pays||[]});
  var list=rows.length?'<div class="ph-list">'+rows.map(function(p){return paymentRowHtml(c,p,false)}).join('')+'</div>':'<div class="ph-empty">No dated payment rows were saved for this completed loan.</div>';
@@ -1243,7 +1293,7 @@ async function saveHistoricalLoan(){
  h.loanId="HIST-"+String(h.customerId||h.name).replace(/[^A-Za-z0-9]/g,"").slice(0,12).toUpperCase()+"-"+Date.now().toString(36).toUpperCase();
  h.id=null;
  if(sb){var ok=await cloudSaveHistorical(h);if(!ok)return;await cloudLoad()}else{HIST.unshift(h);save()}
- close_();location.hash="#loan-history";
+ close_();location.hash="#completed";
 }
 function historicalLoanDetail(id){
  var h=HIST.filter(function(x){return String(x.id)===String(id)})[0];if(!h)return;
@@ -1255,7 +1305,7 @@ async function deleteHistoricalLoan(id,b){
  if(!arm(id,b))return;
  if(sb){var ok=await cloudDeleteHistorical(id);if(!ok)return}
  HIST=HIST.filter(function(x){return String(x.id)!==String(id)});
- save();armed=null;close_();location.hash="#loan-history";
+ save();armed=null;close_();location.hash="#completed";
 }
 
 function newLoanForm(cid){
@@ -1265,7 +1315,7 @@ function newLoanForm(cid){
 }
 function newLoanFormConfirmed(cid){
  var c=DB.filter(function(x){return x.id===cid})[0];if(!c)return;
- open_('<h2>New Loan for '+esc(c.name)+'</h2><p style="color:var(--muted);font-size:13px">The completed loan will move to Loan History. Customer name, Customer ID, phone and PIN stay the same.</p><div class="fg">'+F("nl_loan","New loan amount (₹)","number","",'min="1"')+F("nl_pw","Per week (₹)","number","",'min="1"')+F("nl_wk","Total payable weeks","number","12",'min="1"')+F("nl_date","New loan date","date",new Date().toISOString().slice(0,10))+selDay("nl_day","Collection weekday",c.collectionWeekday==null?4:+c.collectionWeekday)+'</div><div class="note">Week 1 starts on the first selected weekday after the new loan date. The old loan will remain permanently available in Loan History.</div><div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="saveNewLoan(\''+cid+'\')">Archive &amp; Start New Loan</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
+ open_('<h2>New Loan for '+esc(c.name)+'</h2><p style="color:var(--muted);font-size:13px">The completed loan will move to Completed history. Customer name, Customer ID, phone and PIN stay the same.</p><div class="fg">'+F("nl_loan","New loan amount (₹)","number","",'min="1"')+F("nl_pw","Per week (₹)","number","",'min="1"')+F("nl_wk","Total payable weeks","number","12",'min="1"')+F("nl_date","New loan date","date",new Date().toISOString().slice(0,10))+selDay("nl_day","Collection weekday",c.collectionWeekday==null?4:+c.collectionWeekday)+'</div><div class="note">Week 1 starts on the first selected weekday after the new loan date. The old loan will remain permanently available in Completed history.</div><div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="saveNewLoan(\''+cid+'\')">Archive &amp; Start New Loan</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
 }
 async function saveNewLoan(cid){
  var c=DB.filter(function(x){return x.id===cid})[0];if(!c)return;

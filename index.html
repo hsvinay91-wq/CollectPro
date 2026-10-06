@@ -825,13 +825,17 @@ var armed=null;
 
 function loanHistory(c){return Array.isArray(c.loanHistory)?c.loanHistory:[]}
 function loanRecordCalc(h){return calc({perWeek:+h.perWeek||0,weeks:+h.weeks||0,hPaid:+h.hPaid||0,hMiss:+h.hMiss||0,hAmt:h.hAmt==null?"":+h.hAmt,pays:Array.isArray(h.pays)?h.pays:[]})}
+var DEFAULT_CUTTING_PCT=5;
+function rawCut(h){var c=Number(h&&h.cutting);if(!isFinite(c)||c<0)c=Number(h&&h.cutting_amount)||0;return c}
+function usesDefaultCut(h){return !(rawCut(h)>0)}
+function effCutting(h){var l=Number(h&&h.loanAmount);if(!isFinite(l)||l<=0)l=Number(h&&h.loan)||0;var c=rawCut(h);return c>0?c:l*DEFAULT_CUTTING_PCT/100}
+function weekKeyOf(s){var p=String(s||"").split("-").map(Number);if(p.length!==3||!p[0])return "";var d=new Date(p[0],p[1]-1,p[2]);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
 function loanProfitRate(h,k){
  var payable=Number(k&&k.payable)||0;
  /* Current customers store the principal as loan; historical loans store it as loanAmount. */
  var loan=Number(h&&h.loanAmount);
  if(!isFinite(loan)||loan<=0) loan=Number(h&&h.loan)||0;
- var cutting=Number(h&&h.cutting);
- if(!isFinite(cutting)||cutting<0) cutting=Number(h&&h.cutting_amount)||0;
+ var cutting=effCutting(h);
  if(payable<=0||loan<=0)return 0;
  /* Net cash actually given = loan - cutting.
     Full-loan profit = total payable - net cash given.
@@ -1116,14 +1120,14 @@ function monthLabel(key){
  return d.toLocaleDateString("en-IN",{month:"short"});
 }
 function monthlyAnalytics(){
- function make(){var now=new Date();now.setDate(1);now.setHours(0,0,0,0);var a=[];for(var i=5;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth()-i,1);a.push({key:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("en-IN",{month:"short",year:"2-digit"}),collection:0,profit:0,paidWeeks:0})}return a}
+ function make(){var now=new Date();now.setDate(1);now.setHours(0,0,0,0);var a=[];for(var i=5;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth()-i,1);a.push({key:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("en-IN",{month:"short",year:"2-digit"}),collection:0,profit:0,paidWeeks:0,pays:0,ws:{}})}return a}
  var current=make(),historical=make(),cm={},hm={};current.forEach(function(m){cm[m.key]=m});historical.forEach(function(m){hm[m.key]=m});
  DB.filter(function(c){return c.isActive!==false}).forEach(function(c){
    var k=calc(c),rate=loanProfitRate(c,k);
    (c.pays||[]).forEach(function(p){
      if(p.type!=="paid"&&p.type!=="hist")return;
      var m=cm[monthKeyFromDate(p.date)];if(!m)return;
-     var amt=Number(p.amt)||0;m.collection+=amt;m.paidWeeks++;m.profit+=amt*rate;
+     var amt=Number(p.amt)||0;m.collection+=amt;m.pays++;m.ws[weekKeyOf(p.date)]=1;m.profit+=amt*rate;
    });
  });
  function addHist(h){
@@ -1131,17 +1135,18 @@ function monthlyAnalytics(){
    (h.pays||[]).forEach(function(p){
      if(p.type!=="paid"&&p.type!=="hist")return;
      var m=hm[monthKeyFromDate(p.date)];if(!m)return;
-     hasDated=true;var amt=Number(p.amt)||0;m.collection+=amt;m.paidWeeks++;m.profit+=amt*rate;
+     hasDated=true;var amt=Number(p.amt)||0;m.collection+=amt;m.pays++;m.ws[weekKeyOf(p.date)]=1;m.profit+=amt*rate;
    });
    /* Old records often contain only a historical paid amount and completed date.
       Put that undated collection into its completed month rather than showing a misleading ₹0 chart. */
    if(!hasDated){
      var amt=Number(k.paid)||0,m=hm[monthKeyFromDate(String(h.completedAt||h.loanDate||"").slice(0,10))];
-     if(m&&amt>0){m.collection+=amt;m.paidWeeks+=Number(k.paidW)||0;m.profit+=amt*rate;}
+     if(m&&amt>0){m.collection+=amt;m.pays+=Number(k.paidW)||0;m.profit+=amt*rate;}
    }
  }
  DB.forEach(function(c){loanHistory(c).forEach(addHist)});
  HIST.forEach(addHist);
+ current.concat(historical).forEach(function(m){m.paidWeeks=Object.keys(m.ws).length});
  return {current:current,historical:historical};
 }
 
@@ -1160,16 +1165,18 @@ function dashboardView(){
  /* Business run-rate from the current 12 customer accounts.
     The standard model is ₹2,500 profit on ₹12,000 collection = 20.8333%.
     Use each active loan's own margin so custom cutting/terms are also supported. */
- var weeklyCollection=activeDB.reduce(function(s,c){return s+(Number(c.perWeek)||0)},0);
- var weeklyProfit=activeDB.reduce(function(s,c){var k=calc(c);return s+(Number(c.perWeek)||0)*loanProfitRate(c,k)},0);
+ var runDB=activeDB.filter(function(c){return !calc(c).done});var weeklyCollection=runDB.reduce(function(s,c){return s+(Number(c.perWeek)||0)},0);
+ var weeklyProfit=runDB.reduce(function(s,c){var k=calc(c);return s+(Number(c.perWeek)||0)*loanProfitRate(c,k)},0);
  var monthlyRunRate=weeklyCollection*52/12,monthlyProfitRunRate=weeklyProfit*52/12;
  var months=monthlyAnalytics();
- function chart(arr,title,kind){var maxC=Math.max.apply(null,arr.map(function(m){return m.collection}).concat([1]));var maxP=Math.max.apply(null,arr.map(function(m){return m.profit}).concat([1]));return '<div class="monthly-panel"><div class="monthly-panel-head"><div><h3>'+title+'</h3><p>'+ (kind==='current'?'Active/current loans only.':'Completed/old loans only.') +'</p></div><div class="mini-kpi"><b>'+inr(arr.reduce(function(s,m){return s+m.collection},0))+'</b><span>collection</span><b>'+inr(arr.reduce(function(s,m){return s+m.profit},0))+'</b><span>profit</span></div></div><div class="monthly-chart">'+arr.map(function(m){var ch=Math.max(3,Math.round((m.collection/maxC)*145)),ph=Math.max(3,Math.round((m.profit/maxP)*145));return '<div class="month-col"><div class="month-value">'+(m.collection?inr(m.collection):'₹0')+'</div><div class="month-bars"><div class="month-bar collection" style="height:'+ch+'px" title="'+m.label+' collection '+inr(m.collection)+'"></div><div class="month-bar profit" style="height:'+ph+'px" title="'+m.label+' profit '+inr(m.profit)+'"></div></div><div class="month-label">'+m.label+'</div></div>'}).join('')+'</div><div class="month-legend"><span style="--c:#5D9DFF">Collection</span><span style="--c:#24A97E">Realized profit</span></div><div class="monthly-table"><div class="monthly-row head"><span>Month</span><span>Collection</span><span>Profit</span><span>Paid weeks</span></div>'+arr.map(function(m){return '<div class="monthly-row"><b>'+m.label+'</b><b class="collection-num">'+inr(m.collection)+'</b><b class="profit-num">'+inr(m.profit)+'</b><span>'+m.paidWeeks+'</span></div>'}).join('')+'</div></div>'}
- var cards=[['Current Profit',inr(currentProfit),'Realized from active-loan payments'],['Historical Profit',inr(historicalProfit),'Completed/old loans only'],['Current Collected',inr(currentCollected),'Actual active-loan payments'],['Historical Collected',inr(historicalCollected),'Completed/old-loan payments'],['Weekly Collection',inr(weeklyCollection),'Current customer run-rate'],['Weekly Profit',inr(weeklyProfit),'Expected profit from this week'],['Monthly Collection Run-rate',inr(monthlyRunRate),'₹ weekly × 52 ÷ 12'],['Monthly Profit Run-rate',inr(monthlyProfitRunRate),'Expected current-business profit'],['Total Pending',inr(totals.pending),'Active/current loans'],['Active Customers',activeDB.length,'Current collection accounts']];
+ var marginPct=weeklyCollection?weeklyProfit/weeklyCollection*100:0,missCut=activeDB.filter(usesDefaultCut);
+ var howPanel='<div class="sec"><h2>How profit is calculated</h2><p>One model for every loan, so all numbers tally.</p><div class="note" style="line-height:1.9"><b>1. Given amount</b> = Loan - Cutting. Example: ₹10,000 - ₹500 = ₹9,500<br><b>2. Total payable</b> = Weekly x Weeks. Example: ₹1,000 x 12 = ₹12,000<br><b>3. Loan profit</b> = Payable - Given = ₹2,500<br><b>4. Margin</b> = Profit / Payable = 20.83% of every rupee collected<br><b>5. Realized profit</b> = Collected x Margin<br><b>6. Weekly profit</b> = sum of (customer weekly x customer margin) = '+inr(weeklyCollection)+' x '+marginPct.toFixed(2)+'% = <b>'+inr(weeklyProfit)+'</b><br><b>7. Monthly run-rate</b> = Weekly x 52 / 12 (4.33 weeks per month)</div>'+(missCut.length?'<div class="note" style="margin-top:10px;color:#FFC27A">'+missCut.length+' active customer(s) have no cutting saved, so the standard '+DEFAULT_CUTTING_PCT+'% cutting is used for them. Open the customer and save the exact cutting to fix it permanently.</div>':'')+'</div>';
+ function chart(arr,title,kind){var maxC=Math.max.apply(null,arr.map(function(m){return m.collection}).concat([1]));var maxP=Math.max.apply(null,arr.map(function(m){return m.profit}).concat([1]));return '<div class="monthly-panel"><div class="monthly-panel-head"><div><h3>'+title+'</h3><p>'+ (kind==='current'?'Active/current loans only.':'Completed/old loans only.') +'</p></div><div class="mini-kpi"><b>'+inr(arr.reduce(function(s,m){return s+m.collection},0))+'</b><span>collection</span><b>'+inr(arr.reduce(function(s,m){return s+m.profit},0))+'</b><span>profit</span></div></div><div class="monthly-chart">'+arr.map(function(m){var ch=Math.max(3,Math.round((m.collection/maxC)*145)),ph=Math.max(3,Math.round((m.profit/maxC)*145));return '<div class="month-col"><div class="month-value">'+(m.collection?inr(m.collection):'₹0')+'</div><div class="month-bars"><div class="month-bar collection" style="height:'+ch+'px" title="'+m.label+' collection '+inr(m.collection)+'"></div><div class="month-bar profit" style="height:'+ph+'px" title="'+m.label+' profit '+inr(m.profit)+'"></div></div><div class="month-label">'+m.label+'</div></div>'}).join('')+'</div><div class="month-legend"><span style="--c:#5D9DFF">Collection</span><span style="--c:#24A97E">Realized profit</span></div><div class="monthly-table"><div class="monthly-row head"><span>Month</span><span>Collection</span><span>Profit</span><span>Paid weeks</span></div>'+arr.map(function(m){return '<div class="monthly-row"><b>'+m.label+'</b><b class="collection-num">'+inr(m.collection)+'</b><b class="profit-num">'+inr(m.profit)+'</b><span>'+m.paidWeeks+' wk<small style="display:block;color:var(--muted);font-size:10px">'+m.pays+' payments</small></span></div>'}).join('')+'</div><div class="monthly-note">Paid weeks = distinct collection weeks that had a payment. Payments = customer installments received. Profit bar uses the same scale as collection.</div></div>'}
+ var cards=[['Current Profit',inr(currentProfit),'Realized from active-loan payments'],['Historical Profit',inr(historicalProfit),'Completed/old loans only'],['Current Collected',inr(currentCollected),'Actual active-loan payments'],['Historical Collected',inr(historicalCollected),'Completed/old-loan payments'],['Weekly Collection',inr(weeklyCollection),'Sum of weekly amounts · '+runDB.length+' running customers'],['Weekly Profit',inr(weeklyProfit),'Weekly collection x '+marginPct.toFixed(2)+'% margin'],['Monthly Collection Run-rate',inr(monthlyRunRate),'₹ weekly × 52 ÷ 12'],['Monthly Profit Run-rate',inr(monthlyProfitRunRate),'Weekly profit x 52 / 12'],['Total Pending',inr(totals.pending),'Active/current loans'],['Active Customers',activeDB.length,'Current collection accounts']];
  var catRows=[['Prime Customers','1–3 pending weeks',totals.prime,'Best-performing active accounts'],['Standard Customers','4–5 pending weeks',totals.standard,'Medium-range accounts'],['At-Risk Customers','6+ pending weeks',totals.risk,'Follow-up required'],['Healthy Customers','0 pending weeks',totals.healthy,'No pending weeks']];
  return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Analytics</div><h1>Business Dashboard</h1><p>Current business profit, historical profit and collection run-rates are shown separately for clear decisions.</p></div><button class="btn" onclick="go(\'\')">← Back to Customers</button></div>'+
  '<div class="grid dashboard-cards">'+cards.map(function(s){return '<div class="stat dashboard-card"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join('')+'</div>'+
- '<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Current vs Historical Performance</h2><p>Current payments and completed/old loans are calculated separately. The business model uses the actual cutting amount on each loan.</p></div><div class="profit-model"><b>Example: ₹10,000 loan − ₹500 cutting = ₹9,500 given</b><br>₹12,000 collection − ₹9,500 given = ₹2,500 profit (20.83% of collection).</div></div><div class="dashboard-split-charts">'+chart(months.current,'Current Loans','current')+chart(months.historical,'Historical / Completed Loans','historical')+'</div></div>'+
+ howPanel+'<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Current vs Historical Performance</h2><p>Current payments and completed/old loans are calculated separately. The business model uses the actual cutting amount on each loan.</p></div><div class="profit-model"><b>Example: ₹10,000 loan − ₹500 cutting = ₹9,500 given</b><br>₹12,000 collection − ₹9,500 given = ₹2,500 profit (20.83% of collection).</div></div><div class="dashboard-split-charts">'+chart(months.current,'Current Loans','current')+chart(months.historical,'Historical / Completed Loans','historical')+'</div></div>'+
  '<div class="dashboard-layout"><div class="sec"><div class="dash-title"><div><h2>Customer Categories</h2><p>Active customers only.</p></div></div><div class="category-list">'+catRows.map(function(r){return '<div class="category-row"><div><b>'+r[0]+'</b><small>'+r[1]+' · '+r[3]+'</small></div><strong>'+r[2]+'</strong></div>'}).join('')+'</div></div>'+
  '<div class="sec"><h2>Business Snapshot</h2><p>Separate portfolio view.</p><div class="snapshot"><div><span>Current payable</span><b>'+inr(totals.payable)+'</b></div><div><span>Current collected</span><b>'+inr(currentCollected)+'</b></div><div><span>Current profit</span><b>'+inr(currentProfit)+'</b></div><div><span>Historical collected</span><b>'+inr(historicalCollected)+'</b></div><div><span>Historical profit</span><b>'+inr(historicalProfit)+'</b></div><div><span>Completed loans</span><b>'+hp.loans+'</b></div></div></div></div>'+
  '<div class="sec dashboard-card" style="margin-top:14px"><div class="dash-title"><div><h2>Completed</h2><p>Completed loans are automatically moved here when a current loan reaches its final payable week.</p></div><button class="btn sm" onclick="completedPage()">Open Completed →</button></div><div class="loan-summary-grid"><div><span>Completed loans</span><b>'+hp.loans+'</b></div><div><span>Historical collected</span><b>'+inr(historicalCollected)+'</b></div><div><span>Historical profit</span><b>'+inr(historicalProfit)+'</b></div><div><span>Historical customers</span><b>'+Object.keys(historyCustomerGroups()).length+'</b></div></div></div>'+

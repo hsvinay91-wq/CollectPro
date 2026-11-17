@@ -686,12 +686,13 @@ body:after{
  .portal-hero>.row:first-child{display:block}
  .portal-status-row{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:9px!important;margin:11px 0 0!important;width:100%}
  .portal-status-row .sp{margin-left:0!important}
- .portal-voice-wrap{position:static!important;right:auto!important;top:auto!important;transform:none!important;margin:0!important;display:flex;flex:0 0 auto;align-items:center!important;gap:0!important}
- .portal-voice-mic{width:36px!important;height:36px!important;border-radius:13px!important}
- .portal-voice-mic .mic-svg{width:17px!important;height:17px!important}
- .portal-voice-mic:before,.portal-voice-mic:after{inset:-5px!important;border-radius:16px!important}
+ .portal-voice-wrap{position:static!important;right:auto!important;top:auto!important;transform:none!important;margin:0 auto 0 0!important;display:flex;flex:0 0 auto;align-items:center!important;gap:0!important}
+ .portal-voice-mic{width:30px!important;height:30px!important;border-radius:11px!important}
+ .portal-voice-mic .mic-svg{width:14px!important;height:14px!important}
+ .portal-voice-mic:before,.portal-voice-mic:after{inset:-4px!important;border-radius:14px!important}
  .portal-voice-hint{display:none}
- .portal-status-row .portal-lang{margin:0!important}
+ .portal-status-row .portal-lang{margin:0 0 0 auto!important}
+ .portal-status-row .badge{margin-left:0!important}
 }
 @media(prefers-reduced-motion:reduce){.portal-voice-mic:before,.portal-voice-mic:after,.portal-voice-mic.is-speaking .mic-bars i{animation:none!important}}
 
@@ -1162,7 +1163,7 @@ function collectProVoiceScript(){
   var paid=Math.round(Number(k.paid)||0),rem=Math.round(Number(k.pend)||0);
   var wd=Number(c.collectionWeekday==null?4:c.collectionWeekday);
   S.push("నమస్కారం "+collectProVoiceName(c.name)+" గారు! ఎలా ఉన్నారు?");
-  S.push("మీ వారం చీటి వివరాలు చెబుతాను, జాగ్రత్తగా వినండి.");
+  S.push("మీ కలెక్ట్ ప్రో ఖాతా వివరాలు చెబుతాను, జాగ్రత్తగా వినండి.");
   if(k.done){
     S.push("అభినందనలు! మీ ఖాతా మొత్తం పూర్తయింది.");
     if(paid>0)S.push("మీరు ఇప్పటివరకు "+cpMoney(paid)+" చెల్లించారు.");
@@ -1173,18 +1174,18 @@ function collectProVoiceScript(){
     else S.push("మొత్తం "+inTotal+", ఇప్పటివరకు "+cpWeeks(paidW)+" కట్టారు.");
     if(paid>0)S.push("ఇప్పటివరకు మీరు మొత్తం "+cpMoney(paid)+" చెల్లించారు.");
     S.push("ఇంకా "+cpMoney(rem)+" కట్టాల్సి ఉంది."+(remW>0?" అంటే మరో "+cpWeeks(remW)+" మిగిలి ఉన్నాయి.":""));
-    S.push("ప్రతి "+CP_TE_DAYS[wd]+" మీ వారం చీటి ఉంటుంది.");
+    S.push("ప్రతి "+CP_TE_DAYS[wd]+" మీ కలెక్షన్ ఉంటుంది.");
     if(n){
       var d=cpDate(n.date),lead;
-      if(d.diff===0)lead="తదుపరి వారం చీటి ఈ రోజే, "+d.day+"."; 
-      else if(d.diff===1)lead="తదుపరి వారం చీటి రేపే, "+d.day+"."; 
-      else lead="తదుపరి వారం చీటి "+d.text+", "+d.day+" నాడు."; 
+      if(d.diff===0)lead="తదుపరి చెల్లింపు ఈ రోజే, "+d.day+".";
+      else if(d.diff===1)lead="తదుపరి చెల్లింపు రేపే, "+d.day+".";
+      else lead="తదుపరి చెల్లింపు "+d.text+", "+d.day+" నాడు.";
       S.push(lead);
       S.push("ఆ రోజు చెల్లించాల్సిన మొత్తం "+cpMoney(n.amount)+".");
     }
   }
   S.push("ఏమైనా సందేహాలు ఉంటే, మీ కలెక్షన్ వారికి ఫోన్ చేయండి.");
-  S.push("ధన్యవాదాలండి! "+collectProVoiceName(c.name)+" గారు!");
+  S.push("ధన్యవాదాలండి! మీ రోజు శుభంగా గడవాలి.");
   return S;
 }
 

@@ -699,7 +699,37 @@ body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:non
  .portal-status-row .badge{margin-left:0!important}
 }
 
-</style></head><body>
+</style><style>\n
+/* CollectPro customer portal control alignment — mic left, language/status right */
+.portal-hero>.row:first-child{display:flex;align-items:flex-start;gap:16px}
+.portal-status-row{
+  position:relative!important;
+  display:flex!important;
+  flex:0 0 auto;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:10px!important;
+  margin-left:auto!important;
+}
+.portal-status-row .portal-voice-wrap{
+  position:static!important;
+  right:auto!important;
+  top:auto!important;
+  transform:none!important;
+  margin:0!important;
+  display:flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+}
+.portal-status-row .portal-lang,
+.portal-status-row .badge{margin:0!important}
+@media(max-width:700px){
+  .portal-hero>.row:first-child{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+  .portal-status-row{width:100%!important;justify-content:flex-start!important;margin-left:0!important}
+  .portal-status-row .portal-voice-wrap{margin-right:auto!important}
+  .portal-status-row .portal-lang{margin-left:auto!important}
+}
+\n</style>\n</head><body>
 <div class="wrap">
  <div class="top"><div class="brand" onclick="go('')" aria-label="CollectPro home">
   <span class="brand-word">Collect<i>Pro</i></span>

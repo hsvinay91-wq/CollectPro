@@ -663,14 +663,14 @@ body:after{
 
 /* CollectPro Voice Assistant — premium right-side mic, A+B Telugu voice */
 .portal-page .hero{position:relative}
-.portal-voice-wrap{position:absolute;z-index:8;right:34px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:10px}
-.portal-voice-mic{position:relative;width:78px;height:78px;border:1px solid rgba(255,224,153,.72);border-radius:26px;display:grid;place-items:center;cursor:pointer;color:#fff;background:linear-gradient(145deg,#F1C65F 0%,#C58B32 45%,#7650C6 100%);box-shadow:0 12px 30px rgba(0,0,0,.32),0 0 22px rgba(224,176,75,.32),inset 0 1px 0 rgba(255,255,255,.45);transition:transform .22s ease,box-shadow .22s ease;isolation:isolate}
+.portal-voice-wrap{position:absolute;z-index:8;right:58px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:10px}
+.portal-voice-mic{position:relative;width:60px;height:60px;border:1px solid rgba(255,224,153,.72);border-radius:26px;display:grid;place-items:center;cursor:pointer;color:#fff;background:linear-gradient(145deg,#F1C65F 0%,#C58B32 45%,#7650C6 100%);box-shadow:0 12px 30px rgba(0,0,0,.32),0 0 22px rgba(224,176,75,.32),inset 0 1px 0 rgba(255,255,255,.45);transition:transform .22s ease,box-shadow .22s ease;isolation:isolate}
 .portal-voice-mic:hover{transform:translateY(-3px) scale(1.045);box-shadow:0 16px 34px rgba(0,0,0,.38),0 0 32px rgba(224,176,75,.48),inset 0 1px 0 rgba(255,255,255,.55)}
 .portal-voice-mic:focus-visible{outline:3px solid #fff0b8;outline-offset:5px}
 .portal-voice-mic:before,.portal-voice-mic:after{content:"";position:absolute;inset:-9px;border:1.5px solid rgba(244,204,112,.75);border-radius:31px;z-index:-1;animation:collectProMicHalo 2.4s ease-out infinite}
 .portal-voice-mic:after{animation-delay:1.2s}
-.portal-voice-mic .mic-svg{width:34px;height:34px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
-.portal-voice-mic .mic-bars{position:absolute;bottom:9px;display:flex;align-items:center;gap:3px;height:9px}
+.portal-voice-mic .mic-svg{width:27px;height:27px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.portal-voice-mic .mic-bars{position:absolute;bottom:6px;display:flex;align-items:center;gap:3px;height:9px}
 .portal-voice-mic .mic-bars i{display:block;width:3px;height:4px;border-radius:4px;background:#fff7dc;opacity:.9}
 .portal-voice-mic.is-speaking .mic-bars i{animation:collectProMicBars .55s ease-in-out infinite alternate}
 .portal-voice-mic.is-speaking .mic-bars i:nth-child(2){animation-delay:.12s}
@@ -680,8 +680,8 @@ body:after{
 .portal-voice-hint{font-size:10px;line-height:1.35;color:#E8D8A8;white-space:nowrap;text-shadow:0 2px 8px #070B1D;text-align:center}
 @keyframes collectProMicHalo{0%{transform:scale(.88);opacity:.85}100%{transform:scale(1.5);opacity:0}}
 @keyframes collectProMicBars{from{height:3px}to{height:10px}}
-@media(max-width:700px){.portal-voice-wrap{right:20px;top:48%;gap:7px}.portal-voice-mic{width:62px;height:62px;border-radius:21px}.portal-voice-mic .mic-svg{width:28px;height:28px}.portal-voice-mic:before,.portal-voice-mic:after{border-radius:26px}.portal-voice-hint{font-size:9px}}
-@media(max-width:420px){.portal-voice-wrap{right:14px;top:46%}.portal-voice-mic{width:54px;height:54px;border-radius:18px}.portal-voice-mic .mic-svg{width:25px;height:25px}}
+@media(max-width:700px){.portal-voice-wrap{right:34px;top:48%;gap:7px}.portal-voice-mic{width:52px;height:52px;border-radius:21px}.portal-voice-mic .mic-svg{width:23px;height:23px}.portal-voice-mic:before,.portal-voice-mic:after{border-radius:26px}.portal-voice-hint{font-size:9px}}
+@media(max-width:420px){.portal-voice-wrap{right:25px;top:46%}.portal-voice-mic{width:48px;height:48px;border-radius:18px}.portal-voice-mic .mic-svg{width:21px;height:21px}}
 @media(prefers-reduced-motion:reduce){.portal-voice-mic:before,.portal-voice-mic:after,.portal-voice-mic.is-speaking .mic-bars i{animation:none!important}}
 
 </style>
@@ -1026,25 +1026,25 @@ function collectProVoiceText(){
   var remainingWeeks=Math.max(0,Number(k.pendW)||0);
   var paidAmount=Math.round(Number(k.paid)||0);
   var remainingAmount=Math.round(Number(k.pend)||0);
-  var totalWeeks=Math.max(0,Number(c.weeks)||0);
+  var totalWeeks=Math.max(0,Number(c.weeks)||12);
   var collectionDay=weekdayNameLocalized(c.collectionWeekday==null?4:c.collectionWeekday,"te");
   var nextDay=n?weekdayNameLocalized(new Date(n.date+"T00:00:00").getDay(),"te"):"";
   var dateText=n?new Date(n.date+"T00:00:00").toLocaleDateString("te-IN",{day:"numeric",month:"long",year:"numeric"}):"";
   var s="నమస్కారం "+(c.name||"")+" గారు! ఎలా ఉన్నారండి? ";
   s+="మీ కలెక్ట్ ప్రో ఖాతా వివరాలు చెప్తాను వినండి. ";
-  s+="మొత్తం "+totalWeeks+" వారాలకు గాను, మీరు ఇప్పటివరకు "+paidWeeks+" వారాలు కట్టారండి. ";
-  s+="మీరు ఇప్పటివరకు మొత్తం "+paidAmount+" రూపాయలు చెల్లించారు. ";
-  s+="ఇంకా "+remainingWeeks+" వారాలు కట్టాల్సి ఉందండి. ";
-  s+="మిగిలిన మొత్తం "+remainingAmount+" రూపాయలు ఉందండి. ";
-  s+="మీ కలెక్షన్ ప్రతి "+collectionDay+" ఉంటుందండి. ";
+  s+="మీరు ఇప్పటివరకు "+totalWeeks+" వారాల్లో "+paidWeeks+" వారాలు కట్టారండి. ";
+  s+="ఇప్పటివరకు మీరు మొత్తం "+paidAmount+" రూపాయలు చెల్లించారు. ";
+  s+="ఇంకా "+remainingAmount+" రూపాయలు కట్టాల్సి ఉందండి. ";
+  s+="మీ కలెక్షన్ ప్రతి "+collectionDay+" ఉంటుంది. ";
   if(n){
-    s+="మీ తదుపరి చెల్లింపు తేదీ "+dateText+". ";
-    s+="అది "+nextDay+" రోజు వస్తుందండి. ";
-    s+="ఆ రోజు చెల్లించాల్సిన మొత్తం "+Math.round(n.amount)+" రూపాయలు.";
+    s+="తదుపరి చెల్లింపు తేదీ "+dateText+". ";
+    s+="ఆ రోజు "+nextDay+". ";
+    s+="చెల్లించాల్సిన మొత్తం "+Math.round(n.amount)+" రూపాయలు. ";
   }else{
-    s+="అభినందనలు అండి! మీ ఖాతా పూర్తిగా చెల్లించబడింది. ఇక కట్టాల్సిన మొత్తం ఏమీ లేదు.";
+    s+="అభినందనలు అండి! మీ ఖాతా పూర్తయింది. ఇక చెల్లించాల్సిన మొత్తం ఏమీ లేదు. ";
   }
-  return s+" ధన్యవాదాలు అండి. మీ రోజు బాగుండాలి!";
+  s+="ఈ వారానికి సంబంధించిన చెల్లింపు వివరాల కోసం మీ కలెక్షన్ వారికి ఫోన్ చేయవచ్చండి. ";
+  return s+"థాంక్యూ అండి! మంచి రోజు.";
 }
 function collectProVoiceSetState(speaking){
   collectProVoiceActive=!!speaking;
@@ -1078,8 +1078,8 @@ function collectProVoiceSpeak(){
   var utterance=new SpeechSynthesisUtterance(text);
   collectProVoiceUtterance=utterance;
   utterance.lang="te-IN";                 // Always Telugu, regardless of dashboard language.
-  utterance.rate=0.88;                    // Gentle conversational pace.
-  utterance.pitch=1.08;                   // Slightly warmer/higher tone; not a guarantee of female identity.
+  utterance.rate=0.84;                    // Gentle conversational pace.
+  utterance.pitch=1.12;                   // Slightly warmer/higher tone; not a guarantee of female identity.
   utterance.volume=1;
   var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
   var selected=collectProVoiceChooseFemaleTeluguVoice(voices);

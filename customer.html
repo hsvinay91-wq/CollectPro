@@ -862,29 +862,13 @@ function nextWeekDate(loanDate,weekNo,weekday){
 function trackerItems(c){
  var base=[],i;
  for(i=1;i<=c.weeks;i++)base.push({week:i,status:"upcoming"});
- c.pays.forEach(function(p){
-   if(p.week>=1&&p.week<=c.weeks){
-     if(p.type==="paid"||p.type==="hist")base[p.week-1].status="paid";
-     else if(p.type==="unpaid"&&base[p.week-1].status!=="paid")base[p.week-1].status="unpaid";
-   }
+ (c.pays||[]).forEach(function(p){
+   var w=Number(p.week);if(w<1||w>c.weeks)return;
+   if(p.type==="paid"||p.type==="hist")base[w-1].status="paid";
+   else if(p.type==="unpaid"&&base[w-1].status!=="paid")base[w-1].status="unpaid";
  });
- /* Carry-over weeks are released one-at-a-time. If Week 13 is unpaid,
-    Week 14 is not added. Once Week 13 is paid, Week 14 can appear when
-    its real collection date arrives. */
- var debt=base.filter(function(x){return x.status==="unpaid"});
- if(debt.length){
-   var cw=c.weeks+1,weekday=(c.collectionWeekday==null?4:+c.collectionWeekday);
-   for(var guard=0;guard<20;guard++,cw++){
-     var due=nextWeekDate(c.date,cw,weekday);
-     var today=new Date();today.setHours(0,0,0,0);
-     var dueDate=due?new Date(due+"T00:00:00"):null;
-     if(dueDate && dueDate>today)break;
-     var cp=c.pays.filter(function(p){return +p.week===cw});
-     var paid=cp.some(function(p){return p.type==="paid"||p.type==="hist"});
-     base.push({week:cw,status:paid?"paid":"carry"});
-     if(!paid)break;
-   }
- }
+ /* Week status changes only when admin records a paid/unpaid entry.
+    Calendar dates alone never turn an upcoming week orange. */
  return base;
 }
 function strip(c){return trackerItems(c).map(function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""});}

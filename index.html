@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CollectPro">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>CollectPro — Weekly Collections</title>
+<title>CollectPro — Cloud v24 Premium</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -642,29 +642,26 @@ body:after{
 
 <style>
 .portal-remember-row{margin:10px 0 2px}.portal-check{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:12px;cursor:pointer;user-select:none}.portal-check input{width:16px;height:16px;accent-color:#FFC84A;cursor:pointer}
+</style><style>
 
-.dashboard-split-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.monthly-panel{border:1px solid rgba(94,130,230,.25);border-radius:18px;padding:16px;background:rgba(12,20,55,.58)}.monthly-panel-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}.monthly-panel-head h3{margin:0;font-size:20px}.monthly-panel-head p{margin:5px 0 0;color:var(--muted);font-size:12px}.mini-kpi{display:grid;grid-template-columns:auto auto;gap:2px 8px;text-align:right}.mini-kpi b{color:var(--profit);font-size:14px}.mini-kpi span{color:var(--muted);font-size:10px}.dashboard-cards{grid-template-columns:repeat(3,minmax(0,1fr))}.monthly-profit-wrap{overflow:hidden}@media(max-width:900px){.dashboard-split-charts{grid-template-columns:1fr}.dashboard-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.dashboard-cards{grid-template-columns:1fr}.monthly-panel-head{flex-direction:column}.mini-kpi{text-align:left}}
+/* CollectPro Voice Assistant — additive accessibility layer */
+.voice-assistant{margin:14px 0;padding:16px;border:1px solid rgba(113,151,255,.28);border-radius:18px;background:linear-gradient(135deg,rgba(31,54,105,.48),rgba(43,30,83,.42));box-shadow:0 10px 28px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.05)}
+.voice-head{display:flex;align-items:center;gap:12px}
+.voice-icon{width:46px;height:46px;flex:0 0 46px;border-radius:15px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,#315fbd,#7548b8);box-shadow:0 5px 18px rgba(66,103,214,.28)}
+.voice-title{font-weight:800;font-size:15px;color:#F2F4FF}
+.voice-sub{font-size:11px;color:#B6BEDB;margin-top:2px}
+.voice-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.voice-controls .btn{flex:1;min-width:90px;text-align:center}
+.voice-controls .btn.voice-play{background:linear-gradient(135deg,#E9C56A,#C99A3D);border-color:#E2B957;color:#211A0A}
+.voice-speed{display:flex;align-items:center;gap:9px;margin-top:10px;color:#B6BEDB;font-size:11px}
+.voice-speed select{background:rgba(8,13,32,.72);color:#F2F4FF;border:1px solid rgba(255,255,255,.16);border-radius:9px;padding:6px 9px}
+.voice-status{font-size:11px;color:#AFC6FF;margin-top:8px;min-height:16px}
+@media(max-width:420px){.voice-assistant{padding:13px}.voice-controls .btn{min-width:78px;padding:9px 8px;font-size:11px}}
 
-.dashboard-cards{grid-template-columns:repeat(4,minmax(0,1fr))}
-@media(max-width:1100px){.dashboard-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:760px){.dashboard-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.dashboard-cards{grid-template-columns:1fr}}
-
-/* v25 collection workspace */
-
-
-/* v26 motion and icon system */
-body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:none;width:45vw;height:45vw;border-radius:50%;filter:blur(70px);opacity:.12;animation:cpAmbient 22s ease-in-out infinite alternate}body::before{background:#5e8ee8;top:-20vw;left:-12vw}body::after{background:var(--gold);bottom:-25vw;right:-10vw;animation-delay:-10s}.wrap{isolation:isolate}.cp-icon{width:17px;height:17px;vertical-align:-3px;display:inline-block;flex:none;margin-right:7px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.stat .cp-icon{color:var(--gold);width:19px;height:19px}.cp-enter{animation:cpPage .32s ease both}.btn,.chip{transition:background .18s,border-color .18s,transform .18s}.btn:hover{border-color:var(--gold);transform:translateY(-1px)}.btn:active{transform:scale(.97)}.cp-reconcile{display:grid;grid-template-columns:1fr 1fr;gap:14px}.cp-reconcile>div{padding:15px;background:var(--in);border:1px solid var(--line);border-radius:12px}.cp-reconcile small{display:block;color:var(--muted);font-size:11px;margin-top:6px}.cp-check{padding:12px 0;border-top:1px solid var(--line);font-size:12px}.cp-check:first-child{border-top:0}.cp-note{font-size:11px;color:var(--muted);margin:12px 0 0}.cp-check b{color:var(--miss)}@keyframes cpAmbient{from{transform:translate3d(0,0,0)}to{transform:translate3d(8vw,5vw,0)}}@keyframes cpPage{from{opacity:.4;transform:translateY(9px)}to{opacity:1;transform:none}}@media(max-width:560px){.cp-reconcile{grid-template-columns:1fr}.cp-icon{width:15px;height:15px}}@media(prefers-reduced-motion:reduce){body::before,body::after{animation:none}.cp-enter{animation:none}.btn,.chip{transition:none}.btn:hover,.btn:active{transform:none}}
-
-
-/* Payment timeline: due, paid, amount, and remaining balance */
-.ph-row{grid-template-columns:minmax(130px,1.45fr) 48px minmax(72px,.85fr) minmax(112px,1fr) 18px;gap:7px}.ph-date>span{display:block;font-size:12px;font-weight:700}.ph-date small{font-size:10px}.ph-amount b{display:block}.ph-amount small{display:block;font-size:10px;font-weight:500;color:var(--muted);white-space:nowrap}.ph-arrow{font-size:15px}
-@media(max-width:700px){.ph-row{grid-template-columns:minmax(108px,1.3fr) 42px minmax(65px,.8fr) minmax(100px,1fr) 14px;gap:5px}.ph-date>span{font-size:11px}.ph-amount{font-size:12px}.ph-amount small{font-size:9px}}
-@media(max-width:420px){.ph-row{grid-template-columns:minmax(102px,1.2fr) 39px minmax(61px,.8fr) minmax(93px,1fr) 12px;gap:4px}.ph-week{padding:5px}.ph-arrow{font-size:13px}}
-
-</style></head><body>
+</style>
+</head><body>
 <div class="wrap">
- <div class="top"><div class="brand" onclick="go('')" aria-label="CollectPro home">
+ <div class="top"><div class="brand" onclick="go(\'\')" aria-label="CollectPro home">
   <span class="brand-word">Collect<i>Pro</i></span>
 </div>
   <div class="row" id="topActions"></div></div>
@@ -672,13 +669,12 @@ body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:non
 </div>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <script>
-var KEY="collectpro_v19",HIST=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en",portalRemember=false,CUSTOMER_MODE=false;
+var KEY="collectpro_v19",DB=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en",portalRemember=false;
 var SUPABASE_URL="https://haqjtrcwhuoqwqpoanij.supabase.co";
 var SUPABASE_PUBLISHABLE_KEY="sb_publishable_ASbs_DhL_rRfPWd1grUq6Q_7-I87djF";
 var sb=null;
 try{DB=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){DB=[]}
-try{HIST=JSON.parse(localStorage.getItem("collectpro_completed_loans_v1")||"[]")}catch(e){HIST=[]}
-var save=function(){try{localStorage.setItem(KEY,JSON.stringify(DB));localStorage.setItem("collectpro_completed_loans_v1",JSON.stringify(HIST))}catch(e){}};
+var save=function(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}};
 function cloudConfigured(){return SUPABASE_URL.indexOf("YOUR_")!==0&&SUPABASE_PUBLISHABLE_KEY.indexOf("YOUR_")!==0}
 
 var PT={
@@ -778,36 +774,9 @@ var PT={
 function pt(k){return PT[portalLang][k]||PT.en[k]||k}
 function togglePortalLang(){portalLang=portalLang==="en"?"te":"en";render()}
 
-function mapRow(r){return{id:r.id,customerId:r.customer_id,name:r.name,phone:r.phone||"",loan:+r.loan_amount||0,cutting:+r.cutting_amount||0,perWeek:+r.per_week||0,weeks:+r.weeks||0,date:r.loan_date||"",collectionWeekday:(r.collection_weekday==null?4:+r.collection_weekday),hPaid:+r.h_paid||0,hMiss:+r.h_miss||0,hAmt:r.h_amt==null?"":+r.h_amt,pays:Array.isArray(r.pays)?r.pays:[],loanHistory:Array.isArray(r.loan_history)?r.loan_history:[],isActive:r.is_active!==false}}
-function mapHistoricalRow(r){return{id:r.id,source:"standalone",loanId:r.loan_id||makeLoanId({customerId:r.customer_id,name:r.name}),customerId:r.customer_id||"",name:r.name||"",phone:r.phone||"",loanAmount:+r.loan_amount||0,cutting:+r.cutting_amount||0,perWeek:+r.per_week||0,weeks:+r.weeks||0,loanDate:r.loan_date||"",collectionWeekday:(r.collection_weekday==null?4:+r.collection_weekday),hPaid:+r.h_paid||0,hMiss:+r.h_miss||0,hAmt:r.h_amt==null?"":+r.h_amt,pays:Array.isArray(r.pays)?r.pays:[],completedAt:r.completed_at||""}}
-
-async function cloudLoad(){
- if(!sb)return;
- var q=await sb.from("collectpro_customers").select("*").order("name");
- if(q.error){alert("Cloud database error: "+q.error.message);return}
- var hq=await sb.from("collectpro_completed_loans").select("*").order("completed_at",{ascending:false});
- if(hq.error){alert("Completed loan history database error: "+hq.error.message);return}
- DB=(q.data||[]).map(mapRow);
- HIST=(hq.data||[]).map(mapHistoricalRow);
- await autoArchiveCompletedCurrentLoans();
- save();render()
-}
-async function cloudSaveHistorical(h){
- if(!sb)return true;
- var payload={loan_id:h.loanId,customer_id:h.customerId||"",name:h.name||"",phone:h.phone||"",loan_amount:+h.loanAmount||0,cutting_amount:+h.cutting||0,per_week:+h.perWeek||0,weeks:+h.weeks||0,loan_date:h.loanDate||null,collection_weekday:h.collectionWeekday==null?4:+h.collectionWeekday,h_paid:+h.hPaid||0,h_miss:+h.hMiss||0,h_amt:h.hAmt===""?0:+h.hAmt||0,pays:h.pays||[],completed_at:h.completedAt||new Date().toISOString()};
- var r=h.id?await sb.from("collectpro_completed_loans").update(payload).eq("id",h.id):await sb.from("collectpro_completed_loans").insert(payload).select().single();
- if(r.error){alert("Historical loan save failed: "+r.error.message);return false}
- if(r.data&&r.data.id)h.id=r.data.id;
- return true;
-}
-async function cloudDeleteHistorical(id){
- if(!sb)return true;
- var r=await sb.from("collectpro_completed_loans").delete().eq("id",id);
- if(r.error){alert("Historical loan delete failed: "+r.error.message);return false}
- return true;
-}
-
-async function cloudSaveCustomer(c,pin){if(!sb) return true;var a=await sb.rpc("collectpro_admin_save",{p_id:c.id||null,p_customer_id:c.customerId,p_pin:pin==null?null:pin,p_name:c.name,p_phone:c.phone||"",p_loan_amount:+c.loan||0,p_per_week:+c.perWeek||0,p_weeks:+c.weeks||0,p_loan_date:c.date||null,p_collection_weekday:(c.collectionWeekday==null?4:+c.collectionWeekday),p_h_paid:+c.hPaid||0,p_h_miss:+c.hMiss||0,p_h_amt:c.hAmt===""?0:+c.hAmt||0,p_pays:c.pays||[]});if(a.error){alert("Cloud save failed: "+a.error.message);return false}var cut=await sb.from("collectpro_customers").update({cutting_amount:+c.cutting||0,is_active:true}).eq("customer_id",c.customerId);if(cut.error){alert("Customer status/cutting save failed: "+cut.error.message);return false}if(c.id){var h=await sb.from("collectpro_customers").update({loan_history:Array.isArray(c.loanHistory)?c.loanHistory:[],is_active:true}).eq("id",c.id);if(h.error){alert("Loan history save failed: "+h.error.message);return false}}c.isActive=true;return true}
+function mapRow(r){return{id:r.id,customerId:r.customer_id,name:r.name,phone:r.phone||"",loan:+r.loan_amount||0,perWeek:+r.per_week||0,weeks:+r.weeks||0,date:r.loan_date||"",collectionWeekday:(r.collection_weekday==null?4:+r.collection_weekday),hPaid:+r.h_paid||0,hMiss:+r.h_miss||0,hAmt:r.h_amt==null?"":+r.h_amt,pays:Array.isArray(r.pays)?r.pays:[],loanHistory:Array.isArray(r.loan_history)?r.loan_history:[]}}
+async function cloudLoad(){if(!sb)return;var q=await sb.from("collectpro_customers").select("*").order("name");if(q.error){alert("Cloud database error: "+q.error.message);return}DB=(q.data||[]).map(mapRow);save();render()}
+async function cloudSaveCustomer(c,pin){if(!sb) return true;var a=await sb.rpc("collectpro_admin_save",{p_id:c.id||null,p_customer_id:c.customerId,p_pin:pin==null?null:pin,p_name:c.name,p_phone:c.phone||"",p_loan_amount:+c.loan||0,p_per_week:+c.perWeek||0,p_weeks:+c.weeks||0,p_loan_date:c.date||null,p_collection_weekday:(c.collectionWeekday==null?4:+c.collectionWeekday),p_h_paid:+c.hPaid||0,p_h_miss:+c.hMiss||0,p_h_amt:c.hAmt===""?0:+c.hAmt||0,p_pays:c.pays||[]});if(a.error){alert("Cloud save failed: "+a.error.message);return false}if(c.id){var h=await sb.from("collectpro_customers").update({loan_history:Array.isArray(c.loanHistory)?c.loanHistory:[]}).eq("id",c.id);if(h.error){alert("Loan history save failed: "+h.error.message);return false}}return true}
 async function cloudDelete(id){if(!sb)return true;var q=await sb.from("collectpro_customers").delete().eq("id",id);if(q.error){alert("Cloud delete failed: "+q.error.message);return false}return true}
 async function startApp(){
   if(window.supabase){initCloud();return}
@@ -824,7 +793,7 @@ async function startApp(){
   if(msg)msg.innerHTML='<div class="sec" style="max-width:560px;margin:40px auto;text-align:center"><h1 style="font-size:32px">CollectPro</h1><p style="color:var(--miss);font-weight:700">Cloud library could not be loaded.</p><p>Please refresh the page or check your internet connection.</p><button class="btn pri" onclick="location.reload()">Refresh</button></div>';
 }
 
-async function initCloud(){if(!cloudConfigured()){route();return}if(!window.supabase){route();return}sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);cloudReady=true;if((CUSTOMER_MODE||location.hash==="#portal")&&getPortalSession()){if(await restorePortalSession()){render();return}}var g=await sb.auth.getSession();adminSession=g.data.session;if(CUSTOMER_MODE){await cloudLoad();return}if(adminSession)await cloudLoad();else render();sb.auth.onAuthStateChange(function(_e,session){adminSession=session;if(session)cloudLoad();else render()})}
+async function initCloud(){if(!cloudConfigured()){route();return}if(!window.supabase){route();return}sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);cloudReady=true;if(location.hash==="#portal"&&getPortalSession()){if(await restorePortalSession()){render();return}}var g=await sb.auth.getSession();adminSession=g.data.session;if(adminSession)await cloudLoad();else render();sb.auth.onAuthStateChange(function(_e,session){adminSession=session;if(session)cloudLoad();else render()})}
 function adminLogin(){open_('<h2>Admin Login</h2><p style="color:var(--muted);font-size:13px">Sign in with the Admin email/password created in Supabase Authentication.</p><div class="fg">'+F("a_email","Admin email","email","")+F("a_pass","Password","password","")+'</div><div class="row"><button class="btn pri sp" onclick="doAdminLogin()">Login</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
 async function doAdminLogin(){var e=$("a_email").value.trim(),p=$("a_pass").value;if(!e||!p){$("err").textContent="Enter email and password.";return}var r=await sb.auth.signInWithPassword({email:e,password:p});if(r.error)$("err").textContent=r.error.message;else close_()}
 async function adminLogout(){if(sb)await sb.auth.signOut();}
@@ -837,77 +806,27 @@ var uid=function(){return "c"+Date.now().toString(36)+Math.floor(Math.random()*9
 var armed=null;
 
 function loanHistory(c){return Array.isArray(c.loanHistory)?c.loanHistory:[]}
-function loanRecordCalc(h){return calc(h)}
-function businessTerms(x){
- var isY=/^\s*yalamanda\s*$/i.test(String(x&&x.name||''));
- var pw=Number(x&&x.perWeek)||0;
- var weeks=Number(x&&x.weeks)||0;
- var loan=Number(x&&x.loanAmount);
- if(!isFinite(loan)||loan<=0) loan=Number(x&&x.loan)||0;
- var cutting=Number(x&&x.cutting);
- if(!isFinite(cutting)||cutting<0) cutting=Number(x&&x.cutting_amount)||0;
- /* Business rule: Yalamanda is a 10-week, zero-cutting account.
-    With ₹3,000/week this is ₹30,000 payable and ₹30,000 given, hence ₹0 profit. */
- if(isY){ weeks=10; cutting=0; if(pw>0) loan=pw*weeks; }
- return {loan:loan,cutting:cutting,weeks:weeks,perWeek:pw,isYalamanda:isY};
-}
-function businessCalc(x){var k=calc(x);k.terms=businessTerms(x);return k}
-
-function loanProfitRate(h,k){
- var t=businessTerms(h);
- var payable=Number(k&&k.payable)||t.perWeek*t.weeks;
- var loan=t.loan,cutting=t.cutting;
- if(payable<=0||loan<=0)return 0;
- /* Net cash actually given = loan - cutting. Full-loan profit = total payable - net cash given.
-    Allocated loan margin = collected amount × this loan's profit margin. */
- return Math.max((payable-(loan-cutting))/payable,0);
-}
-function loanProfit(h,k){
- var paid=Number(k&&k.paid)||0;
- return Math.max(paid*loanProfitRate(h,k),0);
-}
+function loanRecordCalc(h){return calc({perWeek:+h.perWeek||0,weeks:+h.weeks||0,hPaid:+h.hPaid||0,hMiss:+h.hMiss||0,hAmt:h.hAmt==null?"":+h.hAmt,pays:Array.isArray(h.pays)?h.pays:[]})}
 function makeLoanId(c){return "LN-"+String(c.customerId||c.name||"CUS").replace(/[^A-Za-z0-9]/g,"").slice(0,12).toUpperCase()+"-"+Date.now().toString(36).toUpperCase()}
 function archiveCurrentLoan(c){
  var k=calc(c);
- var rec={loanId:makeLoanId(c),loanAmount:+c.loan||0,cutting:+c.cutting||0,perWeek:+c.perWeek||0,weeks:+c.weeks||0,loanDate:c.date||"",collectionWeekday:c.collectionWeekday==null?4:+c.collectionWeekday,hPaid:+c.hPaid||0,hMiss:+c.hMiss||0,hAmt:c.hAmt==null?"":+c.hAmt,pays:Array.isArray(c.pays)?JSON.parse(JSON.stringify(c.pays)):[],completedAt:new Date().toISOString(),totalPayable:k.payable,totalPaid:k.paid,pending:k.pend,profit:Math.max(k.paid-((+c.loan||0)-(+c.cutting||0)),0)};
+ var rec={loanId:makeLoanId(c),loanAmount:+c.loan||0,perWeek:+c.perWeek||0,weeks:+c.weeks||0,loanDate:c.date||"",collectionWeekday:c.collectionWeekday==null?4:+c.collectionWeekday,hPaid:+c.hPaid||0,hMiss:+c.hMiss||0,hAmt:c.hAmt==null?"":+c.hAmt,pays:Array.isArray(c.pays)?JSON.parse(JSON.stringify(c.pays)):[],completedAt:new Date().toISOString(),totalPayable:k.payable,totalPaid:k.paid,pending:k.pend,profit:Math.max(k.paid-(+c.loan||0),0)};
  if(!Array.isArray(c.loanHistory))c.loanHistory=[];
  c.loanHistory.unshift(rec);
  return rec;
 }
-async function autoArchiveCompletedCurrentLoans(){
- var changed=false;
- var active=DB.filter(function(c){return c.isActive!==false});
- for(var i=0;i<active.length;i++){
-   var c=active[i],k=calc(c);
-   if(!k.done)continue;
-   var already=HIST.some(function(h){return String(h.customerId||"").toLowerCase()===String(c.customerId||"").toLowerCase() && String(h.loanDate||"")===String(c.date||"") && Number(h.loanAmount||0)===Number(c.loan||0) && Number(h.perWeek||0)===Number(c.perWeek||0)});
-   if(already){c.isActive=false;changed=true; if(sb){await sb.from("collectpro_customers").update({is_active:false}).eq("id",c.id)} continue;}
-   var rec={loanId:"AUTO-"+String(c.customerId||c.name||"CUS").replace(/[^A-Za-z0-9]/g,"").slice(0,12).toUpperCase()+"-"+Date.now().toString(36).toUpperCase(),loanAmount:+c.loan||0,cutting:+c.cutting||0,perWeek:+c.perWeek||0,weeks:+c.weeks||0,loanDate:c.date||"",collectionWeekday:c.collectionWeekday==null?4:+c.collectionWeekday,hPaid:+c.hPaid||0,hMiss:+c.hMiss||0,hAmt:c.hAmt==null?"":+c.hAmt,pays:Array.isArray(c.pays)?JSON.parse(JSON.stringify(c.pays)):[],completedAt:new Date().toISOString()};
-   if(sb){var ok=await cloudSaveHistorical(rec);if(!ok)continue;var u=await sb.from("collectpro_customers").update({is_active:false}).eq("id",c.id);if(u.error){alert("Could not move completed customer to Completed: "+u.error.message);continue}}else{HIST.unshift(rec)}
-   c.isActive=false;changed=true;
- }
- if(changed)save();
- return changed;
+function totalPortfolioHistory(){
+ return DB.reduce(function(t,c){loanHistory(c).forEach(function(h){var k=loanRecordCalc(h);t.loans++;t.loan+=Number(h.loanAmount)||0;t.payable+=k.payable;t.collected+=k.paid;t.profit+=Math.max(k.paid-(Number(h.loanAmount)||0),0)});return t;},{loans:0,loan:0,payable:0,collected:0,profit:0});
 }
-
-function cpHistoryRecords(){
- var all=[],seen={};function add(h,c){var x=Object.assign({},h);x.name=x.name||(c&&c.name)||"";x.customerId=x.customerId||(c&&c.customerId)||"";
- var key=x.loanId?"id:"+x.loanId:JSON.stringify([x.customerId,x.loanDate,x.loanAmount,x.perWeek,x.weeks,x.completedAt,x.hPaid,x.hAmt,x.pays]);
- if(!seen[key]){seen[key]=true;all.push(x)}}
- HIST.forEach(function(h){add(h)});DB.forEach(function(c){loanHistory(c).forEach(function(h){add(h,c)})});return all;
-}
-function totalPortfolioHistory(){return cpHistoryRecords().reduce(function(t,h){var k=calc(h);t.loans++;t.loan+=businessTerms(h).loan;t.payable+=k.payable;t.collected+=k.paid;t.profit+=loanProfit(h,k);return t},{loans:0,loan:0,payable:0,collected:0,profit:0})}
 
 function calc(c){
- var t=businessTerms(c),pw=Math.max(0,t.perWeek),weeks=Math.max(0,t.weeks),pays=Array.isArray(c.pays)?c.pays:[];
- var live=pays.filter(function(p){return p.type==="paid"||p.type==="hist"}),hp=Math.max(0,Number(c.hPaid)||0);
- var hAmt=c.hAmt!==""&&c.hAmt!=null?Math.max(0,Number(c.hAmt)||0):hp*pw;
- var paid=hAmt+live.reduce(function(s,p){return s+Math.max(0,Number(p.amt)||0)},0),payable=pw*weeks;
- var full={},missed={};live.forEach(function(p){var w=Number(p.week);full[w]=(full[w]||0)+Math.max(0,Number(p.amt)||0)});
- var paidW=Math.min(weeks,hp+Object.keys(full).filter(function(w){return Number(w)>hp&&full[w]+.005>=pw}).length);
- pays.forEach(function(p){if(p.type==="unpaid"&&!(full[p.week]+.005>=pw))missed[p.week]=true});
- var miss=Math.max(0,Number(c.hMiss)||0)+Object.keys(missed).length,pend=Math.max(payable-paid,0);
- return {paidW:paidW,paid:paid,hAmt:hAmt,miss:miss,payable:payable,pend:pend,pendW:pw?Math.ceil(Math.max(0,pend-.005)/pw):0,done:payable>0&&pend<.005,pct:payable?Math.min(100,Math.round(paid/payable*100)):0};
+ var live=c.pays.filter(function(p){return p.type==="paid"});
+ var paidW=(+c.hPaid||0)+live.length;
+ var hAmt=c.hAmt!==""&&c.hAmt!=null?+c.hAmt:(+c.hPaid||0)*c.perWeek;
+ var paid=hAmt+live.reduce(function(s,p){return s+(+p.amt||0)},0);
+ var payable=c.perWeek*c.weeks,ps={};live.forEach(function(p){ps[p.week]=1});
+ var miss=(+c.hMiss||0)+c.pays.filter(function(p){return p.type==="unpaid"&&!ps[p.week]}).length;
+ return{paidW:paidW,paid:paid,hAmt:hAmt,miss:miss,payable:payable,pend:Math.max(payable-paid,0),pendW:Math.max(c.weeks-paidW,0),done:paidW>=c.weeks,pct:Math.min(100,Math.round(paidW/c.weeks*100))};
 }
 
 function weekdayName(n){return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][Number(n)];}
@@ -924,29 +843,34 @@ function nextWeekDate(loanDate,weekNo,weekday){
   d.setDate(d.getDate()+delta+((Number(weekNo)-1)*7));
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
-function trackerItems(c,asOf){
- var terms=businessTerms(c),base=[],amounts={},i,pw=terms.perWeek;
- for(i=1;i<=Math.min(terms.weeks,520);i++)base.push({week:i,status:"upcoming"});
- /* Historical missed weeks are explicit admin-entered records, so they remain orange. */
- var opening=calc(c).hAmt,hp=Math.min(base.length,Math.max(0,Number(c.hPaid)||0));
- for(i=1;i<=hp;i++)amounts[i]=Math.min(pw,Math.max(0,opening-(i-1)*pw));
- var hm=Math.min(base.length-hp,Math.max(0,Number(c.hMiss)||0));
- for(i=hp+1;i<=hp+hm;i++)base[i-1].status="unpaid";
- (c.pays||[]).forEach(function(p){
-   var w=Number(p.week);if(w<1||w>base.length)return;
-   if(p.type==="paid"||p.type==="hist")amounts[w]=(amounts[w]||0)+Math.max(0,Number(p.amt)||0);
-   else if(p.type==="unpaid")base[w-1].status="unpaid";
+function trackerItems(c){
+ var base=[],i;
+ for(i=1;i<=c.weeks;i++)base.push({week:i,status:"upcoming"});
+ c.pays.forEach(function(p){
+   if(p.week>=1&&p.week<=c.weeks){
+     if(p.type==="paid"||p.type==="hist")base[p.week-1].status="paid";
+     else if(p.type==="unpaid"&&base[p.week-1].status!=="paid")base[p.week-1].status="unpaid";
+   }
  });
- base.forEach(function(x){
-   if(pw>0&&(amounts[x.week]||0)+.005>=pw)x.status="paid";
-   else if(x.status!=="unpaid")x.status="upcoming";
- });
- /* No date-based auto-missed or carry-over colouring. Only an explicit payment
-    or unpaid entry changes a week's status. */
+ /* Carry-over weeks are released one-at-a-time. If Week 13 is unpaid,
+    Week 14 is not added. Once Week 13 is paid, Week 14 can appear when
+    its real collection date arrives. */
+ var debt=base.filter(function(x){return x.status==="unpaid"});
+ if(debt.length){
+   var cw=c.weeks+1,weekday=(c.collectionWeekday==null?4:+c.collectionWeekday);
+   for(var guard=0;guard<20;guard++,cw++){
+     var due=nextWeekDate(c.date,cw,weekday);
+     var today=new Date();today.setHours(0,0,0,0);
+     var dueDate=due?new Date(due+"T00:00:00"):null;
+     if(dueDate && dueDate>today)break;
+     var cp=c.pays.filter(function(p){return +p.week===cw});
+     var paid=cp.some(function(p){return p.type==="paid"||p.type==="hist"});
+     base.push({week:cw,status:paid?"paid":"carry"});
+     if(!paid)break;
+   }
+ }
  return base;
 }
-function overdueSummary(c,asOf){var today=asOf?new Date(asOf):new Date();today.setHours(0,0,0,0);var ages=trackerItems(c,today).reduce(function(a,x){if(x.status!=="unpaid"&&x.status!=="carry")return a;var due=nextWeekDate(c.date,x.week,c.collectionWeekday),dt=due?new Date(due+"T00:00:00"):null;if(dt&&dt<today)a.push(Math.ceil((today-dt)/604800000));return a},[]);return {count:ages.length,oldest:ages.length?Math.max.apply(null,ages):0}}
-
 function strip(c){return trackerItems(c).map(function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""});}
 function portal(){location.hash="#portal"}
 function portalAdmin(){location.hash="#"}
@@ -1047,6 +971,267 @@ function helpHtml(){
   return '<div class="need-help"><div class="need-help-head"><div class="need-help-icon">🆘</div><div><b>'+(te?"సహాయం కావాలా?":"Need Help?")+'</b><small>'+(te?"మా సపోర్ట్ టీమ్‌ను సంప్రదించండి":"Contact our support team")+'</small></div></div><div class="need-help-phone">📞 +91 8106611452</div><div class="need-help-actions"><a class="btn pri" href="tel:+918106611452">'+(te?"కాల్ చేయండి":"Call Now")+'</a><a class="btn" target="_blank" rel="noopener" href="https://wa.me/918106611452">'+(te?"WhatsApp":"WhatsApp")+'</a></div></div>';
 }
 
+/* ===== CollectPro Voice Assistant v2 — natural, polite Telugu (Shruti-style) =====
+   1) Names, digits, months and weekdays are converted to proper Telugu words BEFORE speaking,
+      so the Telugu voice never has to guess how to pronounce English spellings or numerals.
+   2) Picks the most natural Telugu voice on the device (Microsoft Shruti Natural > Google network > others).
+   3) Speaks sentence by sentence with short pauses, normal pitch and a relaxed rate. */
+var collectProVoiceUtterance=null,collectProVoiceActive=false,collectProVoiceSession=0,collectProVoiceTimer=null;
+
+/* ---------- Telugu words: weekdays, months, numbers ---------- */
+var CP_TE_DAYS=["ఆదివారం","సోమవారం","మంగళవారం","బుధవారం","గురువారం","శుక్రవారం","శనివారం"];
+var CP_TE_MONTHS=["జనవరి","ఫిబ్రవరి","మార్చి","ఏప్రిల్","మే","జూన్","జూలై","ఆగస్టు","సెప్టెంబర్","అక్టోబర్","నవంబర్","డిసెంబర్"];
+var CP_TE_SMALL=["సున్నా","ఒకటి","రెండు","మూడు","నాలుగు","ఐదు","ఆరు","ఏడు","ఎనిమిది","తొమ్మిది","పది","పదకొండు","పన్నెండు","పదమూడు","పద్నాలుగు","పదిహేను","పదహారు","పదిహేడు","పద్దెనిమిది","పంతొమ్మిది"];
+var CP_TE_TENS=["","","ఇరవై","ముప్పై","నలభై","యాభై","అరవై","డెబ్బై","ఎనభై","తొంభై"];
+function cpTwo(n){return n<20?CP_TE_SMALL[n]:CP_TE_TENS[Math.floor(n/10)]+(n%10?" "+CP_TE_SMALL[n%10]:"")}
+function cpBeforeNoun(t){return t.replace(/ఒకటి$/,"ఒక్క")}
+/* gen=true → form used before a noun, e.g. "పన్నెండు వేల రూపాయలు" */
+function cpNum(n,gen){
+  n=Math.round(Number(n)||0);if(n<=0)return CP_TE_SMALL[0];
+  if(n>=1100&&n<=1900&&n%100===0)return cpTwo(n/100)+(gen?" వందల":" వందలు");
+  var units=[[10000000,"కోటి","కోట్లు","కోట్ల"],[100000,"లక్ష","లక్షలు","లక్షల"],[1000,"వెయ్యి","వేలు","వేల"],[100,"వంద","వందలు","వందల"]];
+  var rest=n,parts=[];
+  units.forEach(function(u){var c=Math.floor(rest/u[0]);rest%=u[0];if(c)parts.push({c:c,u:u})});
+  var restW=rest?cpTwo(rest):"",out=[];
+  parts.forEach(function(p,i){
+    var follow=(i<parts.length-1)||!!restW;
+    if(p.c===1)out.push((p.u[0]===100&&follow)?"నూట":p.u[1]);
+    else out.push((p.c<100?cpBeforeNoun(cpTwo(p.c)):String(p.c))+" "+((follow||gen)?p.u[3]:p.u[2]));
+  });
+  if(restW)out.push(restW);
+  return out.join(" ");
+}
+function cpMoney(n){n=Math.round(Number(n)||0);return n===1?"ఒక రూపాయి":cpBeforeNoun(cpNum(n,true))+" రూపాయలు"}
+function cpWeeks(n){n=Math.round(Number(n)||0);return n===1?"ఒక వారం":cpBeforeNoun(cpNum(n))+" వారాలు"}
+function cpOrd(n){
+  var w=cpNum(n).split(" "),l=w.pop();
+  if(/ై$/.test(l))l=l.replace(/ై$/,"య్యవ");
+  else if(/[ుి]$/.test(l))l=l.replace(/[ుి]$/,"వ");
+  else l+="వ";
+  w.push(l);return w.join(" ");
+}
+function cpDate(ds){
+  var d=new Date(ds+"T00:00:00"),now=new Date();now.setHours(0,0,0,0);
+  var t=CP_TE_MONTHS[d.getMonth()]+" "+cpOrd(d.getDate())+" తేదీ";
+  if(d.getFullYear()!==now.getFullYear())t+=", "+cpNum(d.getFullYear());
+  return{text:t,day:CP_TE_DAYS[d.getDay()],diff:Math.round((d-now)/86400000)};
+}
+
+/* ---------- Customer name → Telugu script ---------- */
+var CP_NAME_DICT={
+ "lakshmi":"లక్ష్మి","laxmi":"లక్ష్మి","lakshimi":"లక్ష్మి","pujari":"పూజారి","ravi":"రవి","kumar":"కుమార్","kumari":"కుమారి",
+ "vinay":"వినయ్","srinivas":"శ్రీనివాస్","srinivasa":"శ్రీనివాస","suresh":"సురేష్","rajesh":"రాజేష్","mahesh":"మహేష్","ramesh":"రమేష్",
+ "venkatesh":"వెంకటేష్","venkat":"వెంకట్","venkata":"వెంకట","anusha":"అనూష","swathi":"స్వాతి","swati":"స్వాతి","sowmya":"సౌమ్య","soumya":"సౌమ్య",
+ "divya":"దివ్య","priya":"ప్రియ","kavya":"కావ్య","keerthana":"కీర్తన","harika":"హారిక","bhavani":"భవాని","padma":"పద్మ","padmavathi":"పద్మావతి",
+ "sai":"సాయి","ramya":"రమ్య","manjula":"మంజుల","sunitha":"సునీత","sunita":"సునీత","sujatha":"సుజాత","narayana":"నారాయణ","narayan":"నారాయణ",
+ "krishna":"కృష్ణ","venkateswara":"వెంకటేశ్వర","venkateswarlu":"వెంకటేశ్వర్లు","mallika":"మల్లిక","geetha":"గీత","gita":"గీత","geeta":"గీత",
+ "shiva":"శివ","siva":"శివ","shankar":"శంకర్","sankar":"శంకర్","reddy":"రెడ్డి","naidu":"నాయుడు","rao":"రావు","raju":"రాజు","babu":"బాబు",
+ "goud":"గౌడ్","gowd":"గౌడ్","goudu":"గౌడు","chowdary":"చౌదరి","choudary":"చౌదరి","chowdhury":"చౌదరి","sharma":"శర్మ","varma":"వర్మ","verma":"వర్మ",
+ "setty":"శెట్టి","shetty":"శెట్టి","patel":"పటేల్","yadav":"యాదవ్","rani":"రాణి","devi":"దేవి","sridevi":"శ్రీదేవి","mohan":"మోహన్","pavan":"పవన్",
+ "kalyan":"కళ్యాణ్","ganesh":"గణేష్","prakash":"ప్రకాష్","ramu":"రాము","satish":"సతీష్","sathish":"సతీష్","anil":"అనిల్","sunil":"సునీల్",
+ "vijay":"విజయ్","naveen":"నవీన్","praveen":"ప్రవీణ్","teja":"తేజ","swamy":"స్వామి","swami":"స్వామి","nagaraju":"నాగరాజు","mallesh":"మల్లేష్",
+ "bhaskar":"భాస్కర్","sagar":"సాగర్","chandra":"చంద్ర","ammulu":"అమ్ములు","sudha":"సుధ","rama":"రామ","seetha":"సీత","sita":"సీత","radha":"రాధ",
+ "uma":"ఉమ","usha":"ఉష","asha":"ఆశ","jyothi":"జ్యోతి","jyoti":"జ్యోతి","rekha":"రేఖ","latha":"లత","lata":"లత","sarala":"సరళ","vani":"వాణి",
+ "aruna":"అరుణ","kiran":"కిరణ్","ajay":"అజయ్","sandeep":"సందీప్","deepak":"దీపక్","manoj":"మనోజ్","rahul":"రాహుల్","nikhil":"నిఖిల్",
+ "arjun":"అర్జున్","ashok":"అశోక్","naresh":"నరేష్","dinesh":"దినేష్","ramana":"రమణ","yadagiri":"యాదగిరి","anjali":"అంజలి","anjaneyulu":"ఆంజనేయులు",
+ "hanumanth":"హనుమంత్","hemanth":"హేమంత్","srikanth":"శ్రీకాంత్","sampath":"సంపత్","madhu":"మధు","madhavi":"మాధవి","bharathi":"భారతి",
+ "bharati":"భారతి","rajini":"రజని","vamsi":"వంశీ","vamshi":"వంశీ","mounika":"మౌనిక","pooja":"పూజ","puja":"పూజ","anand":"ఆనంద్","ananda":"ఆనంద",
+ "ramakrishna":"రామకృష్ణ","gopal":"గోపాల్","gopi":"గోపి","govardhan":"గోవర్ధన్","lokesh":"లోకేష్","ramesh":"రమేష్","prasad":"ప్రసాద్","prasanna":"ప్రసన్న",
+ "mary":"మేరీ","john":"జాన్","peter":"పీటర్","david":"డేవిడ్","ahmed":"అహ్మద్","khan":"ఖాన్","begum":"బేగం","fatima":"ఫాతిమా","shaik":"షేక్","syed":"సయ్యద్"
+};
+var CP_LETTERS={a:"ఏ",b:"బి",c:"సి",d:"డి",e:"ఈ",f:"ఎఫ్",g:"జి",h:"హెచ్",i:"ఐ",j:"జె",k:"కె",l:"ఎల్",m:"ఎమ్",n:"ఎన్",o:"ఓ",p:"పి",q:"క్యూ",r:"ఆర్",s:"ఎస్",t:"టి",u:"యు",v:"వి",w:"డబ్ల్యూ",x:"ఎక్స్",y:"వై",z:"జెడ్"};
+var CP_IND={"":"అ","ా":"ఆ","ి":"ఇ","ీ":"ఈ","ు":"ఉ","ూ":"ఊ","ె":"ఎ","ే":"ఏ","ై":"ఐ","ొ":"ఒ","ో":"ఓ","ౌ":"ఔ"};
+var CP_CONS=[["ksh","క్ష"],["chh","ఛ"],["ch","చ"],["kh","ఖ"],["gh","ఘ"],["jh","ఝ"],["th","త"],["dh","ధ"],["ph","ఫ"],["bh","భ"],["sh","ష"],["tt","ట్ట"],["dd","డ్డ"],
+ ["k","క"],["g","గ"],["c","క"],["j","జ"],["t","త"],["d","ద"],["n","న"],["p","ప"],["b","బ"],["m","మ"],["y","య"],["r","ర"],["l","ల"],["v","వ"],["w","వ"],["s","స"],["h","హ"],["f","ఫ"],["z","జ"],["q","క"],["x","క్స"]];
+var CP_VOW=[["aa","ా"],["ai","ై"],["au","ౌ"],["ee","ీ"],["ii","ీ"],["oo","ూ"],["uu","ూ"],["ou","ౌ"],["ow","ౌ"],["a",""],["e","ె"],["i","ి"],["o","ొ"],["u","ు"]];
+/* Rule-based fallback for names that are not in the dictionary. */
+function cpRomanToTelugu(word){
+  var w=String(word).toLowerCase().replace(/[^a-z]/g,"");if(!w)return"";
+  var toks=[],i=0,j,m;
+  if(w.indexOf("sri")===0){toks.push({c:"శ్ర"},{v:"ీ"});i=3}
+  else if(w.indexOf("sr")===0){toks.push({c:"శ్ర"});i=2}
+  while(i<w.length){
+    var ch=w.charAt(i);
+    if("aeiou".indexOf(ch)>=0||(ch==="o"&&w.charAt(i+1)==="w")){
+      m=null;for(j=0;j<CP_VOW.length;j++)if(w.substr(i,CP_VOW[j][0].length)===CP_VOW[j][0]){m=CP_VOW[j];break}
+      toks.push({v:m[1],k:m[0]});i+=m[0].length;continue;
+    }
+    m=null;for(j=0;j<CP_CONS.length;j++)if(w.substr(i,CP_CONS[j][0].length)===CP_CONS[j][0]){m=CP_CONS[j];break}
+    if(!m){i++;continue}
+    var k=m[0],unit=m[1],next=w.charAt(i+k.length);
+    if(k==="sh"&&!toks.length)unit="శ";
+    if(k==="y"&&i===w.length-1&&toks.length&&toks[toks.length-1].c!==undefined){toks.push({v:"ి"});i++;continue}
+    var stops="kgcjtdpb"+(k==="m"?"s":"");
+    if((k==="n"||k==="m")&&toks.length&&next!==""&&stops.indexOf(next)>=0){toks.push({anus:true});i++;continue}
+    toks.push({c:unit});i+=k.length;
+  }
+  var res="",pend=null,last=toks.length-1;
+  toks.forEach(function(t,idx){
+    if(t.anus){if(pend!==null){res+=pend;pend=null}res+="ం";return}
+    if(t.v!==undefined){
+      var sign=t.v,n1=toks[idx+1],n2=toks[idx+2];
+      if(t.k==="e"||t.k==="o"){
+        var long=false;
+        if(n1&&n1.c!==undefined&&n1.c.indexOf("్")<0){long=(!n2)||(n2.v!==undefined)}
+        if(long)sign=(t.k==="e")?"ే":"ో";
+      }
+      if(t.k==="a"&&n1&&n1.c!==undefined&&idx+1===last&&(n1.c==="స"||n1.c==="ష"))sign="ా";
+      if(pend!==null){res+=pend+sign;pend=null}else res+=(CP_IND[sign]||"");
+      return;
+    }
+    if(pend!==null)res+=pend+"్";
+    pend=t.c;
+  });
+  if(pend!==null)res+=pend+"్";
+  return res;
+}
+function collectProVoiceName(name){
+  var raw=String(name||"").trim();if(!raw)return"కస్టమర్";
+  var parts=raw.split(/[\s.,]+/).filter(Boolean);
+  var out=parts.map(function(p){
+    if(/[ఀ-౿]/.test(p))return p;
+    var key=p.toLowerCase().replace(/[^a-z]/g,"");
+    if(!key)return"";
+    if(CP_NAME_DICT[key])return CP_NAME_DICT[key];
+    if(key.length===1)return CP_LETTERS[key]||"";
+    return cpRomanToTelugu(key);
+  }).filter(Boolean);
+  return out.length?out.join(" "):"కస్టమర్";
+}
+
+/* ---------- What the assistant says (array of short sentences = natural pauses) ---------- */
+function collectProVoiceScript(){
+  var c=portalData,k=calc(c),n=portalNextPayment(c),S=[];
+  var total=Math.max(0,Number(c.weeks)||0),paidW=Math.min(total,Number(k.paidW)||0),remW=Math.max(0,Number(k.pendW)||0);
+  var paid=Math.round(Number(k.paid)||0),rem=Math.round(Number(k.pend)||0);
+  var wd=Number(c.collectionWeekday==null?4:c.collectionWeekday);
+  S.push("నమస్కారం "+collectProVoiceName(c.name)+" గారు! ఎలా ఉన్నారు?");
+  S.push("మీ వారం చీటి వివరాలు చెబుతాను, జాగ్రత్తగా వినండి.");
+  if(k.done){
+    S.push("అభినందనలు! మీ ఖాతా మొత్తం పూర్తయింది.");
+    if(paid>0)S.push("మీరు ఇప్పటివరకు "+cpMoney(paid)+" చెల్లించారు.");
+    S.push("ఇక మీరు ఏమీ కట్టాల్సిన అవసరం లేదు.");
+  }else{
+    var inTotal=total===1?"ఒక వారంలో":cpNum(total)+" వారాల్లో";
+    if(paidW===0)S.push("మొత్తం "+inTotal+", మీరు ఇంకా ఏ వారం చెల్లింపు చేయలేదు.");
+    else S.push("మొత్తం "+inTotal+", ఇప్పటివరకు "+cpWeeks(paidW)+" కట్టారు.");
+    if(paid>0)S.push("ఇప్పటివరకు మీరు మొత్తం "+cpMoney(paid)+" చెల్లించారు.");
+    S.push("ఇంకా "+cpMoney(rem)+" కట్టాల్సి ఉంది."+(remW>0?" అంటే మరో "+cpWeeks(remW)+" మిగిలి ఉన్నాయి.":""));
+    S.push("ప్రతి "+CP_TE_DAYS[wd]+" మీ వారం చీటి ఉంటుంది.");
+    if(n){
+      var d=cpDate(n.date),lead;
+      if(d.diff===0)lead="తదుపరి వారం చీటి ఈ రోజే, "+d.day+"."; 
+      else if(d.diff===1)lead="తదుపరి వారం చీటి రేపే, "+d.day+"."; 
+      else lead="తదుపరి వారం చీటి "+d.text+", "+d.day+" నాడు."; 
+      S.push(lead);
+      S.push("ఆ రోజు చెల్లించాల్సిన మొత్తం "+cpMoney(n.amount)+".");
+    }
+  }
+  S.push("ఏమైనా సందేహాలు ఉంటే, మీ కలెక్షన్ వారికి ఫోన్ చేయండి.");
+  S.push("ధన్యవాదాలండి! "+collectProVoiceName(c.name)+" గారు!");
+  return S;
+}
+
+/* ---------- Voice selection ---------- */
+function collectProVoiceScore(v){
+  var n=String(v.name||"").toLowerCase()+" "+String(v.voiceURI||"").toLowerCase(),l=String(v.lang||"").replace("_","-").toLowerCase();
+  if(!/^te(-|$)/.test(l))return-1;
+  var s=10;
+  if(/shruti/.test(n))s+=120;                  /* Microsoft Shruti — same family as ReadAnyText */
+  if(/natural|neural/.test(n))s+=70;
+  if(/online|network/.test(n))s+=30;
+  if(/microsoft/.test(n))s+=15;
+  if(/google/.test(n))s+=15;
+  if(/geeta|female|swara|-tef-/.test(n))s+=40;
+  if(/(^|[^a-z])male([^a-z]|$)|mohan|-tem-/.test(n))s-=60;
+  return s;
+}
+function collectProVoicePick(voices){
+  var best=null,bs=-1;
+  (voices||[]).forEach(function(v){var s=collectProVoiceScore(v);if(s>bs){bs=s;best=v}});
+  return best;
+}
+function collectProVoiceGetVoices(cb){
+  var s=window.speechSynthesis,v=s.getVoices();
+  if(v&&v.length){cb(v);return}
+  var done=false;
+  function fin(){if(done)return;done=true;try{s.removeEventListener("voiceschanged",fin)}catch(e){}cb(s.getVoices()||[])}
+  try{s.addEventListener("voiceschanged",fin)}catch(e){}
+  setTimeout(fin,1500);
+}
+
+/* ---------- Playback ---------- */
+function collectProVoiceSetState(speaking){
+  collectProVoiceActive=!!speaking;
+  var b=document.getElementById("portalVoiceMic");
+  if(b){
+    b.classList.toggle("is-speaking",!!speaking);
+    b.setAttribute("aria-label",speaking?"వాయిస్ ఆపండి":"మీ ఖాతా వివరాలు తెలుగులో వినండి");
+    b.title=speaking?"వాయిస్ ఆపడానికి మళ్లీ నొక్కండి":"మీ ఖాతా వివరాలు వినడానికి నొక్కండి";
+  }
+}
+function collectProVoiceStop(){
+  collectProVoiceSession++;
+  clearTimeout(collectProVoiceTimer);
+  try{if("speechSynthesis" in window)window.speechSynthesis.cancel()}catch(e){}
+  collectProVoiceSetState(false);
+}
+function collectProVoiceSpeak(){
+  if(!portalData)return;
+  if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){
+    alert("ఈ పరికరంలో తెలుగు వాయిస్ సదుపాయం అందుబాటులో లేదు. Chrome లేదా Google Speech Services లో Telugu voice install చేసి మళ్లీ ప్రయత్నించండి.");
+    return;
+  }
+  if(collectProVoiceActive){collectProVoiceStop();return}
+  var sentences=collectProVoiceScript();
+  collectProVoiceGetVoices(function(voices){
+    var v=collectProVoicePick(voices);
+    if(!v){
+      alert("మీ ఫోన్‌లో Telugu Text-to-Speech voice install కాలేదు. Android Settings → Text-to-speech output → Preferred engine (Google Speech Services) → Install voice data → Telugu ఎంచుకోండి. తర్వాత మళ్లీ ప్రయత్నించండి.");
+      return;
+    }
+    var natural=/shruti|natural|neural|online|network/i.test(String(v.name||"")+" "+String(v.voiceURI||""));
+    var session=++collectProVoiceSession,i=0;
+    try{window.speechSynthesis.cancel()}catch(e){}
+    collectProVoiceSetState(true);
+    function next(){
+      if(session!==collectProVoiceSession)return;
+      if(i>=sentences.length){collectProVoiceSetState(false);return}
+      var text=sentences[i++],u=new SpeechSynthesisUtterance(text);
+      collectProVoiceUtterance=u;                 /* keep a reference so it is not garbage-collected mid-speech */
+      u.voice=v;u.lang=v.lang||"te-IN";
+      u.rate=natural?0.96:0.9;                    /* relaxed, human pace */
+      u.pitch=1.0;                                /* untouched pitch = no robotic/chipmunk effect */
+      u.volume=1;
+      u.onend=function(){
+        if(session!==collectProVoiceSession)return;
+        collectProVoiceTimer=setTimeout(next,/[!?]$/.test(text)?260:320);
+      };
+      u.onerror=function(ev){
+        if(session!==collectProVoiceSession)return;
+        var er=ev&&ev.error;
+        if(er==="interrupted"||er==="canceled")return;
+        console.warn("CollectPro Telugu speech error:",er);
+        collectProVoiceStop();
+        if(er==="language-unavailable")alert("Telugu voice ప్రస్తుతం అందుబాటులో లేదు. ఫోన్‌లో Telugu voice data install చేసి మళ్లీ ప్రయత్నించండి.");
+      };
+      window.speechSynthesis.speak(u);
+    }
+    collectProVoiceTimer=setTimeout(next,120);
+  });
+}
+/* Pre-load the voice list and stop speaking when the page is hidden/closed. */
+try{if("speechSynthesis" in window){window.speechSynthesis.getVoices();window.addEventListener("pagehide",collectProVoiceStop)}}catch(e){}
+
+function collectProVoiceHtml(){
+  return '<div class="portal-voice-wrap">'+
+    '<button id="portalVoiceMic" class="portal-voice-mic" type="button" onclick="collectProVoiceSpeak()" aria-label="మీ ఖాతా వివరాలు తెలుగులో వినండి" title="మీ ఖాతా వివరాలు వినడానికి నొక్కండి">'+
+    '<svg class="mic-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3" fill="white"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5M8.5 21.5h7" stroke="white" stroke-width="1.8" stroke-linecap="round"/><path d="M4 9.5v2a8 8 0 0 0 16 0v-2" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity=".75"/></svg>'+
+    '<span class="mic-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>'+
+    '<div class="portal-voice-hint">వినడానికి ఇక్కడ నొక్కండి</div></div>';
+}
+
+
 function portalView(){
  if(portalData){
   var c=portalData,k=calc(c),st=strip(c);
@@ -1058,12 +1243,13 @@ function portalView(){
   '<div class="portal-welcome">'+pt("welcome")+' 👋</div>'+
   '<h1 class="portal-name">'+esc(c.name)+'</h1>'+
   '<div class="portal-subtitle">'+pt("subtitle")+'</div>'+
-  '</div><div class="row sp" style="align-self:flex-start">'+
+  '</div><div class="row portal-status-row" style="align-self:flex-start">'+
+  collectProVoiceHtml()+
   '<button class="btn portal-lang" onclick="togglePortalLang()">'+pt("language")+'</button>'+
-  '<span class="badge sp'+(k.done?' o':'')+'">'+status+'</span></div></div>'+
+  '<span class="badge'+(k.done?' o':'')+'">'+status+'</span></div></div>'+
   '<div class="portal-big big"><div><div class="n g countup-ready" data-count="'+pendTarget+'">'+inr(0)+'</div><div class="l">'+pt("remaining")+'</div></div><div><div class="n countup-ready" data-count="'+paidTarget+'">'+inr(0)+'</div><div class="l">'+pt("paidAmount")+'</div></div></div>'+
   '<div class="bar portal-progress"><b style="width:0%" data-progress="'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' '+pt("weeksPaid")+' / '+c.weeks+'</span><span class="sp">'+k.pct+'%</span></div>'+
-  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+'</div>'+completion+'</div>'+
+  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+' · '+(portalLang==="te"?"ప్రతి ":"Collection every ")+weekdayNameLocalized(c.collectionWeekday==null?4:c.collectionWeekday,portalLang)+(portalLang==="te"?" వారం":"")+'</div>'+completion+'</div>'+
   nextPaymentHtml(c)+
   '<div class="grid">'+[
    [pt("loanAmount"),inr(c.loan),pt("originalLoan")],
@@ -1093,29 +1279,27 @@ function animateCustomerPortal(){
   var bar=document.querySelector(".portal-progress b");
   if(bar)setTimeout(function(){bar.style.width=bar.getAttribute("data-progress")||"0%"},120);
 }
-function route(){var m=location.hash.match(/^#customer\/(.+)$/);view=m?m[1]:"";armed=null;if(CUSTOMER_MODE||location.hash==="#portal"){view="";render();return}render();window.scrollTo(0,0)}
+function route(){var m=location.hash.match(/^#customer\/(.+)$/);view=m?m[1]:"";armed=null;if(location.hash==="#portal"){view="";render();return}render();window.scrollTo(0,0)}
 function go(v){var h=v?"#customer/"+v:"";if(location.hash===h||(!v&&(location.hash===""||location.hash==="#")))route();else location.hash=h||"#"}
 window.addEventListener("hashchange",route);
 var q="",flt="all";
 function wa(c,k){var d=(c.phone||"").replace(/\D/g,"");if(d.length===10)d="91"+d;return "https://wa.me/"+d+"?text="+encodeURIComponent("Hi "+c.name+", reminder for your weekly collection of "+inr(c.perWeek)+". Pending balance: "+inr(k.pend)+". Thank you!")}
-function row(c){var k=calc(c),late=overdueSummary(c);return '<div class="cust" onclick="go(\''+c.id+'\')"><div class="ring" style="--p:'+k.pct+'%"><div class="av">'+esc(c.name.charAt(0).toUpperCase())+'</div></div><div class="m"><b>'+esc(c.name)+'</b><small>'+esc(c.phone||"No contact")+' · '+k.paidW+'/'+c.weeks+' weeks</small>'+(late.count?'<small style="color:var(--miss);font-weight:700"> · '+late.count+' overdue · oldest '+late.oldest+' week'+(late.oldest===1?'':'s')+' late</small>':'')+'</div><div class="amt">'+inr(k.pend)+'<small>'+(k.done?"Completed":"pending")+'</small></div></div>'}
-
+function row(c){var k=calc(c),hc=loanHistory(c).length;return '<div class="cust" onclick="go(\''+c.id+'\')"><div class="ring" style="--p:'+k.pct+'%"><div class="av">'+esc(c.name.charAt(0).toUpperCase())+'</div></div><div class="m"><b>'+esc(c.name)+'</b><small>'+esc(c.phone||"No contact")+' · '+k.paidW+'/'+c.weeks+' weeks'+(hc?' · '+hc+' past loan'+(hc===1?'':'s'):'')+'</small>'+(k.miss&&!k.done?'<small style="color:var(--miss);font-weight:600"> · '+k.miss+' unpaid</small>':'')+'</div><div class="amt">'+inr(k.pend)+'<small>'+(k.done?"Completed":"pending")+'</small></div></div>'}
 function list(){
- var L=DB.filter(function(c){if(c.isActive===false)return false;var k=calc(c),late=overdueSummary(c).oldest;return(!q||(c.name+" "+c.phone).toLowerCase().indexOf(q)>=0)&&(flt==="all"||(flt==="over_1"&&late===1)||(flt==="over_2_4"&&late>=2&&late<=4)||(flt==="over_5"&&late>=5)||(flt==="act"&&!k.done)||(flt==="done"&&k.done))});
+ var L=DB.filter(function(c){var k=calc(c);return(!q||(c.name+" "+c.phone).toLowerCase().indexOf(q)>=0)&&(flt==="all"||(flt==="over"&&k.miss>0&&!k.done)||(flt==="act"&&!k.done)||(flt==="done"&&k.done))});
  $("lst").innerHTML=L.length?L.map(row).join(""):'<div class="empty">'+(DB.length?"No customers match this filter.":'No customers yet. Add your first customer, or enter an old customer with their past paid weeks.<br><br><button class="btn pri" onclick="custForm()">+ Add customer</button>')+'</div>';
 }
-function chips(){$("chips").innerHTML=[["all","All"],["act","Active"],["over_1","1 week late"],["over_2_4","2–4 weeks late"],["over_5","5+ weeks late"],["done","Completed"]].map(function(x){return '<button class="chip'+(flt===x[0]?" on":"")+'" onclick="setF(\''+x[0]+'\')">'+x[1]+'</button>'}).join("")}
+function chips(){$("chips").innerHTML=[["all","All"],["act","Active"],["over","Overdue"],["done","Completed"]].map(function(x){return '<button class="chip'+(flt===x[0]?" on":"")+'" onclick="setF(\''+x[0]+'\')">'+x[1]+'</button>'}).join("")}
 function setF(f){flt=f;chips();list()}
-
 function topActions(){
  var t=$("topActions");
  if(!t)return;
- if(CUSTOMER_MODE||location.hash==="#portal"){
+ if(location.hash==="#portal"){
    t.innerHTML='';
    return;
  }
  if(cloudReady && adminSession){
-   t.innerHTML='<button class="btn dashboard-nav-btn" onclick="dashboard()">Dashboard</button><button class="btn dashboard-nav-btn" onclick="completedPage()">Completed</button><button class="btn portal-nav-btn" onclick="portal()">Customer Portal</button><button class="btn logout-nav-btn" onclick="adminLogout()">Logout</button><button class="btn pri add-nav-btn" onclick="custForm()">+ Add customer</button>';
+   t.innerHTML='<button class="btn dashboard-nav-btn" onclick="dashboard()">Dashboard</button><button class="btn dashboard-nav-btn" onclick="loanHistoryPage()">Loan History</button><button class="btn portal-nav-btn" onclick="portal()">Customer Portal</button><button class="btn logout-nav-btn" onclick="adminLogout()">Logout</button><button class="btn pri add-nav-btn" onclick="custForm()">+ Add customer</button>';
  }else if(cloudReady){
    t.innerHTML='<button class="btn" onclick="portal()">Customer Portal</button><button class="btn" onclick="adminLogin()">Admin Login</button>';
  }else{
@@ -1140,15 +1324,24 @@ function monthLabel(key){
  return d.toLocaleDateString("en-IN",{month:"short"});
 }
 function monthlyAnalytics(){
- function make(){var n=new Date(),a=[];for(var i=5;i>=0;i--){var d=new Date(n.getFullYear(),n.getMonth()-i,1);a.push({key:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("en-IN",{month:"short",year:"2-digit"}),collection:0,profit:0,paidWeeks:0})}return a}
- var current=make(),historical=make(),undatedCurrent=0,undatedHistorical=0;
- function add(c,arr){var rate=loanProfitRate(c,calc(c));var opening=calc(c).hAmt,undated=opening;
- (c.pays||[]).forEach(function(p){if(p.type!=="paid"&&p.type!=="hist")return;var amt=Math.max(0,Number(p.amt)||0),ds=String(p.date||"");if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)){undated+=amt;return}var m=arr.find(function(x){return x.key===ds.slice(0,7)});if(m){m.collection+=amt;m.profit+=amt*rate;m.paidWeeks++}});return undated}
- DB.filter(function(c){return c.isActive!==false}).forEach(function(c){undatedCurrent+=add(c,current)});
- cpHistoryRecords().forEach(function(h){undatedHistorical+=add(h,historical)});
- return {current:current,historical:historical,undatedCurrent:undatedCurrent,undatedHistorical:undatedHistorical};
+ var now=new Date();now.setDate(1);now.setHours(0,0,0,0);
+ var months=[];
+ for(var i=5;i>=0;i--){
+   var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+   months.push({key:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("en-IN",{month:"short",year:"2-digit"}),collection:0,profit:0,paidWeeks:0});
+ }
+ var map={};months.forEach(function(m){map[m.key]=m});
+ DB.forEach(function(c){
+   (c.pays||[]).forEach(function(p){
+     if(p.type!=="paid"&&p.type!=="hist")return;
+     var key=monthKeyFromDate(p.date),m=map[key]; if(!m)return;
+     var amt=Number(p.amt)||0;
+     m.collection+=amt;m.paidWeeks++;
+   });
+ });
+ months.forEach(function(m){m.profit=m.collection*(2500/12000)});
+ return months;
 }
-
 function dashboardCategory(miss,done){
  if(done)return {name:"Completed",key:"completed"};
  if(miss>=1&&miss<=3)return {name:"Prime Customers",key:"prime"};
@@ -1157,234 +1350,94 @@ function dashboardCategory(miss,done){
  return {name:"Healthy Customers",key:"healthy"};
 }
 function dashboardView(){
- var activeDB=DB.filter(function(c){return c.isActive!==false});
- var totals=activeDB.reduce(function(t,c){var k=businessCalc(c);t.collected+=k.paid;t.pending+=k.pend;t.pendingWeeks+=k.pendW;t.loan+=Number(c.loan)||0;t.payable+=k.payable;t.realizedProfit+=Math.max(k.paid*loanProfitRate(c,k),0);if(k.done)t.completed++;var cat=dashboardCategory(k.miss,k.done);t[cat.key]++;return t},{collected:0,pending:0,pendingWeeks:0,loan:0,payable:0,realizedProfit:0,completed:0,prime:0,standard:0,risk:0,healthy:0});
+ var totalCustomers=DB.length;
+ var totals=DB.reduce(function(t,c){
+   var k=calc(c);t.collected+=k.paid;t.pending+=k.pend;t.pendingWeeks+=k.pendW;t.loan+=Number(c.loan)||0;t.payable+=k.payable;
+   t.projectedProfit+=Math.max(k.payable-(Number(c.loan)||0),0);t.realizedProfit+=Math.max(k.paid-(Number(c.loan)||0),0);
+   if(k.done)t.completed++;var cat=dashboardCategory(k.miss,k.done);t[cat.key]++;return t;
+ },{collected:0,pending:0,pendingWeeks:0,loan:0,payable:0,projectedProfit:0,realizedProfit:0,completed:0,prime:0,standard:0,risk:0,healthy:0});
  var hp=totalPortfolioHistory();
- var currentProfit=totals.realizedProfit, historicalProfit=hp.profit, currentCollected=totals.collected, historicalCollected=hp.collected;
- /* Business run-rate from the current 12 customer accounts.
-    The standard model is ₹2,500 profit on ₹12,000 collection = 20.8333%.
-    Use each active loan's own margin so custom cutting/terms are also supported. */
- var weeklyCollection=activeDB.filter(function(c){return !calc(c).done}).reduce(function(s,c){return s+businessTerms(c).perWeek},0);
- var weeklyProfit=activeDB.filter(function(c){return !calc(c).done}).reduce(function(s,c){var k=businessCalc(c);return s+(Number(c.perWeek)||0)*loanProfitRate(c,k)},0);
- var monthlyRunRate=weeklyCollection*52/12,monthlyProfitRunRate=weeklyProfit*52/12;
+ totals.allCollected=totals.collected+hp.collected;totals.allProfit=totals.realizedProfit+hp.profit;totals.allPayable=totals.payable+hp.payable;totals.allLoan=totals.loan+hp.loan;totals.completedLoans=hp.loans+DB.filter(function(c){return calc(c).done}).length;
+ var avg=totalCustomers?Math.round(totals.pending/totalCustomers):0;
  var months=monthlyAnalytics();
- function chart(arr,title,kind){var maxC=Math.max.apply(null,arr.map(function(m){return m.collection}).concat([1]));var maxP=maxC;return '<div class="monthly-panel"><div class="monthly-panel-head"><div><h3>'+title+'</h3><p>'+ (kind==='current'?'Last 6 months · dated current payments.':'Last 6 months · dated completed-loan payments.') +'</p></div><div class="mini-kpi"><b>'+inr(arr.reduce(function(s,m){return s+m.collection},0))+'</b><span>collection</span><b>'+inr(arr.reduce(function(s,m){return s+m.profit},0))+'</b><span>profit</span></div></div><div class="monthly-chart">'+arr.map(function(m){var ch=Math.round((m.collection/maxC)*145),ph=Math.round((m.profit/maxP)*145);return '<div class="month-col"><div class="month-value">'+(m.collection?inr(m.collection):'₹0')+'</div><div class="month-bars"><div class="month-bar collection" style="height:'+ch+'px" title="'+m.label+' collection '+inr(m.collection)+'"></div><div class="month-bar profit" style="height:'+ph+'px" title="'+m.label+' profit '+inr(m.profit)+'"></div></div><div class="month-label">'+m.label+'</div></div>'}).join('')+'</div><div class="month-legend"><span style="--c:#5D9DFF">Collection</span><span style="--c:#24A97E">Allocated loan margin</span></div><div class="monthly-table"><div class="monthly-row head"><span>Month</span><span>Collection</span><span>Profit</span><span>Payments</span></div>'+arr.map(function(m){return '<div class="monthly-row"><b>'+m.label+'</b><b class="collection-num">'+inr(m.collection)+'</b><b class="profit-num">'+inr(m.profit)+'</b><span>'+m.paidWeeks+'</span></div>'}).join('')+'</div></div>'}
- var cards=[['Current Allocated Margin',inr(currentProfit),'All-time allocated loan margin'],['Historical Allocated Margin',inr(historicalProfit),'All-time completed loans'],['Current Collected',inr(currentCollected),'All-time active-loan receipts'],['Historical Collected',inr(historicalCollected),'All-time completed-loan receipts'],['Weekly Collection',inr(weeklyCollection),'Current customer run-rate'],['Weekly Expected Margin',inr(weeklyProfit),'Expected profit from current weekly collections'],['Monthly Collection Run-rate',inr(monthlyRunRate),'₹ weekly × 52 ÷ 12'],['Monthly Expected Margin',inr(monthlyProfitRunRate),'Expected current-business profit'],['Total Pending',inr(totals.pending),'Active/current loans'],['Active Customers',activeDB.filter(function(c){return !calc(c).done}).length,'Current collection accounts']];
- var catRows=[['Prime Customers','1–3 pending weeks',totals.prime,'Best-performing active accounts'],['Standard Customers','4–5 pending weeks',totals.standard,'Medium-range accounts'],['At-Risk Customers','6+ pending weeks',totals.risk,'Follow-up required'],['Healthy Customers','0 pending weeks',totals.healthy,'No pending weeks']];
- return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Analytics</div><h1>Business Dashboard</h1><p>Current business profit, historical profit and collection run-rates are shown separately for clear decisions.</p></div><button class="btn" onclick="go(\'\')">← Back to Customers</button></div>'+
- '<div class="grid dashboard-cards">'+cards.map(function(s){return '<div class="stat dashboard-card"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join('')+'</div>'+
- cpAuditHTML(months)+
- '<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Current vs Historical Performance</h2><p>Current payments and completed/old loans are calculated separately. The business model uses the actual cutting amount on each loan.</p></div><div class="profit-model"><b>Contract margin allocation · before expenses</b><br>₹10K−₹500 → ₹9.5K given → ₹2.5K profit; Yalamanda: 10 weeks, ₹0 cutting → ₹0 profit.</div></div><div class="dashboard-split-charts">'+chart(months.current,'Current Loans','current')+chart(months.historical,'Historical / Completed Loans','historical')+'</div><div class="monthly-note"><b>Profit formula:</b> Contract margin = Total payable − (Loan amount − cutting). Allocated margin = receipts × contract margin ÷ total payable; this is not net cash profit and excludes expenses. Weekly expected margin = weekly amount × contract margin rate. Monthly run-rate = weekly × 52 ÷ 12. Yalamanda is treated as 10 weeks with ₹0 cutting, so its profit is ₹0 when ₹3,000 × 10 = ₹30,000 is repaid on a ₹30,000 loan.</div></div>'+
- '<div class="dashboard-layout"><div class="sec"><div class="dash-title"><div><h2>Customer Categories</h2><p>Active customers only.</p></div></div><div class="category-list">'+catRows.map(function(r){return '<div class="category-row"><div><b>'+r[0]+'</b><small>'+r[1]+' · '+r[3]+'</small></div><strong>'+r[2]+'</strong></div>'}).join('')+'</div></div>'+
- '<div class="sec"><h2>Business Snapshot</h2><p>Separate portfolio view.</p><div class="snapshot"><div><span>Current payable</span><b>'+inr(totals.payable)+'</b></div><div><span>Current collected</span><b>'+inr(currentCollected)+'</b></div><div><span>Current profit</span><b>'+inr(currentProfit)+'</b></div><div><span>Historical collected</span><b>'+inr(historicalCollected)+'</b></div><div><span>Historical profit</span><b>'+inr(historicalProfit)+'</b></div><div><span>Completed loans</span><b>'+hp.loans+'</b></div></div></div></div>'+
- '<div class="sec dashboard-card" style="margin-top:14px"><div class="dash-title"><div><h2>Completed</h2><p>Completed loans are automatically moved here when a current loan reaches its final payable week.</p></div><button class="btn sm" onclick="completedPage()">Open Completed →</button></div><div class="loan-summary-grid"><div><span>Completed loans</span><b>'+hp.loans+'</b></div><div><span>Historical collected</span><b>'+inr(historicalCollected)+'</b></div><div><span>Historical profit</span><b>'+inr(historicalProfit)+'</b></div><div><span>Historical customers</span><b>'+Object.keys(historyCustomerGroups()).length+'</b></div></div></div>'+
- '<div class="sec"><div class="dash-title"><div><h2>Current Customer Performance</h2><p>Only active/current customers are shown here.</p></div><span class="dash-live">● Live</span></div><div class="performance-list">'+activeDB.slice().sort(function(a,b){return calc(b).miss-calc(a).miss}).map(function(c){var k=calc(c),cat=dashboardCategory(k.miss,k.done);return '<div class="performance-row" onclick="go(this.dataset.id)" data-id="'+c.id+'"><div class="perf-avatar">'+esc((c.name||'?').charAt(0).toUpperCase())+'</div><div class="perf-main"><b>'+esc(c.name)+'</b><small>'+k.miss+' pending week'+(k.miss===1?'':'s')+' · '+k.paidW+'/'+c.weeks+' paid</small></div><span class="perf-cat '+cat.key+'">'+cat.name+'</span><strong>'+inr(k.pend)+'</strong><span class="perf-arrow">›</span></div>'}).join('')+'</div></div></div></div>';
+ var maxCollection=Math.max.apply(null,months.map(function(m){return m.collection}).concat([1]));
+ var maxProfit=Math.max.apply(null,months.map(function(m){return m.profit}).concat([1]));
+ var current=months[months.length-1],cards=[
+  ["Number Customers",totalCustomers,"Unique customer accounts"],
+  ["Business Profit",inr(totals.allProfit),"Current + completed loans"],
+  ["Total Collected",inr(totals.allCollected),"Current + completed loans"],
+  ["Total Pending",inr(totals.pending),"Current active loans"]
+ ];
+ var catRows=[["Prime Customers","1–3 pending weeks",totals.prime,"Best-performing active accounts"],["Standard Customers","4–5 pending weeks",totals.standard,"Medium-range accounts"],["At-Risk Customers","6+ pending weeks",totals.risk,"Low-range / follow-up accounts"],["Completed Customers","0 pending balance",totals.completed,"Successfully completed accounts"]];
+ return '<div class="dashboard-page">'+
+ '<div class="dashboard-head"><div><div class="dash-kicker">CollectPro Analytics</div><h1>Business Dashboard</h1><p>Live analytics based on the current customer and payment data.</p></div><button class="btn" onclick="go(\'\')">← Back to Customers</button></div>'+
+ '<div class="grid dashboard-cards">'+cards.map(function(s){return '<div class="stat dashboard-card"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+ 
+ '<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Monthly Collection &amp; Profit</h2><p>Actual paid collections by payment date. Profit follows your current ₹10,000 chitti model.</p></div><div class="profit-model"><b>₹1,000 collection → ₹208.33 profit</b><br>Profit rate: <b>20.83%</b></div></div>'+ 
+ '<div class="monthly-chart">'+months.map(function(m){var ch=Math.max(3,Math.round((m.collection/maxCollection)*145)),ph=Math.max(3,Math.round((m.profit/maxProfit)*145));return '<div class="month-col"><div class="month-value">'+(m.collection?inr(m.collection):"₹0")+'</div><div class="month-bars"><div class="month-bar collection" style="height:'+ch+'px" title="'+m.label+' collection '+inr(m.collection)+'"></div><div class="month-bar profit" style="height:'+ph+'px" title="'+m.label+' profit '+inr(m.profit)+'"></div></div><div class="month-label">'+m.label+'</div></div>'}).join("")+'</div>'+ 
+ '<div class="month-legend"><span style="--c:#5D9DFF">Collection</span><span style="--c:#24A97E">Estimated profit</span></div>'+ 
+ '<div class="monthly-table"><div class="monthly-row head"><span>Month</span><span>Collection</span><span>Profit</span><span>Paid weeks</span></div>'+months.map(function(m){return '<div class="monthly-row"><b>'+m.label+'</b><b class="collection-num">'+inr(m.collection)+'</b><b class="profit-num">'+inr(m.profit)+'</b><span>'+m.paidWeeks+'</span></div>'}).join("")+'</div>'+ 
+ '<div class="monthly-note">Logic: every ₹10,000 loan gives ₹9,500 to the customer after ₹500 initial cutting, while total repayment is ₹12,000. Therefore profit = ₹2,500 per ₹12,000 collected = <b>20.83% of collection</b>. Monthly profit = that month’s actual paid collection × 20.83%. Unpaid weeks produce no collection/profit for that month. Historical setup amounts without dated payment rows are not assigned to a month.</div>'+ 
+ '<div class="note" style="margin-top:10px">Current month: <b>'+inr(current.collection)+'</b> collected → approximately <b style="color:var(--profit)">'+inr(current.profit)+'</b> gross profit.</div></div>'+ 
+ '<div class="dashboard-layout">'+
+ '<div class="sec"><div class="dash-title"><div><h2>Customer Categories</h2><p>Categories update automatically when customer data changes.</p></div></div><div class="category-list">'+catRows.map(function(r){return '<div class="category-row"><div><b>'+r[0]+'</b><small>'+r[1]+' · '+r[3]+'</small></div><strong>'+r[2]+'</strong></div>'}).join("")+'</div></div>'+ 
+ '<div class="sec"><h2>Business Snapshot</h2><p>Current portfolio overview.</p><div class="snapshot"><div><span>All loan principal</span><b>'+inr(totals.allLoan)+'</b></div><div><span>All payable</span><b>'+inr(totals.allPayable)+'</b></div><div><span>All realized profit</span><b>'+inr(totals.allProfit)+'</b></div><div><span>Pending weeks</span><b>'+totals.pendingWeeks+'</b></div><div><span>Avg. pending/customer</span><b>'+inr(avg)+'</b></div><div><span>Completed loans</span><b>'+totals.completedLoans+'</b></div></div></div></div>'+ 
+ '<div class="sec dashboard-card" style="margin-top:14px"><div class="dash-title"><div><h2>Loan Portfolio History</h2><p>Completed loans are retained separately and included in business totals.</p></div><button class="btn sm" onclick="loanHistoryPage()">Open Loan History →</button></div><div class="loan-summary-grid"><div><span>Completed loans</span><b>'+totals.completedLoans+'</b></div><div><span>Historical collected</span><b>'+inr(hp.collected)+'</b></div><div><span>Historical profit</span><b>'+inr(hp.profit)+'</b></div><div><span>Unique customers</span><b>'+totalCustomers+'</b></div></div></div><div class="sec"><div class="dash-title"><div><h2>Customer Performance</h2><p>Sorted by pending weeks for quick follow-up.</p></div><span class="dash-live">● Live</span></div><div class="performance-list">'+
+ DB.slice().sort(function(a,b){return calc(b).miss-calc(a).miss}).map(function(c){var k=calc(c),cat=dashboardCategory(k.miss,k.done);return '<div class="performance-row" onclick="go(\''+c.id+'\')"><div class="perf-avatar">'+esc((c.name||"?").charAt(0).toUpperCase())+'</div><div class="perf-main"><b>'+esc(c.name)+'</b><small>'+k.miss+' pending week'+(k.miss===1?"":"s")+' · '+k.paidW+'/'+c.weeks+' paid</small></div><span class="perf-cat '+cat.key+'">'+cat.name+'</span><strong>'+inr(k.pend)+'</strong><span class="perf-arrow">›</span></div>'}).join("")+'</div></div></div>'+
+ '</div>';
 }
 
 function render(){
  topActions();
  var a=$("app");
- if(CUSTOMER_MODE){a.innerHTML=portalView();return}
- if(location.hash==="#portal"){a.innerHTML=portalView();return}
- if(cloudConfigured() && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><div class="av" style="width:64px;height:64px;margin:0 auto 16px">CP</div><h1 style="font-size:34px">CollectPro Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
  if(location.hash==="#dashboard"){a.innerHTML=dashboardView();return}
- if(location.hash==="#completed"||location.hash.indexOf("#completed/")===0){a.innerHTML=completedView();return}
+ if(location.hash==="#loan-history"||location.hash.indexOf("#loan-history/")===0){a.innerHTML=loanHistoryView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
-
+ if(cloudReady && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><div class="av" style="width:64px;height:64px;margin:0 auto 16px">CP</div><h1 style="font-size:34px">CollectPro Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
  if(!view){
-  var currentDB=DB.filter(function(c){return c.isActive!==false});var T=currentDB.reduce(function(t,c){var k=calc(c);t.paid+=k.paid;t.pend+=k.pend;t.pw+=k.pendW;return t},{paid:0,pend:0,pw:0});
-  a.innerHTML='<div class="grid">'+[["Total customers",currentDB.length,"Current collection accounts"],["Total collected",inr(T.paid),"Recorded payments"],["Total pending",inr(T.pend),"Outstanding amount"],["Pending weeks",T.pw,"Across all customers"]].map(function(s){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
-  '<div class="sec"><h2>Customers ('+currentDB.length+')</h2><p>Tap a customer to open their collection account.</p><input id="srch" placeholder="Search by name or phone" value="'+esc(q)+'" oninput="q=this.value.toLowerCase();list()"><div class="row" id="chips" style="margin:12px 0 6px"></div><div id="lst"></div></div>'+
+  var T=DB.reduce(function(t,c){var k=calc(c);t.paid+=k.paid;t.pend+=k.pend;t.pw+=k.pendW;return t},{paid:0,pend:0,pw:0});
+  a.innerHTML='<div class="grid">'+[["Total customers",DB.length,"Active collection accounts"],["Total collected",inr(T.paid),"Recorded payments"],["Total pending",inr(T.pend),"Outstanding amount"],["Pending weeks",T.pw,"Across all customers"]].map(function(s){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
+  '<div class="sec"><h2>Customers ('+DB.length+')</h2><p>Tap a customer to open their collection account.</p><input id="srch" placeholder="Search by name or phone" value="'+esc(q)+'" oninput="q=this.value.toLowerCase();list()"><div class="row" id="chips" style="margin:12px 0 6px"></div><div id="lst"></div></div>'+
   '<div class="row" style="margin-top:14px"><button class="btn sm" onclick="backup()">Backup &amp; restore</button><button class="btn sm" id="installBtn" style="display:none" onclick="installApp()">Install App</button></div>';
   chips();list();return;
  }
- var c=DB.filter(function(x){return x.id===view && x.isActive!==false})[0];if(!c){go("");return}
+ var c=DB.filter(function(x){return x.id===view})[0];if(!c){go("");return}
  var k=calc(c),st=strip(c);
  var asc=c.pays.map(function(p,i){return{p:p,i:i}}).sort(function(x,y){return x.p.date<y.p.date?-1:x.p.date>y.p.date?1:x.i-y.i});
- var bal=k.payable-k.hAmt,B={};asc.forEach(function(o){if(o.p.type==="paid"||o.p.type==="hist")bal-=(+o.p.amt||0);B[o.p.id]=Math.max(bal,0)});
+ var bal=k.payable-k.hAmt,B={};asc.forEach(function(o){if(o.p.type==="paid")bal-=(+o.p.amt||0);B[o.p.id]=Math.max(bal,0)});
  var ps=asc.map(function(o){return o.p}).reverse(),R='style="color:var(--miss)"';
  a.innerHTML='<div class="row" style="margin-bottom:12px"><button class="btn sm" onclick="go(\'\')">← All customers</button></div>'+
- '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>'+esc(c.phone||"No contact")+' · Loan taken '+fmt(c.date)+'</small></div><div class="row sp" style="justify-content:flex-end"><span class="tag">Every '+weekdayName(c.collectionWeekday==null?4:c.collectionWeekday)+'</span><span class="badge'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div>'+
+ '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>'+esc(c.phone||"No contact")+' · Loan taken '+fmt(c.date)+'</small></div><span class="badge sp'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div>'+
  '<div class="big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">Pending balance</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">Collected so far</div></div></div>'+
  '<div class="l" style="margin-top:12px;font-size:12.5px;color:#B9B6C8">'+inr(k.payable)+' total payable − '+inr(k.paid)+' paid = '+inr(k.pend)+'</div>'+
  '<div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;font-size:13px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div>'+
  '<div class="row" style="margin-top:14px"><button class="btn pri" onclick="payForm(\''+c.id+'\')">+ Add payment</button><button class="btn" onclick="newLoanForm(\''+c.id+'\')">+ New Loan</button><button class="btn" onclick="custForm(\''+c.id+'\')">Edit customer</button>'+(c.phone?'<a class="btn" href="tel:'+esc(c.phone)+'">Call</a><a class="btn" target="_blank" rel="noopener" href="'+wa(c,k)+'">WhatsApp reminder</a>':'')+'<button class="btn del sp" onclick="delC(\''+c.id+'\',this)">Delete customer</button></div>'+
- '<div class="grid">'+[["Loan amount",inr(c.loan),"Original principal"],["Initial cutting",inr(c.cutting),"Withheld at disbursement"],["Total payable",inr(k.payable),inr(c.perWeek)+" × "+c.weeks+" weeks"],["Missed weeks",k.miss,inr(k.miss*c.perWeek)+" overdue"],["Weeks remaining",k.pendW,"Until account closes"]].map(function(s,i){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v"'+(i===2&&k.miss?' '+R:'')+'>'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
- '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = fully paid. Orange = missed, partial or carried over.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
+ '<div class="grid">'+[["Loan amount",inr(c.loan),"Original principal"],["Total payable",inr(k.payable),inr(c.perWeek)+" × "+c.weeks+" weeks"],["Missed weeks",k.miss,inr(k.miss*c.perWeek)+" overdue"],["Weeks remaining",k.pendW,"Until account closes"]].map(function(s,i){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v"'+(i===2&&k.miss?' '+R:'')+'>'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
+ '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = paid. Orange = missed or carried over beyond the original payable weeks.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
 
- paymentHistoryHtml(c,true)+((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
-}
-
-
-function completedPage(customerKey){location.hash=customerKey?'#completed/'+encodeURIComponent(customerKey):'#completed'}
-
-function historyCustomerKey(h){
- var cid=String(h.customerId||"").trim();
- if(cid)return "id:"+cid.toLowerCase();
- var phone=String(h.phone||"").replace(/\D/g,"");
- return "name:"+String(h.name||"").trim().toLowerCase()+"|"+phone;
-}
-function historyCustomerGroups(){
- var groups={};
- DB.forEach(function(c){
-   loanHistory(c).forEach(function(h){
-     var rec={customerId:h.customerId||c.customerId,name:h.name||c.name,phone:h.phone||c.phone};
-     var key=historyCustomerKey(rec);
-     if(!groups[key])groups[key]={key:key,name:rec.name||"Unknown customer",customerId:rec.customerId||"",phone:rec.phone||"",loans:[]};
-     groups[key].loans.push({type:"embedded",c:c,h:h});
-   });
- });
- HIST.forEach(function(h){
-   var key=historyCustomerKey(h);
-   if(!groups[key])groups[key]={key:key,name:h.name||"Unknown customer",customerId:h.customerId||"",phone:h.phone||"",loans:[]};
-   groups[key].loans.push({type:"standalone",h:h});
- });
- Object.keys(groups).forEach(function(k){
-   groups[k].loans.sort(function(a,b){return String(b.h.completedAt||b.h.loanDate||"").localeCompare(String(a.h.completedAt||a.h.loanDate||""))});
- });
- return groups;
-}
-function historyGroupTotals(g){
- var out={loans:0,loan:0,collected:0,profit:0};
- g.loans.forEach(function(x){
-   var h=x.h,k=loanRecordCalc(h);
-   out.loans++;
-   out.loan+=Number(h.loanAmount)||0;
-   out.collected+=k.paid;
-   out.profit+=loanProfit(h,k);
- });
- return out;
-}
-function completedCustomerCard(g){
- var t=historyGroupTotals(g);
- var standalone=g.loans.filter(function(x){return x.type==="standalone"});
- var actions='<div class="row" style="gap:6px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end">'+
-   '<button class="btn sm" onclick="event.stopPropagation();completedPage(\''+encodeURIComponent(g.key)+'\')">View</button>'+
-   (standalone.length===1?'<button class="btn sm" onclick="event.stopPropagation();historicalLoanForm(\''+esc(standalone[0].h.id)+'\')">Edit</button>':'<button class="btn sm" onclick="event.stopPropagation();completedPage(\''+encodeURIComponent(g.key)+'\')">Manage</button>')+
-   (standalone.length?'<button class="btn sm del" onclick="event.stopPropagation();deleteHistoricalCustomer(\''+encodeURIComponent(g.key)+'\',this)">Delete old data</button>':'')+
-   '</div>';
- return '<div class="cust" onclick="completedPage(\''+encodeURIComponent(g.key)+'\')">'+
-   '<div class="ring" style="--p:100%"><div class="av">'+esc(String(g.name||"?").charAt(0).toUpperCase())+'</div></div>'+
-   '<div class="m"><b>'+esc(g.name||"Unknown customer")+'</b><small>'+esc(g.customerId||"Old customer")+' · '+esc(g.phone||"No contact")+' · '+t.loans+' completed loan'+(t.loans===1?'':'s')+'</small>'+
-   '<small style="color:var(--profit);font-weight:700">Collected '+inr(t.collected)+' · Profit '+inr(t.profit)+'</small></div>'+
-   '<div class="amt">'+inr(t.collected)+'<small>Completed</small></div>'+actions+'</div>';
-}
-function reactivateHistoricalCustomer(customerId){
- var c=DB.filter(function(x){return String(x.customerId||"").toLowerCase()===String(customerId||"").toLowerCase()})[0];
- if(!c){alert("No saved customer account found for this old customer.");return}
- c.isActive=true;
- if(sb){sb.from("collectpro_customers").update({is_active:true}).eq("id",c.id).then(function(r){if(r.error){alert("Could not reactivate customer: "+r.error.message);return}newLoanFormConfirmed(c.id)});}else{save();newLoanFormConfirmed(c.id)}
-}
-function completedCustomerView(g){
- var t=historyGroupTotals(g);
- return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>'+esc(g.name)+'</h1><p>All completed/old loans for this customer are stored separately from the current customer account.</p></div><div class="row"><button class="btn" onclick="completedPage()">← Completed customers</button><button class="btn" onclick="reactivateHistoricalCustomer(this.dataset.cid)" data-cid="'+esc(g.customerId)+'">＋ New Loan for Customer</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+
- '<div class="hero"><div class="row"><div><h1>'+esc(g.name)+'</h1><small>'+esc(g.customerId||"Old customer")+' · '+esc(g.phone||"No contact")+'</small></div><span class="badge o">Completed history</span></div>'+
- '<div class="big"><div><div class="n">'+inr(t.collected)+'</div><div class="l">Historical collected</div></div><div><div class="n g">'+inr(t.profit)+'</div><div class="l">Historical profit</div></div></div>'+
- '<div class="l" style="margin-top:12px;font-size:12.5px;color:#B9B6C8">'+t.loans+' completed loan'+(t.loans===1?'':'s')+' · Total principal '+inr(t.loan)+'</div></div>'+
- '<div class="grid"><div class="stat"><div class="l">Completed loans</div><div class="v">'+t.loans+'</div><div class="s">Past loans stored separately</div></div>'+
- '<div class="stat"><div class="l">Total principal</div><div class="v">'+inr(t.loan)+'</div><div class="s">Original loan amounts</div></div>'+
- '<div class="stat"><div class="l">Total collected</div><div class="v">'+inr(t.collected)+'</div><div class="s">Historical payments</div></div>'+
- '<div class="stat"><div class="l">Total profit</div><div class="v">'+inr(t.profit)+'</div><div class="s">Collected × loan margin, including cutting</div></div></div>'+
- '<div class="sec"><div class="ph-head"><div><h2>Completed Loan Details</h2><p style="margin-bottom:0">Each old loan is a separate record. Click a loan to see its payment history.</p></div><span class="loan-history-badge">'+t.loans+' records</span></div>'+
- '<div class="loan-history-list">'+g.loans.map(function(x){
-   var h=x.h,k=loanRecordCalc(h),tag=x.type==="standalone"?"Old data":"Archived";
-   var onclick=x.type==="standalone"?"historicalLoanDetail(\'"+esc(h.id)+"\')":"loanHistoryDetail(\'"+esc(x.c.id)+"\',\'"+esc(h.loanId)+"\')";
-   return '<div class="loan-history-row" style="cursor:default"><div class="loan-history-icon" onclick="'+onclick+'">✓</div><div class="loan-history-main" onclick="'+onclick+'"><b>'+esc(h.loanId)+'</b><small>'+fmt(h.loanDate)+' · '+inr(h.loanAmount)+' loan · Cutting '+inr(h.cutting)+' · '+k.paidW+'/'+h.weeks+' weeks · '+tag+'</small></div><div class="loan-history-money" onclick="'+onclick+'"><b>'+inr(k.paid)+'</b><small>Profit '+inr(loanProfit(h,k))+'</small></div>'+(x.type==="standalone"?'<div class="row" style="gap:6px"><button class="btn sm" onclick="event.stopPropagation();historicalLoanForm(\''+esc(h.id)+'\')">Edit</button><button class="btn sm del" onclick="event.stopPropagation();deleteHistoricalLoan(\''+esc(h.id)+'\',this)">Delete</button></div>':'<div class="loan-history-arrow">›</div>')+'</div>';
- }).join("")+'</div></div></div>';
-}
-function completedRecordCard(x){
- var h=x.h,k=loanRecordCalc(h),isStandalone=x.type==="standalone";
- var detail=isStandalone?"historicalLoanDetail('"+esc(h.id)+"')":"loanHistoryDetail('"+esc(x.c.id)+"','"+esc(h.loanId)+"')";
- var actions='<div class="row" style="gap:6px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end">'+
-   '<button class="btn sm" onclick="event.stopPropagation();'+detail+'">View</button>'+
-   (isStandalone?'<button class="btn sm" onclick="event.stopPropagation();historicalLoanForm(\''+esc(h.id)+'\')">Edit</button><button class="btn sm del" onclick="event.stopPropagation();deleteHistoricalLoan(\''+esc(h.id)+'\',this)">Delete</button>':'')+
-   '</div>';
- var customerId=h.customerId||(x.c&&x.c.customerId)||"";
- var phone=h.phone||(x.c&&x.c.phone)||"";
- var name=h.name||(x.c&&x.c.name)||"Unknown customer";
- var tag=isStandalone?"Old data":"Auto-completed";
- return '<div class="cust" style="cursor:default">'+
-   '<div class="ring" style="--p:100%"><div class="av">'+esc(String(name||"?").charAt(0).toUpperCase())+'</div></div>'+
-   '<div class="m"><b>'+esc(name)+'</b><small>'+esc(customerId||"Old customer")+' · '+esc(phone||"No contact")+' · '+esc(h.loanId||"Completed loan")+'</small>'+
-   '<small style="color:var(--muted)">'+fmt(h.loanDate)+' · Loan '+inr(h.loanAmount)+' · Cutting '+inr(h.cutting||0)+' · '+k.paidW+'/'+h.weeks+' weeks · '+tag+'</small>'+ 
-   '<small style="color:var(--profit);font-weight:700">Collected '+inr(k.paid)+' · Profit '+inr(loanProfit(h,k))+'</small></div>'+ 
-   '<div class="amt">'+inr(k.paid)+'<small>Completed</small></div>'+actions+'</div>';
-}
-function completedView(){
- var records=[],standaloneKeys={};
- HIST.forEach(function(h){
-   var sk=String(h.customerId||h.name||"").toLowerCase()+"|"+String(h.loanId||"").toLowerCase();
-   standaloneKeys[sk]=1;
-   records.push({type:"standalone",h:h});
- });
- DB.forEach(function(c){loanHistory(c).forEach(function(h){
-   var ek=String(h.customerId||c.customerId||c.name||"").toLowerCase()+"|"+String(h.loanId||"").toLowerCase();
-   if(!standaloneKeys[ek])records.push({type:"embedded",c:c,h:h});
- })});
- records.sort(function(a,b){return String(b.h.completedAt||b.h.loanDate||"").localeCompare(String(a.h.completedAt||a.h.loanDate||""))});
- var totalLoans=records.length,totalCollected=0,totalProfit=0;
- records.forEach(function(x){var k=loanRecordCalc(x.h);totalCollected+=k.paid;totalProfit+=loanProfit(x.h,k)});
- var unique={};records.forEach(function(x){var h=x.h,c=x.c||{};var key=historyCustomerKey({customerId:h.customerId||c.customerId,name:h.name||c.name,phone:h.phone||c.phone});unique[key]=1});
- return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>Completed Customers</h1><p>Every completed/old loan is shown as a separate record. If the same customer had 2 past loans, they appear as 2 separate records. Editing or deleting an old record never changes the current customer account.</p></div><div class="row"><button class="btn" onclick="go(\'\')">← Current Customers</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+ 
- '<div class="grid dashboard-cards"><div class="stat dashboard-card"><div class="l">Completed records</div><div class="v">'+totalLoans+'</div><div class="s">One card per completed loan</div></div><div class="stat dashboard-card"><div class="l">Historical customers</div><div class="v">'+Object.keys(unique).length+'</div><div class="s">A customer can have multiple records</div></div><div class="stat dashboard-card"><div class="l">Historical collected</div><div class="v">'+inr(totalCollected)+'</div><div class="s">Completed/old loan collections</div></div><div class="stat dashboard-card"><div class="l">Historical profit</div><div class="v">'+inr(totalProfit)+'</div><div class="s">Business analytics</div></div></div>'+ 
- '<div class="sec"><div class="ph-head"><div><h2>Completed / Old Loan Records</h2><p style="margin-bottom:0">Each past loan stays independent. Same customer name or ID does not merge these records.</p></div><span class="loan-history-badge">'+totalLoans+' records</span></div>'+ 
- (records.length?'<div id="completedCustomerList">'+records.map(completedRecordCard).join("")+'</div>':'<div class="empty">No completed/old loans yet.<br><br><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div>')+ 
- '</div></div>';
+ loanHistoryHtml(c,true)+paymentHistoryHtml(c,true)+((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
 }
 
+
+function loanHistoryHtml(c,compact){
+ var hs=loanHistory(c);
+ if(!hs.length)return '<div class="sec"><div class="ph-head"><div><h2>Loan History</h2><p style="margin-bottom:0">No completed loans for this customer yet.</p></div></div></div>';
+ return '<div class="sec"><div class="ph-head"><div><h2>Loan History</h2><p style="margin-bottom:0">'+hs.length+' completed loan'+(hs.length===1?'':'s')+' for '+esc(c.name)+'.</p></div><span class="loan-history-badge">Past loans</span></div><div class="loan-history-list">'+hs.slice(0,compact?4:hs.length).map(function(h){var k=loanRecordCalc(h);return '<div class="loan-history-row" onclick="loanHistoryDetail(\''+esc(c.id)+'\',\''+esc(h.loanId)+'\')"><div class="loan-history-icon">✓</div><div class="loan-history-main"><b>'+esc(h.loanId)+'</b><small>'+fmt(h.loanDate)+' · '+inr(h.loanAmount)+' loan · '+k.paidW+'/'+h.weeks+' weeks</small></div><div class="loan-history-money"><b>'+inr(k.paid)+'</b><small>Profit '+inr(Math.max(k.paid-(Number(h.loanAmount)||0),0))+'</small></div><div class="loan-history-arrow">›</div></div>'}).join('')+'</div>'+(hs.length>4?'<button class="ph-view" onclick="loanHistoryPage(\''+esc(c.id)+'\')">View all loan history <span class="arr">›</span></button>':'')+'</div>';
+}
+function loanHistoryPage(customerId){location.hash=customerId?'#loan-history/'+encodeURIComponent(customerId):'#loan-history'}
+function loanHistoryView(){
+ var m=location.hash.match(/^#loan-history(?:\/(.+))?$/),customerId=m?decodeURIComponent(m[1]||''):'';
+ var list=[];DB.forEach(function(c){if(customerId&&c.id!==customerId)return;loanHistory(c).forEach(function(h){list.push({c:c,h:h})})});
+ list.sort(function(a,b){return String(b.h.completedAt||b.h.loanDate||'').localeCompare(String(a.h.completedAt||a.h.loanDate||''))});
+ var hp=totalPortfolioHistory();
+ return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>Completed Loan History</h1><p>Every completed loan is stored separately. The same customer can have multiple loans.</p></div><button class="btn" onclick="go(\'\')">← Back to Customers</button></div>'+
+ '<div class="grid dashboard-cards"><div class="stat dashboard-card"><div class="l">Completed loans</div><div class="v">'+hp.loans+'</div><div class="s">Across all customers</div></div><div class="stat dashboard-card"><div class="l">Historical collected</div><div class="v">'+inr(hp.collected)+'</div><div class="s">Completed loans only</div></div><div class="stat dashboard-card"><div class="l">Historical profit</div><div class="v">'+inr(hp.profit)+'</div><div class="s">Collected − principal</div></div><div class="stat dashboard-card"><div class="l">Customers with history</div><div class="v">'+DB.filter(function(c){return loanHistory(c).length}).length+'</div><div class="s">Repeat-loan customers</div></div></div>'+
+ '<div class="sec"><div class="ph-head"><div><h2>All Completed Loans</h2><p style="margin-bottom:0">Click any loan to see its payment history and original details.</p></div><span class="loan-history-badge">'+list.length+' records</span></div>'+ (list.length?'<div class="loan-history-list">'+list.map(function(x){var h=x.h,k=loanRecordCalc(h);return '<div class="loan-history-row" onclick="loanHistoryDetail(\''+esc(x.c.id)+'\',\''+esc(h.loanId)+'\')"><div class="loan-history-icon">✓</div><div class="loan-history-main"><b>'+esc(x.c.name)+' · '+esc(h.loanId)+'</b><small>'+esc(x.c.customerId)+' · Loan date '+fmt(h.loanDate)+' · Completed '+fmt(String(h.completedAt||'').slice(0,10))+'</small></div><div class="loan-history-money"><b>'+inr(k.paid)+'</b><small>Profit '+inr(Math.max(k.paid-(Number(h.loanAmount)||0),0))+'</small></div><div class="loan-history-arrow">›</div></div>'}).join('')+'</div>':'<div class="empty">No completed loan history yet.<br><br>When a customer finishes a loan, use <b>+ New Loan</b> to archive the completed loan and start the next one.</div>')+'</div></div>';
+}
 function loanHistoryDetail(cid,loanId){
- var c=DB.filter(function(x){return x.id===cid})[0];if(!c)return;
- var h=loanHistory(c).filter(function(x){return String(x.loanId)===String(loanId)})[0];if(!h)return;
- var k=loanRecordCalc(h),rows=paymentRows({pays:h.pays||[]});
- var list=rows.length?'<div class="ph-list">'+rows.map(function(p){return paymentRowHtml({name:c.name},p,false)}).join('')+'</div>':'<div class="ph-empty">No dated payment rows were saved for this completed loan.</div>';
- open_('<div class="row"><div><h2>'+esc(c.name)+'</h2><p style="color:var(--muted);font-size:13px;margin:4px 0 0">'+esc(h.loanId)+' · Completed loan</p></div><button class="btn sm sp" onclick="close_()">Close</button></div><div class="loan-summary-grid"><div><span>Loan amount</span><b>'+inr(h.loanAmount)+'</b></div><div><span>Initial cutting</span><b>'+inr(h.cutting)+'</b></div><div><span>Net given</span><b>'+inr(Math.max((Number(h.loanAmount)||0)-(Number(h.cutting)||0),0))+'</b></div><div><span>Total payable</span><b>'+inr(k.payable)+'</b></div><div><span>Total paid</span><b>'+inr(k.paid)+'</b></div><div><span>Profit</span><b>'+inr(loanProfit(h,k))+'</b></div></div><div class="note" style="margin-top:12px">Loan date: <b>'+fmt(h.loanDate)+'</b> · Completed: <b>'+fmt(String(h.completedAt||'').slice(0,10))+'</b> · '+k.paidW+'/'+h.weeks+' weeks completed.</div><div class="sec" style="margin-top:14px"><h2>Completed Loan Payment History</h2>'+list+'</div>');
+ var c=DB.filter(function(x){return x.id===cid})[0];if(!c)return;var h=loanHistory(c).filter(function(x){return x.loanId===loanId})[0];if(!h)return;var k=loanRecordCalc(h),rows=paymentRows({pays:h.pays||[]});
+ var list=rows.length?'<div class="ph-list">'+rows.map(function(p){return paymentRowHtml(c,p,false)}).join('')+'</div>':'<div class="ph-empty">No dated payment rows were saved for this completed loan.</div>';
+ open_('<div class="row"><div><h2>'+esc(c.name)+'</h2><p style="color:var(--muted);font-size:13px;margin:4px 0 0">'+esc(h.loanId)+' · Completed loan</p></div><button class="btn sm sp" onclick="close_()">Close</button></div><div class="loan-summary-grid"><div><span>Loan amount</span><b>'+inr(h.loanAmount)+'</b></div><div><span>Total payable</span><b>'+inr(k.payable)+'</b></div><div><span>Total paid</span><b>'+inr(k.paid)+'</b></div><div><span>Profit</span><b>'+inr(Math.max(k.paid-(Number(h.loanAmount)||0),0))+'</b></div></div><div class="note" style="margin-top:12px">Loan date: <b>'+fmt(h.loanDate)+'</b> · Completed: <b>'+fmt(String(h.completedAt||'').slice(0,10))+'</b> · '+k.paidW+'/'+h.weeks+' weeks completed.</div><div class="sec" style="margin-top:14px"><h2>Completed Loan Payment History</h2>'+list+'</div>');
 }
-function historicalLoanForm(editId){
- var existing=editId?HIST.filter(function(x){return String(x.id)===String(editId)})[0]:null;
- if(editId&&!existing)return;
- var h=existing||{name:"",customerId:"",phone:"",loanAmount:"",cutting:"",perWeek:"",weeks:12,loanDate:"",hPaid:0,hMiss:0,hAmt:"",completedAt:new Date().toISOString(),pays:[]};
- open_('<h2>'+(editId?'Edit Old / Completed Loan':'＋ Add Old / Completed Loan')+'</h2><p style="color:var(--muted);font-size:13px">This record is stored separately. Editing it never changes the current customer account.</p><div class="fg">'+
- F("oh_name","Customer name","text",h.name)+F("oh_cid","Customer ID","text",h.customerId)+F("oh_phone","Contact no","tel",h.phone)+
- F("oh_loan","Old loan amount (₹)","number",h.loanAmount,'min="0"')+F("oh_cut","Initial cutting amount (₹)","number",h.cutting,'min="0"')+
- F("oh_pw","Per week (₹)","number",h.perWeek,'min="1"')+F("oh_wk","Total payable weeks","number",h.weeks||12,'min="1"')+F("oh_date","Loan date","date",h.loanDate||"")+ F("oh_hp","Historical paid weeks","number",h.hPaid||0,'min="0"')+F("oh_hm","Historical missed weeks","number",h.hMiss||0,'min="0"')+
- '<div class="full">'+F("oh_ha","Historical paid amount (optional)","number",h.hAmt==null?"":h.hAmt,'min="0"')+'</div><div class="full"><label>Completed date<input id="oh_completed" type="date" value="'+esc(String(h.completedAt||"").slice(0,10))+'"></label></div></div>'+ '<div class="note">Cutting is the amount kept when the loan is given. Example: ₹10,000 loan with ₹500 cutting means ₹9,500 is actually given. Profit = amount collected − (loan amount − cutting).</div><div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="saveHistoricalLoan(&quot;'+(editId||"")+'&quot;)">'+(editId?'Update Old Loan':'Save Old Loan')+'</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
-}
-async function saveHistoricalLoan(editId){
- var old=editId?HIST.filter(function(x){return String(x.id)===String(editId)})[0]:null;
- var h={name:$("oh_name").value.trim(),customerId:$("oh_cid").value.trim(),phone:$("oh_phone").value.trim(),loanAmount:+$("oh_loan").value,cutting:+$("oh_cut").value||0,perWeek:+$("oh_pw").value,weeks:+$("oh_wk").value,loanDate:$("oh_date").value,hPaid:+$("oh_hp").value||0,hMiss:+$("oh_hm").value||0,hAmt:$("oh_ha").value.trim(),completedAt:$("oh_completed").value?new Date($("oh_completed").value+"T12:00:00").toISOString():new Date().toISOString(),collectionWeekday:old&&old.collectionWeekday!=null?old.collectionWeekday:4,pays:old&&Array.isArray(old.pays)?old.pays:[]};
- var e=!h.name?"Enter customer name.":!h.customerId?"Enter Customer ID.":!(h.loanAmount>0)?"Enter old loan amount.":!(h.perWeek>0)?"Enter per week amount.":!(h.weeks>0)?"Enter total weeks.":(h.hPaid+h.hMiss>h.weeks)?"Paid + missed weeks cannot exceed total weeks.":"";
- if(e){$("err").textContent=e;return}
- h.loanId=old&&old.loanId?old.loanId:("HIST-"+String(h.customerId||h.name).replace(/[^A-Za-z0-9]/g,"").slice(0,12).toUpperCase()+"-"+Date.now().toString(36).toUpperCase());
- h.id=old?old.id:null;
- if(sb){var ok=await cloudSaveHistorical(h);if(!ok)return;await cloudLoad()}else{if(old){var ix=HIST.indexOf(old);if(ix>=0)HIST[ix]=h}else HIST.unshift(h);save()}
- close_();location.hash="#completed/"+encodeURIComponent(historyCustomerKey(h));
-}
-function historicalLoanDetail(id){
- var h=HIST.filter(function(x){return String(x.id)===String(id)})[0];if(!h)return;
- var k=loanRecordCalc(h),rows=paymentRows({pays:h.pays||[]});
- var list=rows.length?'<div class="ph-list">'+rows.map(function(p){return paymentRowHtml({name:h.name},p,false)}).join('')+'</div>':'<div class="ph-empty">No dated payment rows were saved for this old loan.</div>';
- open_('<div class="row"><div><h2>'+esc(h.name)+'</h2><p style="color:var(--muted);font-size:13px;margin:4px 0 0">'+esc(h.loanId)+' · Old completed loan</p></div><div class="row"><button class="btn sm" onclick="historicalLoanForm(&quot;'+esc(h.id)+'&quot;)">Edit</button><button class="btn sm sp" onclick="close_()">Close</button></div></div><div class="loan-summary-grid"><div><span>Loan amount</span><b>'+inr(h.loanAmount)+'</b></div><div><span>Initial cutting</span><b>'+inr(h.cutting)+'</b></div><div><span>Net given</span><b>'+inr(Math.max((Number(h.loanAmount)||0)-(Number(h.cutting)||0),0))+'</b></div><div><span>Total payable</span><b>'+inr(k.payable)+'</b></div><div><span>Total paid</span><b>'+inr(k.paid)+'</b></div><div><span>Profit</span><b>'+inr(loanProfit(h,k))+'</b></div></div><div class="note" style="margin-top:12px">Customer ID: <b>'+esc(h.customerId)+'</b> · Loan date: <b>'+fmt(h.loanDate)+'</b> · Completed: <b>'+fmt(String(h.completedAt||'').slice(0,10))+'</b> · '+k.paidW+'/'+h.weeks+' weeks.</div><div class="sec" style="margin-top:14px"><h2>Old Loan Payment History</h2>'+list+'</div><div class="row" style="margin-top:12px"><button class="btn del sp" onclick="deleteHistoricalLoan(\''+esc(h.id)+'\',this)">Delete old loan record</button></div>');
-}
-async function deleteHistoricalCustomer(encodedKey,b){
- if(!arm("customer:"+encodedKey,b))return;
- var key=decodeURIComponent(encodedKey||"");
- var rows=HIST.filter(function(h){return historyCustomerKey(h)===key});
- if(!rows.length){armed=null;return}
- if(sb){
-   var ids=rows.map(function(h){return h.id}).filter(Boolean);
-   for(var i=0;i<ids.length;i++){var ok=await cloudDeleteHistorical(ids[i]);if(!ok){armed=null;return}}
- }
- HIST=HIST.filter(function(h){return historyCustomerKey(h)!==key});
- save();armed=null;location.hash="#completed";render();
-}
-
-async function deleteHistoricalLoan(id,b){
- if(!arm(id,b))return;
- if(sb){var ok=await cloudDeleteHistorical(id);if(!ok)return}
- HIST=HIST.filter(function(x){return String(x.id)!==String(id)});
- save();armed=null;close_();location.hash="#completed";
-}
-
 function newLoanForm(cid){
  var c=DB.filter(function(x){return x.id===cid})[0];if(!c)return;var k=calc(c);
  if(!k.done){open_('<h2>Current loan is not completed</h2><p style="color:var(--muted)">This customer still has '+k.pendW+' payable week'+(k.pendW===1?'':'s')+' remaining. If you still want to start a new loan, first confirm that you want to archive the current loan as-is.</p><div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="close_();newLoanFormConfirmed(\''+cid+'\')">Continue</button></div>');return}
@@ -1392,33 +1445,42 @@ function newLoanForm(cid){
 }
 function newLoanFormConfirmed(cid){
  var c=DB.filter(function(x){return x.id===cid})[0];if(!c)return;
- open_('<h2>New Loan for '+esc(c.name)+'</h2><p style="color:var(--muted);font-size:13px">The completed loan will move to Completed history. Customer name, Customer ID, phone and PIN stay the same.</p><div class="fg">'+F("nl_loan","New loan amount (₹)","number","",'min="1"')+F("nl_cut","Initial cutting amount (₹)","number",0,'min="0"')+F("nl_pw","Per week (₹)","number","",'min="1"')+F("nl_wk","Total payable weeks","number","12",'min="1"')+F("nl_date","New loan date","date",new Date().toISOString().slice(0,10))+selDay("nl_day","Collection weekday",c.collectionWeekday==null?4:+c.collectionWeekday)+'</div><div class="note">Week 1 starts on the first selected weekday after the new loan date. The old loan will remain permanently available in Completed history.</div><div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="saveNewLoan(\''+cid+'\')">Archive &amp; Start New Loan</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
+ open_('<h2>New Loan for '+esc(c.name)+'</h2><p style="color:var(--muted);font-size:13px">The completed loan will move to Loan History. Customer name, Customer ID, phone and PIN stay the same.</p><div class="fg">'+F("nl_loan","New loan amount (₹)","number","",'min="1"')+F("nl_pw","Per week (₹)","number","",'min="1"')+F("nl_wk","Total payable weeks","number","12",'min="1"')+F("nl_date","New loan date","date",new Date().toISOString().slice(0,10))+selDay("nl_day","Collection weekday",c.collectionWeekday==null?4:+c.collectionWeekday)+'</div><div class="note">Week 1 starts on the first selected weekday after the new loan date. The old loan will remain permanently available in Loan History.</div><div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="saveNewLoan(\''+cid+'\')">Archive &amp; Start New Loan</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
 }
 async function saveNewLoan(cid){
  var c=DB.filter(function(x){return x.id===cid})[0];if(!c)return;
- var loan=+$('nl_loan').value,cut=+$('nl_cut').value||0,pw=+$('nl_pw').value,weeks=+$('nl_wk').value,date=$('nl_date').value,day=+$('nl_day').value;
+ var loan=+$('nl_loan').value,pw=+$('nl_pw').value,weeks=+$('nl_wk').value,date=$('nl_date').value,day=+$('nl_day').value;
  if(!(loan>0)||!(pw>0)||!(weeks>0)||!date){$('err').textContent='Enter loan amount, weekly amount, weeks and loan date.';return}
  archiveCurrentLoan(c);
- c.loan=loan;c.cutting=cut;c.perWeek=pw;c.weeks=weeks;c.date=date;c.collectionWeekday=day;c.hPaid=0;c.hMiss=0;c.hAmt="";c.pays=[];
+ c.loan=loan;c.perWeek=pw;c.weeks=weeks;c.date=date;c.collectionWeekday=day;c.hPaid=0;c.hMiss=0;c.hAmt="";c.pays=[];
  if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await cloudLoad()}else save();close_();go(c.id);
 }
 
 function paymentRows(c){
- var all=(c.pays||[]).map(function(p,i){return {p:Object.assign({},p),i:i}}).sort(function(a,b){var d=String(a.p.date||"").localeCompare(String(b.p.date||""));return d!==0?d:a.i-b.i}),balance=Math.max(0,calc(c).payable-calc(c).hAmt);
- all.forEach(function(x){if(x.p.type==="paid"||x.p.type==="hist")balance=Math.max(0,balance-Math.max(0,Number(x.p.amt)||0));x.p.balanceAfter=balance;x.p.dueDate=nextWeekDate(c.date,x.p.week,c.collectionWeekday==null?4:+c.collectionWeekday)});
- return all.reverse().map(function(x){return x.p});
+  return c.pays.map(function(p,i){return {p:p,i:i}}).sort(function(a,b){
+    var d=String(b.p.date||"").localeCompare(String(a.p.date||""));
+    return d!==0?d:b.i-a.i;
+  }).map(function(x){return x.p});
 }
-
 function paymentDay(s){
   if(!s)return "";
   var d=new Date(s+"T00:00:00");
   return Number.isNaN(d.getTime())?"":d.toLocaleDateString("en-IN",{weekday:"short"});
 }
 function paymentRowHtml(c,p,adminMode){
- var u=p.type==="unpaid",status=u?pt("unpaid"):(p.type==="hist"?pt("historical"):pt("paid")),statusClass=u?"unpaid":"",action=adminMode?" onclick=\"payForm('"+c.id+"','"+(p.id||"")+"')\"":"",weekLabel=portalLang==="te"?("వారం "+esc(p.week)):("W"+esc(p.week));
- return '<div class="ph-row"'+action+'><div class="ph-date"><span>Due · '+(p.dueDate?fmt(p.dueDate):"—")+'</span><small>Paid · '+(u?"Not paid":fmt(p.date))+'</small></div><div class="ph-week">'+weekLabel+'</div><div class="ph-status '+statusClass+'"><span class="ph-dot"></span>'+status+'</div><div class="ph-amount"><b>'+inr(u?0:p.amt)+'</b><small>Balance · '+inr(p.balanceAfter)+'</small></div><div class="ph-arrow">'+(adminMode?'✎':'›')+'</div></div>';
+  var u=p.type==="unpaid";
+  var status=u?pt("unpaid"):(p.type==="hist"?pt("historical"):pt("paid"));
+  var statusClass=u?"unpaid":"";
+  var action=adminMode ? " onclick=\"payForm('"+c.id+"','"+(p.id||"")+"')\"" : "";
+  var weekLabel=portalLang==="te"?("వారం "+esc(p.week)):("W"+esc(p.week));
+  return '<div class="ph-row"'+action+'>'+
+    '<div class="ph-date">'+fmt(p.date)+'<small>'+paymentDay(p.date)+'</small></div>'+
+    '<div class="ph-week">'+weekLabel+'</div>'+
+    '<div class="ph-status '+statusClass+'"><span class="ph-dot"></span>'+status+'</div>'+
+    '<div class="ph-amount">'+(u?inr(0):inr(p.amt))+'</div>'+
+    '<div class="ph-arrow">›</div>'+
+  '</div>';
 }
-
 function paymentHistoryHtml(c,adminMode){
   var rows=paymentRows(c),recent=rows.slice(0,5);
   return '<div class="sec '+(adminMode?"":"portal-history")+'">'+
@@ -1439,8 +1501,8 @@ function viewAllPayments(cid,adminMode){
 }
 
 
-function backup(){open_('<h2>Backup &amp; restore</h2><p style="color:var(--muted);font-size:13px;margin:6px 0 12px">Copy this text and keep it safe (Notes, WhatsApp to yourself). To move data to another device, paste it here and tap Restore. Restore replaces current data.</p><textarea id="bk" rows="7" onfocus="this.select()">'+esc(JSON.stringify({version:25,customers:DB,completed:HIST}))+'</textarea><div class="row" style="margin-top:12px"><button class="btn" onclick="close_()">Close</button><button class="btn pri sp" onclick="restore()">Restore from text</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
-function restore(){if(sb){$("err").textContent="Cloud restore is not supported here. Download this backup for safekeeping; use your database restore workflow for cloud records.";return}try{var d=JSON.parse($("bk").value),customers=Array.isArray(d)?d:d.customers,history=Array.isArray(d)?HIST:d.completed;if(!Array.isArray(customers)||customers.some(function(c){return !c.id||!c.name||!Array.isArray(c.pays)})||!Array.isArray(history))throw 0;if(!confirm("Replace all local customer and completed-loan records with this backup?"))return;DB=customers;HIST=history;save();close_();go("")}catch(e){$("err").textContent="This text is not a valid CollectPro backup."}}
+function backup(){open_('<h2>Backup &amp; restore</h2><p style="color:var(--muted);font-size:13px;margin:6px 0 12px">Copy this text and keep it safe (Notes, WhatsApp to yourself). To move data to another device, paste it here and tap Restore. Restore replaces current data.</p><textarea id="bk" rows="7" onfocus="this.select()">'+esc(JSON.stringify(DB))+'</textarea><div class="row" style="margin-top:12px"><button class="btn" onclick="close_()">Close</button><button class="btn pri sp" onclick="restore()">Restore from text</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
+function restore(){try{var d=JSON.parse($("bk").value);if(!Array.isArray(d)||d.some(function(c){return !c.id||!c.name||!Array.isArray(c.pays)}))throw 0;DB=d;save();close_();go("")}catch(e){$("err").textContent="This text is not a valid CollectPro backup."}}
 
 function open_(h){$("modal").innerHTML=h;$("ov").classList.add("on")}
 function close_(){$("ov").classList.remove("on")}
@@ -1454,11 +1516,11 @@ function selDay(id,label,v){
   return '<div><label>'+label+'<select id="'+id+'">'+days.map(function(d,i){return '<option value="'+i+'"'+(i===v?' selected':'')+'>'+d+'</option>'}).join("")+'</select></label></div>';
 }
 function custForm(id){
- var c=id?DB.filter(function(x){return x.id===id})[0]:{name:"",customerId:"",phone:"",loan:"",cutting:"",perWeek:"",weeks:"",date:new Date().toISOString().slice(0,10),hPaid:0,hMiss:0,hAmt:"",loanHistory:[]};
+ var c=id?DB.filter(function(x){return x.id===id})[0]:{name:"",customerId:"",phone:"",loan:"",perWeek:"",weeks:"",date:new Date().toISOString().slice(0,10),hPaid:0,hMiss:0,hAmt:"",loanHistory:[]};
  open_('<h2>'+(id?"Edit customer":"Add customer / existing customer")+'</h2><div class="fg">'+
  F("f_name","Customer name","text",c.name)+F("f_cid","Customer ID","text",c.customerId||"")+F("f_pin","4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="new-password"')+F("f_phone","Contact no","tel",c.phone)+
- F("f_loan","Loan amount (₹)","number",c.loan,'min="0"')+F("f_cut","Initial cutting amount (₹)","number",c.cutting==null?((+c.loan||0)*0.05):c.cutting,'min="0"')+F("f_pw","Per week (₹)","number",c.perWeek,'min="1"')+
- F("f_wk","Total payable weeks","number",c.weeks,'min="1"')+F("f_date","Date loan taken","date",c.date)+selDay("f_day","Weekly collection day",c.collectionWeekday==null?4:+c.collectionWeekday)+
+ F("f_loan","Loan amount (₹)","number",c.loan,'min="0"')+F("f_pw","Per week (₹)","number",c.perWeek,'min="1"')+
+ F("f_wk","Total payable weeks","number",c.weeks,'min="1"')+F("f_date","Date loan taken","date",c.date)+
  '<div class="hd">Old customer? Enter what was already paid</div>'+
  F("f_hp","Historical paid weeks","number",c.hPaid,'min="0"')+F("f_hm","Historical missed weeks","number",c.hMiss,'min="0"')+
  '<div class="full">'+F("f_ha","Historical paid amount (optional)","number",c.hAmt,'min="0"')+'</div>'+
@@ -1467,46 +1529,13 @@ function custForm(id){
 }
 async function saveC(id){
  var g=function(i){return $(i).value.trim()};
- var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),cutting:+g("f_cut")||0,perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),collectionWeekday:+g("f_day"),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
+ var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),collectionWeekday:(id?((DB.filter(function(x){return x.id===id})[0].collectionWeekday==null)?4:+DB.filter(function(x){return x.id===id})[0].collectionWeekday):4),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
  var pin=g("f_pin");
  var e=!o.name?"Enter the customer name.":!o.customerId?"Enter a Customer ID.":(!id&&!pin)?"Set a 4-digit PIN for this customer.":(pin&&!/^\d{4}$/.test(pin))?"PIN must be exactly 4 digits.":!(o.perWeek>0)?"Enter the per week amount.":!(o.weeks>0)?"Enter the total payable weeks.":(o.hPaid+o.hMiss>o.weeks)?"Paid + missed weeks cannot exceed total weeks.":"";
  if(e){$("err").textContent=e;return}
-
- // FIX: When adding old/existing customer data, reuse the existing customer row
- // instead of attempting a second INSERT with the same Customer ID.
- if(!id && sb){
-   var dup=await sb.from("collectpro_customers").select("*").eq("customer_id",o.customerId).maybeSingle();
-   if(dup.error){
-     $("err").textContent="Unable to check existing Customer ID: "+dup.error.message;
-     return;
-   }
-   if(dup.data){
-     id=dup.data.id;
-     var local=DB.filter(function(x){return x.id===id})[0];
-     if(!local){local=mapRow(dup.data);DB.push(local)}
-   }
- }
-
- var c;
- if(id){
-   c=DB.filter(function(x){return x.id===id})[0];
-   if(!c){c=mapRow(dup&&dup.data?dup.data:{});c.id=id;DB.push(c)}
-   // Preserve payment history and loan history when editing/re-entering an existing customer.
-   for(var k in o)c[k]=o[k];
-   if(!Array.isArray(c.pays))c.pays=[];
-   if(!Array.isArray(c.loanHistory))c.loanHistory=[];
-   if(pin)c._newPin=pin;
- }else{
-   o.id=null;o.pays=[];o.loanHistory=[];o._newPin=pin;DB.push(o);c=o;
- }
-
- if(sb){
-   var ok=await cloudSaveCustomer(c,pin||null);
-   if(!ok)return;
-   await cloudLoad();
-   var match=DB.filter(function(x){return x.customerId.toLowerCase()===o.customerId.toLowerCase()})[0];
-   if(match)id=match.id;
- }
+ if(id){var c=DB.filter(function(x){return x.id===id})[0];for(var k in o)c[k]=o[k];if(pin)c._newPin=pin}
+ else{o.id=null;o.pays=[];o.loanHistory=[];o._newPin=pin;DB.push(o)}
+ if(sb){var c2=id?DB.filter(function(x){return x.id===id})[0]:DB[DB.length-1];var ok=await cloudSaveCustomer(c2,pin||null);if(!ok)return;await cloudLoad();var match=DB.filter(function(x){return x.customerId.toLowerCase()===o.customerId.toLowerCase()})[0];if(match)id=match.id}
  save();close_();go(id||"");
 }
 function payForm(cid,pid){
@@ -1526,83 +1555,9 @@ async function saveP(cid,pid){
  var c=DB.filter(function(x){return x.id===cid})[0];
  var o={date:$("p_date").value,amt:+$("p_amt").value,mode:$("p_mode").value,week:+$("p_wk").value,type:$("p_type").value};
  var maxWeek=trackerItems(c).length;if(!o.date||!(o.amt>=0)||!(o.week>=1&&o.week<=maxWeek)){$("err").textContent="Enter a date, amount and a week between 1 and "+maxWeek+".";return}
- if(!Number.isInteger(o.week)||!Number.isFinite(o.amt)||((o.type==="paid"||o.type==="hist")&&o.amt<=0)){$("err").textContent="Enter a whole week number and a positive payment amount.";return}
- if((o.type==="paid"||o.type==="hist")&&c.pays.some(function(p){return p.id!==pid&&+p.week===o.week&&(p.type==="paid"||p.type==="hist")})){$("err").textContent="This week already has a payment. Edit the existing payment instead.";return}
- var previousPays=JSON.parse(JSON.stringify(c.pays));
  if(pid){var p=c.pays.filter(function(x){return x.id===pid})[0];for(var k in o)p[k]=o[k]}else{o.id=uid();c.pays.push(o)}
- var savedPayment=Object.assign({},o);if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok){c.pays=previousPays;return}await autoArchiveCompletedCurrentLoans();await cloudLoad()}else{save();await autoArchiveCompletedCurrentLoans();save()}var updatedCustomer=DB.filter(function(x){return x.id===cid})[0]||c;close_();render();if(savedPayment.type==="paid"||savedPayment.type==="hist")showPaymentReceipt(updatedCustomer,savedPayment);
+ if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await cloudLoad()}else save();close_();render();
 }
-function paymentReceiptLink(c,p,balance){var phone=(c.phone||"").replace(/\D/g,"");if(phone.length===10)phone="91"+phone;var msg="Hi "+c.name+", your CollectPro payment receipt for Week "+p.week+": amount "+inr(p.amt)+", paid on "+fmt(p.date)+", remaining balance "+inr(balance)+". Please find the attached CollectPro receipt.";return "https://wa.me/"+phone+"?text="+encodeURIComponent(msg)}
-function receiptRoundRect(ctx,x,y,w,h,r,fill){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();if(fill)ctx.fill()}
-function receiptText(ctx,text,x,y,size,color,weight,align){ctx.font=(weight||"400")+" "+size+"px Arial, sans-serif";ctx.fillStyle=color||"#18233f";ctx.textAlign=align||"left";ctx.fillText(String(text==null?"":text),x,y)}
-function receiptCanvas(c,p,balance){
- var cv=document.createElement("canvas");cv.width=1080;cv.height=1900;
- var x=cv.getContext("2d"),terms=businessTerms(c),summary=calc(c),total=summary.paid,
- customerId=c.customerId||"—",
- due=p.dueDate||nextWeekDate(c.date,p.week,c.collectionWeekday==null?4:+c.collectionWeekday),
- dateDigits=String(p.date||"").replace(/\D/g,"");
- x.fillStyle="#f1f0eb";x.fillRect(0,0,cv.width,cv.height);
- x.shadowColor="rgba(14,25,50,.14)";x.shadowBlur=28;x.shadowOffsetY=12;
- x.fillStyle="#fff";receiptRoundRect(x,52,42,976,1810,30,true);
- x.shadowColor="transparent";x.shadowBlur=0;x.shadowOffsetY=0;
- /* Header */
- x.fillStyle="#111b38";receiptRoundRect(x,52,42,976,360,30,true);x.fillRect(52,340,976,62);
- x.fillStyle="#d7a83f";x.beginPath();x.arc(142,132,42,0,Math.PI*2);x.fill();
- receiptText(x,"CP",142,144,32,"#111b38","700","center");
- receiptText(x,"CollectPro",204,132,43,"#f8f7f2","700");
- receiptText(x,"WEEKLY COLLECTIONS",206,169,16,"#d6c27d","700");
- x.fillStyle="#27b286";receiptRoundRect(x,805,86,158,46,22,true);
- receiptText(x,"PAYMENT RECEIVED",884,116,14,"#fff","700","center");
- receiptText(x,"WEEKLY PAYMENT RECEIPT",106,236,30,"#bec8e1","700");
- receiptText(x,inr(p.amt),106,318,60,"#fff","700");
- receiptText(x,"Amount received",111,362,17,"#bdc5da","400");
- var receiptNo="CP-"+String(customerId).replace(/[^A-Za-z0-9]/g,"").slice(-10).toUpperCase()+"-W"+String(p.week)+"-"+(dateDigits||"DATE");
- function line(y){x.strokeStyle="#e5e7ed";x.lineWidth=2;x.beginPath();x.moveTo(106,y);x.lineTo(974,y);x.stroke()}
- function field(label,value,y,opts){
-   opts=opts||{};
-   var left=opts.x||108, width=opts.width||850, align=opts.align||"left";
-   receiptText(x,label.toUpperCase(),left,y,15,"#777f91","700",align);
-   var val=String(value==null||value===""?"—":value);
-   x.save();x.beginPath();x.rect(left, y+9, width, 54);x.clip();
-   receiptText(x,val,left,y+48,23,"#18233f","600",align);x.restore();
- }
- /* Receipt metadata */
- field("Receipt number",receiptNo,448,{width:560});
- field("Payment date",fmt(p.date),448,{x:700,width:274,align:"right"});
- line(535);
- /* Customer identity: each item has its own full-height row */
- field("Received from / Customer name",c.name||"Customer",585);
- field("Customer ID",customerId,700);
- line(790);
- /* Payment details */
- field("Payment week","Week "+p.week,835);
- field("Paid weeks",summary.paidW+" of "+terms.weeks+" weeks paid",950);
- field("Scheduled due date",due?fmt(due):"—",1065);
- field("Payment method",p.mode||"—",1180);
- /* Account summary */
- x.fillStyle="#edf3fc";receiptRoundRect(x,100,1325,880,340,22,true);
- x.strokeStyle="#dbe4f2";x.lineWidth=2;x.stroke();
- receiptText(x,"ACCOUNT SUMMARY",132,1380,18,"#586782","700");
- receiptText(x,"Total payable",132,1450,18,"#555e70","400");
- receiptText(x,inr(summary.payable),500,1450,21,"#18233f","700","right");
- receiptText(x,"Total paid to date",132,1515,18,"#555e70","400");
- receiptText(x,inr(total),500,1515,21,"#18233f","700","right");
- receiptText(x,"Remaining balance",570,1450,18,"#555e70","400");
- receiptText(x,inr(balance),950,1450,22,"#18233f","700","right");
- line(1730);
- receiptText(x,"Thank you for your payment.",540,1785,18,"#697184","400","center");
- return cv;
-}
-var receiptDraft=null;
-function showPaymentReceipt(c,p){
- var balance=calc(c).pend,cv=receiptCanvas(c,p,balance),png=cv.toDataURL("image/png"),name="CollectPro-Receipt-W"+p.week+"-"+String(p.date||"").replace(/[^0-9]/g,"")+".png";
- receiptDraft={customer:Object.assign({},c),payment:Object.assign({},p),balance:balance,file:null,name:name};
- var link=paymentReceiptLink(c,p,balance);
- open_('<div class="row"><div><h2>CollectPro payment receipt</h2><p style="color:var(--muted);font-size:13px">Week '+esc(p.week)+' · '+fmt(p.date)+'</p></div><button class="btn sm sp" onclick="close_()">Close</button></div><img alt="CollectPro weekly payment receipt preview" src="'+png+'" style="display:block;width:100%;max-height:390px;object-fit:contain;background:#f1f0eb;border-radius:12px;margin:12px auto"><div class="row" style="justify-content:flex-end;margin-top:12px"><a class="btn" href="'+png+'" download="'+esc(name)+'">↓ Download PNG</a><button class="btn pri" id="receiptShareBtn" disabled onclick="shareReceiptImage()">Preparing image…</button><a class="btn" id="receiptWhatsAppFallback" style="display:none" target="_blank" rel="noopener" href="'+link+'">Open WhatsApp</a></div><small id="receiptStatus" style="display:block;color:var(--muted);margin-top:9px">Receipt includes the CollectPro logo and payment summary.</small>');
- cv.toBlob(function(blob){var share=$("receiptShareBtn"),fallback=$("receiptWhatsAppFallback"),status=$("receiptStatus");if(!blob){share.textContent="Image not ready";if(fallback)fallback.style.display="inline-block";if(status)status.textContent="Download the PNG and attach it in WhatsApp.";return}try{receiptDraft.file=new File([blob],name,{type:"image/png"})}catch(e){receiptDraft.file=null}if(share){share.disabled=false;share.textContent="Share receipt image"}var supported=!!(navigator.share&&navigator.canShare&&receiptDraft.file&&navigator.canShare({files:[receiptDraft.file]}));if(status)status.textContent=supported?"Tap Share receipt image, then choose WhatsApp and the customer chat.":"Your browser cannot attach images from this share button. Download the PNG, open WhatsApp, and attach it to the customer chat.";if(fallback)fallback.style.display=supported?"none":"inline-block"},"image/png");
-}
-function shareReceiptImage(){if(!receiptDraft||!receiptDraft.file)return;var data={files:[receiptDraft.file],title:"CollectPro payment receipt",text:"CollectPro weekly payment receipt for "+receiptDraft.customer.name+", Week "+receiptDraft.payment.week+"."};if(!navigator.share||!navigator.canShare||!navigator.canShare({files:data.files})){var s=$("receiptStatus");if(s)s.textContent="Download the PNG and attach it in WhatsApp.";return}navigator.share(data).catch(function(e){if(e&&e.name!=="AbortError"){var s=$("receiptStatus");if(s)s.textContent="Could not open the share sheet. Download the PNG and share it from WhatsApp."}})}
-
 function arm(key,b){if(armed===key)return true;armed=key;var t=b.textContent;b.textContent="Tap again";setTimeout(function(){if(armed===key){armed=null;b.textContent=t}},3000);return false}
 async function delP(cid,pid,b){if(!arm(pid,b))return;var c=DB.filter(function(x){return x.id===cid})[0];c.pays=c.pays.filter(function(x){return x.id!==pid});if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await cloudLoad()}else save();armed=null;render()}
 async function delC(cid,b){if(!arm(cid,b))return;if(sb){var ok=await cloudDelete(cid);if(!ok)return}DB=DB.filter(function(x){return x.id!==cid});save();go("")}
@@ -1610,7 +1565,7 @@ var deferredInstallPrompt=null;
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferredInstallPrompt=e;var b=$("installBtn");if(b)b.style.display="inline-block"});
 async function installApp(){if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;var b=$("installBtn");if(b)b.style.display="none"}
 window.addEventListener("appinstalled",function(){var b=$("installBtn");if(b)b.style.display="none"});
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js",{scope:"./"}).catch(function(e){console.warn("CollectPro offline shell registration failed",e)})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})}).catch(function(){})})}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")close_()});
 
 (function(){
@@ -1620,18 +1575,6 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")close_()});
     if(portalData)setTimeout(animateCustomerPortal,40);
   };
 })();
-
-function cpIcon(kind){var paths={money:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 9h10M9 9c5 0 5 5 0 5l5 3M7 12h10"/>',users:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0112 0v2M16 5a3 3 0 010 6M18 14a5 5 0 013 4v2"/>',chart:'<path d="M4 4v16h17M8 16v-4M13 16V8M18 16V5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M7 12l3 3 7-7"/>',arrow:'<path d="M19 12H5m6-6l-6 6 6 6"/>',plus:'<path d="M12 5v14M5 12h14"/>',download:'<path d="M12 3v12m-5-5l5 5 5-5M4 16v4h16v-4"/>',portal:'<rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="9" r="2"/><path d="M8 17a4 4 0 018 0"/>',edit:'<path d="M14 5l5 5M4 20l5-1L20 8l-5-5L4 14z"/>',trash:'<path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7"/>',phone:'<path d="M7 3H4a1 1 0 00-1 1c0 9 8 17 17 17a1 1 0 001-1v-3l-5-2-2 2-7-7 2-2z"/>',logout:'<path d="M9 3H3v18h6M10 12h11m-4-4l4 4-4 4"/>'};return '<svg class="cp-icon" viewBox="0 0 24 24" aria-hidden="true">'+(paths[kind]||paths.money)+'</svg>'}
-function cpDecorate(){if(!document.querySelectorAll)return;document.querySelectorAll('.btn,.chip,.stat .l').forEach(function(e){if(e.querySelector('svg'))return;var s=e.textContent.toLowerCase(),kind=/delete/.test(s)?'trash':/back|all customers|cancel/.test(s)?'arrow':/logout/.test(s)?'logout':/add|new loan/.test(s)?'plus':/edit|target/.test(s)?'edit':/dashboard|performance|rate|profit|margin/.test(s)?'chart':/portal|login/.test(s)?'portal':/customer|member/.test(s)?'users':/completed|save/.test(s)?'check':/csv|backup|download|install/.test(s)?'download':/call|whatsapp/.test(s)?'phone':/pending|week|due/.test(s)?'clock':'money';e.insertAdjacentHTML('afterbegin',cpIcon(kind))})}
-function cpAuditHTML(months){
- var issues=[],active=DB.filter(function(c){return c.isActive!==false});active.concat(cpHistoryRecords()).forEach(function(c){var k=calc(c),weeks={},dup=false;(c.pays||[]).forEach(function(p){if((p.type==='paid'||p.type==='hist')){if(weeks[p.week])dup=true;weeks[p.week]=true}});var label=esc(c.name||c.customerId||'Account');if(dup)issues.push(label+': multiple paid entries for a week; cash amounts are included, week count is unique. Review payment history.');if(k.paid>k.payable+.005)issues.push(label+': receipts exceed payable by '+inr(k.paid-k.payable)+'.');if(k.pend>0&&Number(c.hPaid)>=businessTerms(c).weeks)issues.push(label+': historical week count says completed, but an amount is still outstanding.');if(businessTerms(c).isYalamanda)issues.push(label+': existing special rule uses 10 weeks and zero cutting; verify these agreed terms.');if(businessTerms(c).cutting>businessTerms(c).loan)issues.push(label+': cutting exceeds principal; correct loan terms.');});
- function reconcile(arr,total,undated){var windowTotal=arr.reduce(function(s,m){return s+m.collection},0);return '<b>All-time '+inr(total)+'</b><small>Last 6 months, dated: '+inr(windowTotal)+'</small><small>Undated historical / opening: '+inr(undated)+'</small><small>Other dated periods: '+inr(Math.max(0,total-windowTotal-undated))+'</small>'}
- var current=active.reduce(function(s,c){return s+calc(c).paid},0),historical=totalPortfolioHistory().collected;
- return '<section class="sec"><h2>Totals explained</h2><p>Cards show all-time receipts. Charts show dated payments in the last 6 months, using one shared rupee scale.</p><div class="cp-reconcile"><div><span class="tag">Current loans</span><div style="margin-top:9px">'+reconcile(months.current,current,months.undatedCurrent)+'</div></div><div><span class="tag">Completed loans</span><div style="margin-top:9px">'+reconcile(months.historical,historical,months.undatedHistorical)+'</div></div></div><p class="cp-note">Allocated margin distributes the contract margin across receipts. Net cash surplus = receipts − cash disbursed, before expenses; it is a different measure. Undated opening amounts are not assigned invented dates.</p><details style="margin-top:14px"><summary>Data checks · '+issues.length+' item'+(issues.length===1?'':'s')+' to review</summary>'+(issues.length?issues.map(function(x){return '<div class="cp-check">'+x+'</div>'}).join(''):'<div class="cp-check">No duplicate-week, overpayment or invalid-cutting flags detected.</div>')+'</details></section>';
-}
-var cpLastPage='';
-var cpRenderBase=render;render=function(){cpRenderBase();cpDecorate();var a=$('app');if(a&&cpLastPage!==location.hash){a.classList.remove('cp-enter');void a.offsetWidth;a.classList.add('cp-enter');cpLastPage=location.hash}};
-var cpOpenBase=open_;open_=function(html){cpOpenBase(html);cpDecorate()};
 
 startApp();
 </script></body></html>

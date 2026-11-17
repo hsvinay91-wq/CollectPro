@@ -833,13 +833,16 @@ function totalPortfolioHistory(){
 }
 
 function calc(c){
- var live=c.pays.filter(function(p){return p.type==="paid"});
- var paidW=(+c.hPaid||0)+live.length;
- var hAmt=c.hAmt!==""&&c.hAmt!=null?+c.hAmt:(+c.hPaid||0)*c.perWeek;
- var paid=hAmt+live.reduce(function(s,p){return s+(+p.amt||0)},0);
- var payable=c.perWeek*c.weeks,ps={};live.forEach(function(p){ps[p.week]=1});
- var miss=(+c.hMiss||0)+c.pays.filter(function(p){return p.type==="unpaid"&&!ps[p.week]}).length;
- return{paidW:paidW,paid:paid,hAmt:hAmt,miss:miss,payable:payable,pend:Math.max(payable-paid,0),pendW:Math.max(c.weeks-paidW,0),done:paidW>=c.weeks,pct:Math.min(100,Math.round(paidW/c.weeks*100))};
+ var pays=Array.isArray(c.pays)?c.pays:[],live=pays.filter(function(p){return p.type==="paid"||p.type==="hist"});
+ var hp=Math.max(0,Number(c.hPaid)||0),pw=Number(c.perWeek)||0,weeks=Number(c.weeks)||0;
+ var hAmt=c.hAmt!==""&&c.hAmt!=null?Math.max(0,Number(c.hAmt)||0):hp*pw;
+ var paid=hAmt+live.reduce(function(s,p){return s+Math.max(0,Number(p.amt)||0)},0),payable=pw*weeks,byWeek={},paidKeys={};
+ live.forEach(function(p){var w=Number(p.week);if(w>0)byWeek[w]=(byWeek[w]||0)+Math.max(0,Number(p.amt)||0)});
+ Object.keys(byWeek).forEach(function(w){if(Number(w)>hp&&byWeek[w]+.005>=pw)paidKeys[w]=true});
+ var paidW=Math.min(weeks,hp+Object.keys(paidKeys).length),missed={};
+ pays.forEach(function(p){var w=Number(p.week);if(p.type==="unpaid"&&!paidKeys[w]&&w>0)missed[w]=true});
+ var miss=Math.max(0,Number(c.hMiss)||0)+Object.keys(missed).length,pend=Math.max(payable-paid,0);
+ return{paidW:paidW,paid:paid,hAmt:hAmt,miss:miss,payable:payable,pend:pend,pendW:Math.max(weeks-paidW,0),done:payable>0&&pend<.005,pct:payable?Math.min(100,Math.round(paid/payable*100)):0};
 }
 
 function weekdayName(n){return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][Number(n)];}
@@ -1000,7 +1003,7 @@ function portalView(){
   '<span class="badge sp'+(k.done?' o':'')+'">'+status+'</span></div></div>'+
   '<div class="portal-big big"><div><div class="n g countup-ready" data-count="'+pendTarget+'">'+inr(0)+'</div><div class="l">'+pt("remaining")+'</div></div><div><div class="n countup-ready" data-count="'+paidTarget+'">'+inr(0)+'</div><div class="l">'+pt("paidAmount")+'</div></div></div>'+
   '<div class="bar portal-progress"><b style="width:0%" data-progress="'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' '+pt("weeksPaid")+' / '+c.weeks+'</span><span class="sp">'+k.pct+'%</span></div>'+
-  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+'</div>'+completion+'</div>'+
+  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+' · Collection every '+weekdayName(c.collectionWeekday==null?4:c.collectionWeekday)+'</div>'+completion+'</div>'+
   nextPaymentHtml(c)+
   '<div class="grid">'+[
    [pt("loanAmount"),inr(c.loan),pt("originalLoan")],
@@ -1010,7 +1013,7 @@ function portalView(){
   ].map(function(x){return '<div class="stat portal-stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
   '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+
   paymentHistoryHtml(c,false)+helpHtml()+
-  '<div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button></div>'+
+  '<div class="row" style="margin:14px 0"><button class="btn" id="installBtn" style="display:none" onclick="installApp()">Install CollectPro</button><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button></div>'+
   '</div>';
  }
  return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="row" style="justify-content:space-between"><div class="av" style="width:64px;height:64px;font-size:20px">CP</div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid",portalLang==="te"?"మీ పేరు":"Your Name","text","",'autocomplete="name"')+F("portal_pin",portalLang==="te"?"4-Digit PIN":"4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="current-password"')+'</div><div class="portal-remember-row"><label class="portal-check"><input id="portal_remember" type="checkbox" '+(portalRemember?"checked":"")+'><span>'+(portalLang==="te"?"ఈ పరికరంలో నన్ను గుర్తుంచుకో":"Remember me on this device")+'</span></label></div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
@@ -1418,7 +1421,7 @@ var deferredInstallPrompt=null;
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferredInstallPrompt=e;var b=$("installBtn");if(b)b.style.display="inline-block"});
 async function installApp(){if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;var b=$("installBtn");if(b)b.style.display="none"}
 window.addEventListener("appinstalled",function(){var b=$("installBtn");if(b)b.style.display="none"});
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})}).catch(function(){})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js",{scope:"./"}).catch(function(e){console.warn("CollectPro offline shell registration failed",e)})})}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")close_()});
 
 (function(){

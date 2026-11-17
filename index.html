@@ -1072,7 +1072,7 @@ function portalView(){
   ].map(function(x){return '<div class="stat portal-stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
   '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+
   paymentHistoryHtml(c,false)+helpHtml()+
-  '<div class="row" style="margin:14px 0"><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button></div>'+
+  '<div class="row" style="margin:14px 0"><button class="btn" id="installBtn" style="display:none" onclick="installApp()">Install CollectPro</button><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button></div>'+
   '</div>';
  }
  return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="row" style="justify-content:space-between"><div class="av" style="width:64px;height:64px;font-size:20px">CP</div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid",portalLang==="te"?"మీ పేరు":"Your Name","text","",'autocomplete="name"')+F("portal_pin",portalLang==="te"?"4-Digit PIN":"4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="current-password"')+'</div><div class="portal-remember-row"><label class="portal-check"><input id="portal_remember" type="checkbox" '+(portalRemember?"checked":"")+'><span>'+(portalLang==="te"?"ఈ పరికరంలో నన్ను గుర్తుంచుకో":"Remember me on this device")+'</span></label></div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
@@ -1203,7 +1203,7 @@ function render(){
  var bal=k.payable-k.hAmt,B={};asc.forEach(function(o){if(o.p.type==="paid"||o.p.type==="hist")bal-=(+o.p.amt||0);B[o.p.id]=Math.max(bal,0)});
  var ps=asc.map(function(o){return o.p}).reverse(),R='style="color:var(--miss)"';
  a.innerHTML='<div class="row" style="margin-bottom:12px"><button class="btn sm" onclick="go(\'\')">← All customers</button></div>'+
- '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>'+esc(c.phone||"No contact")+' · Loan taken '+fmt(c.date)+'</small></div><span class="badge sp'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div>'+
+ '<div class="hero"><div class="row"><div><h1>'+esc(c.name)+'</h1><small>'+esc(c.phone||"No contact")+' · Loan taken '+fmt(c.date)+'</small></div><div class="row sp" style="justify-content:flex-end"><span class="tag">Every '+weekdayName(c.collectionWeekday==null?4:c.collectionWeekday)+'</span><span class="badge'+(k.done?' o':'')+'">'+(k.done?"Completed":"Active")+'</span></div>'+
  '<div class="big"><div><div class="n g">'+inr(k.pend)+'</div><div class="l">Pending balance</div></div><div><div class="n">'+inr(k.paid)+'</div><div class="l">Collected so far</div></div></div>'+
  '<div class="l" style="margin-top:12px;font-size:12.5px;color:#B9B6C8">'+inr(k.payable)+' total payable − '+inr(k.paid)+' paid = '+inr(k.pend)+'</div>'+
  '<div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;font-size:13px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div>'+
@@ -1457,7 +1457,7 @@ function custForm(id){
  open_('<h2>'+(id?"Edit customer":"Add customer / existing customer")+'</h2><div class="fg">'+
  F("f_name","Customer name","text",c.name)+F("f_cid","Customer ID","text",c.customerId||"")+F("f_pin","4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="new-password"')+F("f_phone","Contact no","tel",c.phone)+
  F("f_loan","Loan amount (₹)","number",c.loan,'min="0"')+F("f_cut","Initial cutting amount (₹)","number",c.cutting==null?((+c.loan||0)*0.05):c.cutting,'min="0"')+F("f_pw","Per week (₹)","number",c.perWeek,'min="1"')+
- F("f_wk","Total payable weeks","number",c.weeks,'min="1"')+F("f_date","Date loan taken","date",c.date)+
+ F("f_wk","Total payable weeks","number",c.weeks,'min="1"')+F("f_date","Date loan taken","date",c.date)+selDay("f_day","Weekly collection day",c.collectionWeekday==null?4:+c.collectionWeekday)+
  '<div class="hd">Old customer? Enter what was already paid</div>'+
  F("f_hp","Historical paid weeks","number",c.hPaid,'min="0"')+F("f_hm","Historical missed weeks","number",c.hMiss,'min="0"')+
  '<div class="full">'+F("f_ha","Historical paid amount (optional)","number",c.hAmt,'min="0"')+'</div>'+
@@ -1466,7 +1466,7 @@ function custForm(id){
 }
 async function saveC(id){
  var g=function(i){return $(i).value.trim()};
- var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),cutting:+g("f_cut")||0,perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),collectionWeekday:(id?((DB.filter(function(x){return x.id===id})[0].collectionWeekday==null)?4:+DB.filter(function(x){return x.id===id})[0].collectionWeekday):4),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
+ var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),cutting:+g("f_cut")||0,perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),collectionWeekday:+g("f_day"),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
  var pin=g("f_pin");
  var e=!o.name?"Enter the customer name.":!o.customerId?"Enter a Customer ID.":(!id&&!pin)?"Set a 4-digit PIN for this customer.":(pin&&!/^\d{4}$/.test(pin))?"PIN must be exactly 4 digits.":!(o.perWeek>0)?"Enter the per week amount.":!(o.weeks>0)?"Enter the total payable weeks.":(o.hPaid+o.hMiss>o.weeks)?"Paid + missed weeks cannot exceed total weeks.":"";
  if(e){$("err").textContent=e;return}
@@ -1546,7 +1546,7 @@ function receiptCanvas(c,p,balance){
  receiptText(x,"RECEIPT NO.",106,484,15,"#777f91","700");receiptText(x,receiptNo,106,520,21,"#18233f","700");receiptText(x,"PAYMENT DATE",974,484,15,"#777f91","700","right");receiptText(x,fmt(p.date),974,520,21,"#18233f","700","right");
  x.strokeStyle="#e5e7ed";x.lineWidth=2;x.beginPath();x.moveTo(106,550);x.lineTo(974,550);x.stroke();
  function detail(label,value,y){receiptText(x,label.toUpperCase(),108,y,14,"#777f91","700");receiptText(x,value,108,y+34,22,"#18233f","600")}
- detail("Received from",c.name||"Customer",610);detail("Customer ID",customerId,704);detail("Instalment","Week "+p.week+" of "+terms.weeks,798);detail("Scheduled due date",due?fmt(due):"—",892);detail("Payment method",p.mode||"—",986);
+ detail("Received from",c.name||"Customer",610);detail("Customer ID",customerId,704);detail("Payment week","Week "+p.week,740);detail("Paid weeks",calc(c).paidW+" of "+terms.weeks+" weeks paid",810);detail("Scheduled due date",due?fmt(due):"—",880);detail("Payment method",p.mode||"—",950);
  x.fillStyle="#edf3fc";receiptRoundRect(x,100,1050,880,205,22,true);x.strokeStyle="#dbe4f2";x.lineWidth=2;x.stroke();receiptText(x,"ACCOUNT SUMMARY",132,1098,16,"#586782","700");
  receiptText(x,"Total payable",132,1147,16,"#555e70","400");receiptText(x,inr(calc(c).payable),490,1147,18,"#18233f","700","right");
  receiptText(x,"Total paid to date",132,1192,16,"#555e70","400");receiptText(x,inr(total),490,1192,18,"#18233f","700","right");
@@ -1570,7 +1570,7 @@ var deferredInstallPrompt=null;
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferredInstallPrompt=e;var b=$("installBtn");if(b)b.style.display="inline-block"});
 async function installApp(){if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;var b=$("installBtn");if(b)b.style.display="none"}
 window.addEventListener("appinstalled",function(){var b=$("installBtn");if(b)b.style.display="none"});
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})}).catch(function(){})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js",{scope:"./"}).catch(function(e){console.warn("CollectPro offline shell registration failed",e)})})}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")close_()});
 
 (function(){

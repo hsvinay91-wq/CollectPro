@@ -799,7 +799,7 @@ var PT={
  }
 };
 function pt(k){return PT[portalLang][k]||PT.en[k]||k}
-function togglePortalLang(){if("speechSynthesis" in window)window.speechSynthesis.cancel();collectProVoiceSetState(false);portalLang=portalLang==="en"?"te":"en";render()}
+function togglePortalLang(){collectProVoiceStop();portalLang=portalLang==="en"?"te":"en";render()}
 
 function mapRow(r){return{id:r.id,customerId:r.customer_id,name:r.name,phone:r.phone||"",loan:+r.loan_amount||0,perWeek:+r.per_week||0,weeks:+r.weeks||0,date:r.loan_date||"",collectionWeekday:(r.collection_weekday==null?4:+r.collection_weekday),hPaid:+r.h_paid||0,hMiss:+r.h_miss||0,hAmt:r.h_amt==null?"":+r.h_amt,pays:Array.isArray(r.pays)?r.pays:[],loanHistory:Array.isArray(r.loan_history)?r.loan_history:[]}}
 function mapHistoricalRow(r){return{id:r.id,source:"standalone",loanId:r.loan_id||makeLoanId({customerId:r.customer_id,name:r.name}),customerId:r.customer_id||"",name:r.name||"",phone:r.phone||"",loanAmount:+r.loan_amount||0,perWeek:+r.per_week||0,weeks:+r.weeks||0,loanDate:r.loan_date||"",collectionWeekday:(r.collection_weekday==null?4:+r.collection_weekday),hPaid:+r.h_paid||0,hMiss:+r.h_miss||0,hAmt:r.h_amt==null?"":+r.h_amt,pays:Array.isArray(r.pays)?r.pays:[],completedAt:r.completed_at||""}}
@@ -975,7 +975,7 @@ async function portalLogin(){
    $("perr").textContent="Unable to connect to the cloud right now. Please check your connection and try again.";
  }
 }
-async function portalLogout(){var s=getPortalSession();if(s&&sb){try{await sb.rpc("collectpro_customer_logout",{p_token:s.token})}catch(e){}}clearPortalSession();portalData=null;portalError="";render()}
+async function portalLogout(){collectProVoiceStop();var s=getPortalSession();if(s&&sb){try{await sb.rpc("collectpro_customer_logout",{p_token:s.token})}catch(e){}}clearPortalSession();portalData=null;portalError="";render()}
 
 function portalNextPayment(c){
   var today=new Date(); today.setHours(0,0,0,0);
@@ -1016,61 +1016,196 @@ function nextPaymentHtml(c){
 }
 
 
-/* CollectPro Voice Assistant — A+B warm, polite conversational Telugu female target voice. */
-var collectProVoiceUtterance=null;
-var collectProVoiceActive=false;
-function collectProVoiceName(name){
-  var raw=String(name||"").trim();
-  if(!raw)return "కస్టమర్";
-  /* Common customer-name spellings: explicit Telugu readings prevent English-accented name playback. */
-  var known={
-    "lakshmi":"లక్ష్మి","laxmi":"లక్ష్మి","lakshimi":"లక్ష్మి","pujari":"పూజారి",
-    "ravi":"రవి","kumar":"కుమార్","vinay":"వినయ్","srinivas":"శ్రీనివాస్",
-    "srinivasa":"శ్రీనివాస","suresh":"సురేష్","rajesh":"రాజేష్","mahesh":"మహేష్",
-    "ramesh":"రమేష్","venkatesh":"వెంకటేష్","venkat":"వెంకట్","anusha":"అనూష",
-    "swathi":"స్వాతి","sowmya":"సౌమ్య","divya":"దివ్య","priya":"ప్రియ",
-    "kavya":"కావ్య","keerthana":"కీర్తన","harika":"హారిక","bhavani":"భవాని",
-    "padma":"పద్మ","padmavathi":"పద్మావతి","sai":"సాయి","sai kumar":"సాయి కుమార్",
-    "ramya":"రమ్య","manjula":"మంజుల","sunitha":"సునీత","sujatha":"సుజాత",
-    "narayana":"నారాయణ","narayan":"నారాయణ","krishna":"కృష్ణ","venkateswara":"వెంకటేశ్వర",
-    "mallika":"మల్లిక","geetha":"గీత","gita":"గీత","shiva":"శివ","shankar":"శంకర్"
-  };
-  return raw.split(/\s+/).map(function(part){
-    var key=part.toLowerCase().replace(/[.,]/g,"");
-    if(known[key])return known[key];
-    /* If the value is already Telugu, keep it unchanged. */
-    if(/[ఀ-౿]/.test(part))return part;
-    return part;
-  }).join(" ");
+/* ===== CollectPro Voice Assistant v2 — natural, polite Telugu (Shruti-style) =====
+   1) Names, digits, months and weekdays are converted to proper Telugu words BEFORE speaking,
+      so the Telugu voice never has to guess how to pronounce English spellings or numerals.
+   2) Picks the most natural Telugu voice on the device (Microsoft Shruti Natural > Google network > others).
+   3) Speaks sentence by sentence with short pauses, normal pitch and a relaxed rate. */
+var collectProVoiceUtterance=null,collectProVoiceActive=false,collectProVoiceSession=0,collectProVoiceTimer=null;
+
+/* ---------- Telugu words: weekdays, months, numbers ---------- */
+var CP_TE_DAYS=["ఆదివారం","సోమవారం","మంగళవారం","బుధవారం","గురువారం","శుక్రవారం","శనివారం"];
+var CP_TE_MONTHS=["జనవరి","ఫిబ్రవరి","మార్చి","ఏప్రిల్","మే","జూన్","జూలై","ఆగస్టు","సెప్టెంబర్","అక్టోబర్","నవంబర్","డిసెంబర్"];
+var CP_TE_SMALL=["సున్నా","ఒకటి","రెండు","మూడు","నాలుగు","ఐదు","ఆరు","ఏడు","ఎనిమిది","తొమ్మిది","పది","పదకొండు","పన్నెండు","పదమూడు","పద్నాలుగు","పదిహేను","పదహారు","పదిహేడు","పద్దెనిమిది","పంతొమ్మిది"];
+var CP_TE_TENS=["","","ఇరవై","ముప్పై","నలభై","యాభై","అరవై","డెబ్బై","ఎనభై","తొంభై"];
+function cpTwo(n){return n<20?CP_TE_SMALL[n]:CP_TE_TENS[Math.floor(n/10)]+(n%10?" "+CP_TE_SMALL[n%10]:"")}
+function cpBeforeNoun(t){return t.replace(/ఒకటి$/,"ఒక్క")}
+/* gen=true → form used before a noun, e.g. "పన్నెండు వేల రూపాయలు" */
+function cpNum(n,gen){
+  n=Math.round(Number(n)||0);if(n<=0)return CP_TE_SMALL[0];
+  if(n>=1100&&n<=1900&&n%100===0)return cpTwo(n/100)+(gen?" వందల":" వందలు");
+  var units=[[10000000,"కోటి","కోట్లు","కోట్ల"],[100000,"లక్ష","లక్షలు","లక్షల"],[1000,"వెయ్యి","వేలు","వేల"],[100,"వంద","వందలు","వందల"]];
+  var rest=n,parts=[];
+  units.forEach(function(u){var c=Math.floor(rest/u[0]);rest%=u[0];if(c)parts.push({c:c,u:u})});
+  var restW=rest?cpTwo(rest):"",out=[];
+  parts.forEach(function(p,i){
+    var follow=(i<parts.length-1)||!!restW;
+    if(p.c===1)out.push((p.u[0]===100&&follow)?"నూట":p.u[1]);
+    else out.push((p.c<100?cpBeforeNoun(cpTwo(p.c)):String(p.c))+" "+((follow||gen)?p.u[3]:p.u[2]));
+  });
+  if(restW)out.push(restW);
+  return out.join(" ");
 }
-function collectProVoiceText(){
-  if(!portalData)return "";
-  var c=portalData,k=calc(c),n=portalNextPayment(c);
-  var paidWeeks=Number(k.paidW)||0;
-  var remainingWeeks=Math.max(0,Number(k.pendW)||0);
-  var paidAmount=Math.round(Number(k.paid)||0);
-  var remainingAmount=Math.round(Number(k.pend)||0);
-  var totalWeeks=Math.max(0,Number(c.weeks)||12);
-  var collectionDay=weekdayNameLocalized(c.collectionWeekday==null?4:c.collectionWeekday,"te");
-  var nextDay=n?weekdayNameLocalized(new Date(n.date+"T00:00:00").getDay(),"te"):"";
-  var dateText=n?new Date(n.date+"T00:00:00").toLocaleDateString("te-IN",{day:"numeric",month:"long",year:"numeric"}):"";
-  var spokenName=collectProVoiceName(c.name);
-  var s="నమస్కారం "+spokenName+" గారు! ఎలా ఉన్నారండి? ";
-  s+="మీ కలెక్ట్ ప్రో ఖాతా వివరాలు చెప్తాను వినండి. ";
-  s+="మీరు ఇప్పటివరకు "+totalWeeks+" వారాల్లో "+paidWeeks+" వారాలు కట్టారండి. ";
-  s+="ఇప్పటివరకు మీరు మొత్తం "+paidAmount+" రూపాయలు చెల్లించారు. ";
-  s+="ఇంకా "+remainingAmount+" రూపాయలు కట్టాల్సి ఉందండి. ";
-  s+="మీ కలెక్షన్ ప్రతి "+collectionDay+" ఉంటుంది. ";
-  if(n){
-    s+="తదుపరి చెల్లింపు తేదీ "+dateText+". ";
-    s+="ఆ రోజు "+nextDay+". ";
-    s+="చెల్లించాల్సిన మొత్తం "+Math.round(n.amount)+" రూపాయలు. ";
-  }else{
-    s+="అభినందనలు అండి! మీ ఖాతా పూర్తయింది. ఇక చెల్లించాల్సిన మొత్తం ఏమీ లేదు. ";
+function cpMoney(n){n=Math.round(Number(n)||0);return n===1?"ఒక రూపాయి":cpBeforeNoun(cpNum(n,true))+" రూపాయలు"}
+function cpWeeks(n){n=Math.round(Number(n)||0);return n===1?"ఒక వారం":cpBeforeNoun(cpNum(n))+" వారాలు"}
+function cpOrd(n){
+  var w=cpNum(n).split(" "),l=w.pop();
+  if(/ై$/.test(l))l=l.replace(/ై$/,"య్యవ");
+  else if(/[ుి]$/.test(l))l=l.replace(/[ుి]$/,"వ");
+  else l+="వ";
+  w.push(l);return w.join(" ");
+}
+function cpDate(ds){
+  var d=new Date(ds+"T00:00:00"),now=new Date();now.setHours(0,0,0,0);
+  var t=CP_TE_MONTHS[d.getMonth()]+" "+cpOrd(d.getDate())+" తేదీ";
+  if(d.getFullYear()!==now.getFullYear())t+=", "+cpNum(d.getFullYear());
+  return{text:t,day:CP_TE_DAYS[d.getDay()],diff:Math.round((d-now)/86400000)};
+}
+
+/* ---------- Customer name → Telugu script ---------- */
+var CP_NAME_DICT={
+ "lakshmi":"లక్ష్మి","laxmi":"లక్ష్మి","lakshimi":"లక్ష్మి","pujari":"పూజారి","ravi":"రవి","kumar":"కుమార్","kumari":"కుమారి",
+ "vinay":"వినయ్","srinivas":"శ్రీనివాస్","srinivasa":"శ్రీనివాస","suresh":"సురేష్","rajesh":"రాజేష్","mahesh":"మహేష్","ramesh":"రమేష్",
+ "venkatesh":"వెంకటేష్","venkat":"వెంకట్","venkata":"వెంకట","anusha":"అనూష","swathi":"స్వాతి","swati":"స్వాతి","sowmya":"సౌమ్య","soumya":"సౌమ్య",
+ "divya":"దివ్య","priya":"ప్రియ","kavya":"కావ్య","keerthana":"కీర్తన","harika":"హారిక","bhavani":"భవాని","padma":"పద్మ","padmavathi":"పద్మావతి",
+ "sai":"సాయి","ramya":"రమ్య","manjula":"మంజుల","sunitha":"సునీత","sunita":"సునీత","sujatha":"సుజాత","narayana":"నారాయణ","narayan":"నారాయణ",
+ "krishna":"కృష్ణ","venkateswara":"వెంకటేశ్వర","venkateswarlu":"వెంకటేశ్వర్లు","mallika":"మల్లిక","geetha":"గీత","gita":"గీత","geeta":"గీత",
+ "shiva":"శివ","siva":"శివ","shankar":"శంకర్","sankar":"శంకర్","reddy":"రెడ్డి","naidu":"నాయుడు","rao":"రావు","raju":"రాజు","babu":"బాబు",
+ "goud":"గౌడ్","gowd":"గౌడ్","goudu":"గౌడు","chowdary":"చౌదరి","choudary":"చౌదరి","chowdhury":"చౌదరి","sharma":"శర్మ","varma":"వర్మ","verma":"వర్మ",
+ "setty":"శెట్టి","shetty":"శెట్టి","patel":"పటేల్","yadav":"యాదవ్","rani":"రాణి","devi":"దేవి","sridevi":"శ్రీదేవి","mohan":"మోహన్","pavan":"పవన్",
+ "kalyan":"కళ్యాణ్","ganesh":"గణేష్","prakash":"ప్రకాష్","ramu":"రాము","satish":"సతీష్","sathish":"సతీష్","anil":"అనిల్","sunil":"సునీల్",
+ "vijay":"విజయ్","naveen":"నవీన్","praveen":"ప్రవీణ్","teja":"తేజ","swamy":"స్వామి","swami":"స్వామి","nagaraju":"నాగరాజు","mallesh":"మల్లేష్",
+ "bhaskar":"భాస్కర్","sagar":"సాగర్","chandra":"చంద్ర","ammulu":"అమ్ములు","sudha":"సుధ","rama":"రామ","seetha":"సీత","sita":"సీత","radha":"రాధ",
+ "uma":"ఉమ","usha":"ఉష","asha":"ఆశ","jyothi":"జ్యోతి","jyoti":"జ్యోతి","rekha":"రేఖ","latha":"లత","lata":"లత","sarala":"సరళ","vani":"వాణి",
+ "aruna":"అరుణ","kiran":"కిరణ్","ajay":"అజయ్","sandeep":"సందీప్","deepak":"దీపక్","manoj":"మనోజ్","rahul":"రాహుల్","nikhil":"నిఖిల్",
+ "arjun":"అర్జున్","ashok":"అశోక్","naresh":"నరేష్","dinesh":"దినేష్","ramana":"రమణ","yadagiri":"యాదగిరి","anjali":"అంజలి","anjaneyulu":"ఆంజనేయులు",
+ "hanumanth":"హనుమంత్","hemanth":"హేమంత్","srikanth":"శ్రీకాంత్","sampath":"సంపత్","madhu":"మధు","madhavi":"మాధవి","bharathi":"భారతి",
+ "bharati":"భారతి","rajini":"రజని","vamsi":"వంశీ","vamshi":"వంశీ","mounika":"మౌనిక","pooja":"పూజ","puja":"పూజ","anand":"ఆనంద్","ananda":"ఆనంద",
+ "ramakrishna":"రామకృష్ణ","gopal":"గోపాల్","gopi":"గోపి","govardhan":"గోవర్ధన్","lokesh":"లోకేష్","ramesh":"రమేష్","prasad":"ప్రసాద్","prasanna":"ప్రసన్న",
+ "mary":"మేరీ","john":"జాన్","peter":"పీటర్","david":"డేవిడ్","ahmed":"అహ్మద్","khan":"ఖాన్","begum":"బేగం","fatima":"ఫాతిమా","shaik":"షేక్","syed":"సయ్యద్"
+};
+var CP_LETTERS={a:"ఏ",b:"బి",c:"సి",d:"డి",e:"ఈ",f:"ఎఫ్",g:"జి",h:"హెచ్",i:"ఐ",j:"జె",k:"కె",l:"ఎల్",m:"ఎమ్",n:"ఎన్",o:"ఓ",p:"పి",q:"క్యూ",r:"ఆర్",s:"ఎస్",t:"టి",u:"యు",v:"వి",w:"డబ్ల్యూ",x:"ఎక్స్",y:"వై",z:"జెడ్"};
+var CP_IND={"":"అ","ా":"ఆ","ి":"ఇ","ీ":"ఈ","ు":"ఉ","ూ":"ఊ","ె":"ఎ","ే":"ఏ","ై":"ఐ","ొ":"ఒ","ో":"ఓ","ౌ":"ఔ"};
+var CP_CONS=[["ksh","క్ష"],["chh","ఛ"],["ch","చ"],["kh","ఖ"],["gh","ఘ"],["jh","ఝ"],["th","త"],["dh","ధ"],["ph","ఫ"],["bh","భ"],["sh","ష"],["tt","ట్ట"],["dd","డ్డ"],
+ ["k","క"],["g","గ"],["c","క"],["j","జ"],["t","త"],["d","ద"],["n","న"],["p","ప"],["b","బ"],["m","మ"],["y","య"],["r","ర"],["l","ల"],["v","వ"],["w","వ"],["s","స"],["h","హ"],["f","ఫ"],["z","జ"],["q","క"],["x","క్స"]];
+var CP_VOW=[["aa","ా"],["ai","ై"],["au","ౌ"],["ee","ీ"],["ii","ీ"],["oo","ూ"],["uu","ూ"],["ou","ౌ"],["ow","ౌ"],["a",""],["e","ె"],["i","ి"],["o","ొ"],["u","ు"]];
+/* Rule-based fallback for names that are not in the dictionary. */
+function cpRomanToTelugu(word){
+  var w=String(word).toLowerCase().replace(/[^a-z]/g,"");if(!w)return"";
+  var toks=[],i=0,j,m;
+  if(w.indexOf("sri")===0){toks.push({c:"శ్ర"},{v:"ీ"});i=3}
+  else if(w.indexOf("sr")===0){toks.push({c:"శ్ర"});i=2}
+  while(i<w.length){
+    var ch=w.charAt(i);
+    if("aeiou".indexOf(ch)>=0||(ch==="o"&&w.charAt(i+1)==="w")){
+      m=null;for(j=0;j<CP_VOW.length;j++)if(w.substr(i,CP_VOW[j][0].length)===CP_VOW[j][0]){m=CP_VOW[j];break}
+      toks.push({v:m[1],k:m[0]});i+=m[0].length;continue;
+    }
+    m=null;for(j=0;j<CP_CONS.length;j++)if(w.substr(i,CP_CONS[j][0].length)===CP_CONS[j][0]){m=CP_CONS[j];break}
+    if(!m){i++;continue}
+    var k=m[0],unit=m[1],next=w.charAt(i+k.length);
+    if(k==="sh"&&!toks.length)unit="శ";
+    if(k==="y"&&i===w.length-1&&toks.length&&toks[toks.length-1].c!==undefined){toks.push({v:"ి"});i++;continue}
+    var stops="kgcjtdpb"+(k==="m"?"s":"");
+    if((k==="n"||k==="m")&&toks.length&&next!==""&&stops.indexOf(next)>=0){toks.push({anus:true});i++;continue}
+    toks.push({c:unit});i+=k.length;
   }
-  s+="ఈ వారానికి సంబంధించిన చెల్లింపు వివరాల కోసం మీ కలెక్షన్ వారికి ఫోన్ చేయవచ్చండి. ";
-  return s+"థాంక్యూ అండి! మంచి రోజు.";
+  var res="",pend=null,last=toks.length-1;
+  toks.forEach(function(t,idx){
+    if(t.anus){if(pend!==null){res+=pend;pend=null}res+="ం";return}
+    if(t.v!==undefined){
+      var sign=t.v,n1=toks[idx+1],n2=toks[idx+2];
+      if(t.k==="e"||t.k==="o"){
+        var long=false;
+        if(n1&&n1.c!==undefined&&n1.c.indexOf("్")<0){long=(!n2)||(n2.v!==undefined)}
+        if(long)sign=(t.k==="e")?"ే":"ో";
+      }
+      if(t.k==="a"&&n1&&n1.c!==undefined&&idx+1===last&&(n1.c==="స"||n1.c==="ష"))sign="ా";
+      if(pend!==null){res+=pend+sign;pend=null}else res+=(CP_IND[sign]||"");
+      return;
+    }
+    if(pend!==null)res+=pend+"్";
+    pend=t.c;
+  });
+  if(pend!==null)res+=pend+"్";
+  return res;
 }
+function collectProVoiceName(name){
+  var raw=String(name||"").trim();if(!raw)return"కస్టమర్";
+  var parts=raw.split(/[\s.,]+/).filter(Boolean);
+  var out=parts.map(function(p){
+    if(/[ఀ-౿]/.test(p))return p;
+    var key=p.toLowerCase().replace(/[^a-z]/g,"");
+    if(!key)return"";
+    if(CP_NAME_DICT[key])return CP_NAME_DICT[key];
+    if(key.length===1)return CP_LETTERS[key]||"";
+    return cpRomanToTelugu(key);
+  }).filter(Boolean);
+  return out.length?out.join(" "):"కస్టమర్";
+}
+
+/* ---------- What the assistant says (array of short sentences = natural pauses) ---------- */
+function collectProVoiceScript(){
+  var c=portalData,k=calc(c),n=portalNextPayment(c),S=[];
+  var total=Math.max(0,Number(c.weeks)||0),paidW=Math.min(total,Number(k.paidW)||0),remW=Math.max(0,Number(k.pendW)||0);
+  var paid=Math.round(Number(k.paid)||0),rem=Math.round(Number(k.pend)||0);
+  var wd=Number(c.collectionWeekday==null?4:c.collectionWeekday);
+  S.push("నమస్కారం "+collectProVoiceName(c.name)+" గారు! ఎలా ఉన్నారు?");
+  S.push("మీ కలెక్ట్ ప్రో ఖాతా వివరాలు చెబుతాను, జాగ్రత్తగా వినండి.");
+  if(k.done){
+    S.push("అభినందనలు! మీ ఖాతా మొత్తం పూర్తయింది.");
+    if(paid>0)S.push("మీరు ఇప్పటివరకు "+cpMoney(paid)+" చెల్లించారు.");
+    S.push("ఇక మీరు ఏమీ కట్టాల్సిన అవసరం లేదు.");
+  }else{
+    var inTotal=total===1?"ఒక వారంలో":cpNum(total)+" వారాల్లో";
+    if(paidW===0)S.push("మొత్తం "+inTotal+", మీరు ఇంకా ఏ వారం చెల్లింపు చేయలేదు.");
+    else S.push("మొత్తం "+inTotal+", ఇప్పటివరకు "+cpWeeks(paidW)+" కట్టారు.");
+    if(paid>0)S.push("ఇప్పటివరకు మీరు మొత్తం "+cpMoney(paid)+" చెల్లించారు.");
+    S.push("ఇంకా "+cpMoney(rem)+" కట్టాల్సి ఉంది."+(remW>0?" అంటే మరో "+cpWeeks(remW)+" మిగిలి ఉన్నాయి.":""));
+    S.push("ప్రతి "+CP_TE_DAYS[wd]+" మీ కలెక్షన్ ఉంటుంది.");
+    if(n){
+      var d=cpDate(n.date),lead;
+      if(d.diff===0)lead="తదుపరి చెల్లింపు ఈ రోజే, "+d.day+".";
+      else if(d.diff===1)lead="తదుపరి చెల్లింపు రేపే, "+d.day+".";
+      else lead="తదుపరి చెల్లింపు "+d.text+", "+d.day+" నాడు.";
+      S.push(lead);
+      S.push("ఆ రోజు చెల్లించాల్సిన మొత్తం "+cpMoney(n.amount)+".");
+    }
+  }
+  S.push("ఏమైనా సందేహాలు ఉంటే, మీ కలెక్షన్ వారికి ఫోన్ చేయండి.");
+  S.push("ధన్యవాదాలండి! మీ రోజు శుభంగా గడవాలి.");
+  return S;
+}
+
+/* ---------- Voice selection ---------- */
+function collectProVoiceScore(v){
+  var n=String(v.name||"").toLowerCase()+" "+String(v.voiceURI||"").toLowerCase(),l=String(v.lang||"").replace("_","-").toLowerCase();
+  if(!/^te(-|$)/.test(l))return-1;
+  var s=10;
+  if(/shruti/.test(n))s+=120;                  /* Microsoft Shruti — same family as ReadAnyText */
+  if(/natural|neural/.test(n))s+=70;
+  if(/online|network/.test(n))s+=30;
+  if(/microsoft/.test(n))s+=15;
+  if(/google/.test(n))s+=15;
+  if(/geeta|female|swara|-tef-/.test(n))s+=40;
+  if(/(^|[^a-z])male([^a-z]|$)|mohan|-tem-/.test(n))s-=60;
+  return s;
+}
+function collectProVoicePick(voices){
+  var best=null,bs=-1;
+  (voices||[]).forEach(function(v){var s=collectProVoiceScore(v);if(s>bs){bs=s;best=v}});
+  return best;
+}
+function collectProVoiceGetVoices(cb){
+  var s=window.speechSynthesis,v=s.getVoices();
+  if(v&&v.length){cb(v);return}
+  var done=false;
+  function fin(){if(done)return;done=true;try{s.removeEventListener("voiceschanged",fin)}catch(e){}cb(s.getVoices()||[])}
+  try{s.addEventListener("voiceschanged",fin)}catch(e){}
+  setTimeout(fin,1500);
+}
+
+/* ---------- Playback ---------- */
 function collectProVoiceSetState(speaking){
   collectProVoiceActive=!!speaking;
   var b=document.getElementById("portalVoiceMic");
@@ -1080,12 +1215,11 @@ function collectProVoiceSetState(speaking){
     b.title=speaking?"వాయిస్ ఆపడానికి మళ్లీ నొక్కండి":"మీ ఖాతా వివరాలు వినడానికి నొక్కండి";
   }
 }
-function collectProVoiceChooseFemaleTeluguVoice(voices){
-  var telugu=voices.filter(function(v){return /^te([_-]|$)/i.test(String(v.lang||"").trim());});
-  if(!telugu.length)return null;
-  /* Prefer a voice whose display name identifies it as female, otherwise use a Telugu voice only. */
-  var femaleHints=/female|woman|girl|kalpana|swara|hema|lekha|priya|ananya|aditi/i;
-  return telugu.find(function(v){return femaleHints.test(String(v.name||""));})||telugu[0];
+function collectProVoiceStop(){
+  collectProVoiceSession++;
+  clearTimeout(collectProVoiceTimer);
+  try{if("speechSynthesis" in window)window.speechSynthesis.cancel()}catch(e){}
+  collectProVoiceSetState(false);
 }
 function collectProVoiceSpeak(){
   if(!portalData)return;
@@ -1093,43 +1227,47 @@ function collectProVoiceSpeak(){
     alert("ఈ పరికరంలో తెలుగు వాయిస్ సదుపాయం అందుబాటులో లేదు. Chrome లేదా Google Speech Services లో Telugu voice install చేసి మళ్లీ ప్రయత్నించండి.");
     return;
   }
-  if(window.speechSynthesis.speaking||window.speechSynthesis.pending){
-    window.speechSynthesis.cancel();collectProVoiceSetState(false);return;
-  }
-  var text=collectProVoiceText();
-  if(!text)return;
-
-  /* Never allow the browser's English default voice to read Telugu text. */
-  var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
-  var selected=collectProVoiceChooseFemaleTeluguVoice(voices);
-  if(!selected){
-    alert("మీ ఫోన్‌లో Telugu Text-to-Speech voice install కాలేదు. Android Settings → Text-to-speech output → Preferred engine (Google Speech Services) → Install voice data → Telugu ఎంచుకోండి. తర్వాత మళ్లీ ప్రయత్నించండి.");
-    return;
-  }
-  if(!/^te([_-]|$)/i.test(String(selected.lang||""))){
-    alert("Telugu voice దొరకలేదు. దయచేసి మీ ఫోన్‌లో Telugu voice install చేయండి.");
-    return;
-  }
-
-  window.speechSynthesis.cancel();
-  var utterance=new SpeechSynthesisUtterance(text);
-  collectProVoiceUtterance=utterance;
-  utterance.lang="te-IN";
-  utterance.voice=selected;             // Explicit Telugu voice; no English fallback.
-  utterance.rate=0.82;                  // Calm, conversational pace.
-  utterance.pitch=1.16;                 // Softer/higher tone; actual female voice depends on installed voice.
-  utterance.volume=1;
-  utterance.onstart=function(){collectProVoiceSetState(true);};
-  utterance.onend=function(){collectProVoiceSetState(false);};
-  utterance.onerror=function(ev){
-    collectProVoiceSetState(false);
-    console.warn("CollectPro Telugu speech error:",ev&&ev.error);
-    if(ev&&ev.error==="language-unavailable"){
-      alert("Telugu voice ప్రస్తుతం అందుబాటులో లేదు. ఫోన్‌లో Telugu voice data install చేసి మళ్లీ ప్రయత్నించండి.");
+  if(collectProVoiceActive){collectProVoiceStop();return}
+  var sentences=collectProVoiceScript();
+  collectProVoiceGetVoices(function(voices){
+    var v=collectProVoicePick(voices);
+    if(!v){
+      alert("మీ ఫోన్‌లో Telugu Text-to-Speech voice install కాలేదు. Android Settings → Text-to-speech output → Preferred engine (Google Speech Services) → Install voice data → Telugu ఎంచుకోండి. తర్వాత మళ్లీ ప్రయత్నించండి.");
+      return;
     }
-  };
-  window.speechSynthesis.speak(utterance);
+    var natural=/shruti|natural|neural|online|network/i.test(String(v.name||"")+" "+String(v.voiceURI||""));
+    var session=++collectProVoiceSession,i=0;
+    try{window.speechSynthesis.cancel()}catch(e){}
+    collectProVoiceSetState(true);
+    function next(){
+      if(session!==collectProVoiceSession)return;
+      if(i>=sentences.length){collectProVoiceSetState(false);return}
+      var text=sentences[i++],u=new SpeechSynthesisUtterance(text);
+      collectProVoiceUtterance=u;                 /* keep a reference so it is not garbage-collected mid-speech */
+      u.voice=v;u.lang=v.lang||"te-IN";
+      u.rate=natural?0.96:0.9;                    /* relaxed, human pace */
+      u.pitch=1.0;                                /* untouched pitch = no robotic/chipmunk effect */
+      u.volume=1;
+      u.onend=function(){
+        if(session!==collectProVoiceSession)return;
+        collectProVoiceTimer=setTimeout(next,/[!?]$/.test(text)?260:320);
+      };
+      u.onerror=function(ev){
+        if(session!==collectProVoiceSession)return;
+        var er=ev&&ev.error;
+        if(er==="interrupted"||er==="canceled")return;
+        console.warn("CollectPro Telugu speech error:",er);
+        collectProVoiceStop();
+        if(er==="language-unavailable")alert("Telugu voice ప్రస్తుతం అందుబాటులో లేదు. ఫోన్‌లో Telugu voice data install చేసి మళ్లీ ప్రయత్నించండి.");
+      };
+      window.speechSynthesis.speak(u);
+    }
+    collectProVoiceTimer=setTimeout(next,120);
+  });
 }
+/* Pre-load the voice list and stop speaking when the page is hidden/closed. */
+try{if("speechSynthesis" in window){window.speechSynthesis.getVoices();window.addEventListener("pagehide",collectProVoiceStop)}}catch(e){}
+
 function collectProVoiceHtml(){
   return '<div class="portal-voice-wrap">'+
     '<button id="portalVoiceMic" class="portal-voice-mic" type="button" onclick="collectProVoiceSpeak()" aria-label="మీ ఖాతా వివరాలు తెలుగులో వినండి" title="మీ ఖాతా వివరాలు వినడానికి నొక్కండి">'+

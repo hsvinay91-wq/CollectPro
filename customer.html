@@ -773,7 +773,7 @@ var PT={
  }
 };
 function pt(k){return PT[portalLang][k]||PT.en[k]||k}
-function togglePortalLang(){portalLang=portalLang==="en"?"te":"en";render()}
+function togglePortalLang(){if("speechSynthesis" in window)window.speechSynthesis.cancel();collectProVoiceSetState(false);portalLang=portalLang==="en"?"te":"en";render()}
 
 function mapRow(r){return{id:r.id,customerId:r.customer_id,name:r.name,phone:r.phone||"",loan:+r.loan_amount||0,perWeek:+r.per_week||0,weeks:+r.weeks||0,date:r.loan_date||"",collectionWeekday:(r.collection_weekday==null?4:+r.collection_weekday),hPaid:+r.h_paid||0,hMiss:+r.h_miss||0,hAmt:r.h_amt==null?"":+r.h_amt,pays:Array.isArray(r.pays)?r.pays:[],loanHistory:Array.isArray(r.loan_history)?r.loan_history:[]}}
 function mapHistoricalRow(r){return{id:r.id,source:"standalone",loanId:r.loan_id||makeLoanId({customerId:r.customer_id,name:r.name}),customerId:r.customer_id||"",name:r.name||"",phone:r.phone||"",loanAmount:+r.loan_amount||0,perWeek:+r.per_week||0,weeks:+r.weeks||0,loanDate:r.loan_date||"",collectionWeekday:(r.collection_weekday==null?4:+r.collection_weekday),hPaid:+r.h_paid||0,hMiss:+r.h_miss||0,hAmt:r.h_amt==null?"":+r.h_amt,pays:Array.isArray(r.pays)?r.pays:[],completedAt:r.completed_at||""}}
@@ -863,6 +863,11 @@ function calc(c){
 }
 
 function weekdayName(n){return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][Number(n)];}
+function weekdayNameLocalized(n,lang){
+  var en=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var te=["ఆదివారం","సోమవారం","మంగళవారం","బుధవారం","గురువారం","శుక్రవారం","శనివారం"];
+  var i=Number(n);return (lang==="te"?te:en)[i]||"";
+}
 function weekdayShort(n){return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][Number(n)];}
 function nextWeekDate(loanDate,weekNo,weekday){
   if(!loanDate || !weekNo) return "";
@@ -980,21 +985,23 @@ function nextPaymentHtml(c){
   var dt=new Date(n.date+"T00:00:00");
   var calDay=dt.getDate();
   var monthShort=dt.toLocaleDateString(portalLang==="te"?"te-IN":"en-IN",{month:"short"});
-  return '<div class="next-payment-card"><div class="next-payment-cal"><span>'+monthShort+'</span><b>'+calDay+'</b></div><div class="next-payment-main"><div class="k">'+(portalLang==="te"?"తదుపరి చెల్లింపు":"Next Payment")+'</div><div class="d">'+esc(n.dateText)+'</div><div class="s">'+(portalLang==="te"?"వారం ":"Week ")+n.week+(portalLang==="te"?" · ప్రతి వారం చెల్లింపు":" · Your scheduled weekly payment")+'</div></div><div class="next-payment-amt"><b>'+inr(n.amount)+'</b><small>'+pt("weeklyAmount")+'</small></div></div>';
+  var nextDayName=weekdayNameLocalized(dt.getDay(),portalLang);
+  return '<div class="next-payment-card"><div class="next-payment-cal"><span>'+monthShort+'</span><b>'+calDay+'</b></div><div class="next-payment-main"><div class="k">'+(portalLang==="te"?"తదుపరి చెల్లింపు":"Next Payment")+'</div><div class="d">'+esc(n.dateText)+' · '+nextDayName+'</div><div class="s">'+(portalLang==="te"?"వారం ":"Week ")+n.week+(portalLang==="te"?" · ప్రతి వారం చెల్లింపు":" · Your scheduled weekly payment")+'</div></div><div class="next-payment-amt"><b>'+inr(n.amount)+'</b><small>'+pt("weeklyAmount")+'</small></div></div>';
 }
 
 
-/* CollectPro Voice Assistant: speaks only the currently authenticated customer's own portalData. */
+/* CollectPro Voice Assistant: one-tap speech playback for the authenticated customer only. */
 var collectProVoiceUtterance=null;
+var collectProVoiceActive=false;
 function collectProVoiceText(){
   if(!portalData)return "";
-  var c=portalData,k=calc(c),n=portalNextPayment(c);
-  var te=portalLang==="te";
+  var c=portalData,k=calc(c),n=portalNextPayment(c),te=portalLang==="te";
   var paidWeeks=Number(k.paidW)||0;
   var remainingWeeks=Math.max(0,Number(k.pendW)||0);
   var paidAmount=Math.round(Number(k.paid)||0);
   var remainingAmount=Math.round(Number(k.pend)||0);
-  var weekday=n?weekdayName(new Date(n.date+"T00:00:00").getDay()):"";
+  var weekday=n?weekdayNameLocalized(new Date(n.date+"T00:00:00").getDay(),portalLang):"";
+  var collectionDay=weekdayNameLocalized(c.collectionWeekday==null?4:c.collectionWeekday,portalLang);
   var dateText=n?new Date(n.date+"T00:00:00").toLocaleDateString(te?"te-IN":"en-IN",{day:"numeric",month:"long",year:"numeric"}):"";
   if(te){
     var s="నమస్కారం "+(c.name||"")+" గారు. కలెక్ట్ ప్రో ఖాతా వివరాలు. ";
@@ -1002,55 +1009,58 @@ function collectProVoiceText(){
     s+="ఇంకా చెల్లించాల్సిన వారాలు "+remainingWeeks+". ";
     s+="మీరు చెల్లించిన మొత్తం "+paidAmount+" రూపాయలు. ";
     s+="ఇంకా చెల్లించాల్సిన మొత్తం "+remainingAmount+" రూపాయలు. ";
-    if(n){s+="మీ తదుపరి చెల్లింపు తేదీ "+dateText+". "+weekday+" వారం రోజు. చెల్లించాల్సిన మొత్తం "+Math.round(n.amount)+" రూపాయలు.";}
+    s+="మీరు సాధారణంగా "+collectionDay+" వారం రోజు చెల్లిస్తారు. ";
+    if(n){s+="మీ తదుపరి చెల్లింపు తేదీ "+dateText+". "+weekday+" చెల్లింపు రోజు. చెల్లించాల్సిన మొత్తం "+Math.round(n.amount)+" రూపాయలు.";}
     else{s+="అభినందనలు. మీ ఖాతా పూర్తయింది. చెల్లించాల్సిన మొత్తం ఏమీ లేదు.";}
     return s+" ధన్యవాదాలు.";
   }
   var e="Hello "+(c.name||"")+". Here are your CollectPro account details. ";
-  e+="You have paid "+paidWeeks+" weeks. ";
-  e+="Your remaining payable weeks are "+remainingWeeks+". ";
-  e+="Your total paid amount is "+paidAmount+" rupees. ";
-  e+="Your remaining payable amount is "+remainingAmount+" rupees. ";
+  e+="You have paid "+paidWeeks+" weeks. Your remaining payable weeks are "+remainingWeeks+". ";
+  e+="Your total paid amount is "+paidAmount+" rupees. Your remaining payable amount is "+remainingAmount+" rupees. ";
+  e+="Your regular collection day is "+collectionDay+". ";
   if(n){e+="Your next payment date is "+dateText+". The payment weekday is "+weekday+". The amount due is "+Math.round(n.amount)+" rupees.";}
   else{e+="Congratulations. Your account is completed and there is no remaining payment.";}
   return e+" Thank you.";
 }
+function collectProVoiceSetState(speaking){
+  collectProVoiceActive=!!speaking;
+  var b=document.getElementById("portalVoiceMic");
+  if(b){b.classList.toggle("is-speaking",!!speaking);b.setAttribute("aria-label",speaking?(portalLang==="te"?"వాయిస్ ఆపండి":"Stop account voice"):(portalLang==="te"?"ఖాతా వివరాలు వినండి":"Listen to account details"));}
+}
 function collectProVoiceSpeak(){
   if(!portalData)return;
   if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){
-    var msg=portalLang==="te"?"ఈ ఫోన్ లేదా బ్రౌజర్‌లో వాయిస్ సదుపాయం అందుబాటులో లేదు.":"Voice playback is not supported on this device or browser.";
-    var el=document.getElementById("voiceStatus");if(el)el.textContent=msg;return;
+    alert(portalLang==="te"?"ఈ పరికరంలో వాయిస్ సదుపాయం లేదు. Chrome లేదా మరో ఆధునిక బ్రౌజర్‌లో ప్రయత్నించండి.":"Voice playback is not supported on this device. Please try Chrome or another modern browser.");
+    return;
   }
+  if(window.speechSynthesis.speaking||window.speechSynthesis.pending){
+    window.speechSynthesis.cancel();collectProVoiceSetState(false);return;
+  }
+  var text=collectProVoiceText();
+  if(!text)return;
   window.speechSynthesis.cancel();
-  collectProVoiceUtterance=new SpeechSynthesisUtterance(collectProVoiceText());
-  collectProVoiceUtterance.lang=portalLang==="te"?"te-IN":"en-IN";
-  var rateEl=document.getElementById("voiceRate");
-  collectProVoiceUtterance.rate=rateEl?Number(rateEl.value)||0.85:0.85;
+  collectProVoiceUtterance=new SpeechSynthesisUtterance(text);
+  var lang=portalLang==="te"?"te-IN":"en-IN";
+  collectProVoiceUtterance.lang=lang;
+  collectProVoiceUtterance.rate=0.86;
   collectProVoiceUtterance.pitch=1;
-  collectProVoiceUtterance.onstart=function(){var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"మీ ఖాతా వివరాలు చదువుతున్నాము…":"Reading your account details…";};
-  collectProVoiceUtterance.onend=function(){var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"వివరాలు పూర్తయ్యాయి. మళ్లీ వినడానికి Play నొక్కండి.":"Finished. Press Play to listen again.";};
-  collectProVoiceUtterance.onerror=function(){var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"వాయిస్ ప్లే కాలేదు. మళ్లీ ప్రయత్నించండి.":"Could not play voice. Please try again.";};
+  /* Pick a matching installed voice when available; browser default remains a fallback. */
+  var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
+  var wanted=voices.find(function(v){return String(v.lang||"").toLowerCase()===lang.toLowerCase();})||
+             voices.find(function(v){return String(v.lang||"").toLowerCase().indexOf(portalLang==="te"?"te":"en-in")===0;});
+  if(wanted)collectProVoiceUtterance.voice=wanted;
+  collectProVoiceUtterance.onstart=function(){collectProVoiceSetState(true);};
+  collectProVoiceUtterance.onend=function(){collectProVoiceSetState(false);};
+  collectProVoiceUtterance.onerror=function(ev){
+    collectProVoiceSetState(false);
+    console.warn("CollectPro speech playback error:",ev&&ev.error);
+  };
   window.speechSynthesis.speak(collectProVoiceUtterance);
-}
-function collectProVoicePause(){
-  if("speechSynthesis" in window && window.speechSynthesis.speaking)window.speechSynthesis.pause();
-  var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"వాయిస్ పాజ్ అయింది.":"Voice paused.";
-}
-function collectProVoiceResume(){
-  if("speechSynthesis" in window && window.speechSynthesis.paused)window.speechSynthesis.resume();
-  var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"మళ్లీ కొనసాగుతోంది…":"Resuming…";
-}
-function collectProVoiceStop(){
-  if("speechSynthesis" in window)window.speechSynthesis.cancel();
-  var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"వాయిస్ ఆపివేయబడింది.":"Voice stopped.";
 }
 function collectProVoiceHtml(){
   var te=portalLang==="te";
-  return '<section class="voice-assistant" aria-label="CollectPro Voice Assistant">'+
-    '<div class="voice-head"><div class="voice-icon" aria-hidden="true">🔊</div><div><div class="voice-title">'+(te?"నా ఖాతా వివరాలు వినండి":"Listen to My Account")+'</div><div class="voice-sub">'+(te?"మీ ఖాతా వివరాలు వాయిస్‌లో వినవచ్చు":"Hear your account details spoken aloud")+'</div></div></div>'+
-    '<div class="voice-controls"><button class="btn voice-play" type="button" onclick="collectProVoiceSpeak()">▶ '+(te?"వినండి":"Play")+'</button><button class="btn" type="button" onclick="collectProVoicePause()">Ⅱ '+(te?"పాజ్":"Pause")+'</button><button class="btn" type="button" onclick="collectProVoiceResume()">▶ '+(te?"కొనసాగించు":"Resume")+'</button><button class="btn" type="button" onclick="collectProVoiceStop()">■ '+(te?"ఆపు":"Stop")+'</button></div>'+
-    '<div class="voice-speed"><span>'+(te?"వాయిస్ వేగం":"Voice speed")+'</span><select id="voiceRate" aria-label="Voice speed"><option value="0.7">'+(te?"నెమ్మదిగా":"Slow")+'</option><option value="0.85" selected>'+(te?"సాధారణం":"Normal")+'</option><option value="1">'+(te?"వేగంగా":"Fast")+'</option></select></div>'+
-    '<div class="voice-status" id="voiceStatus" aria-live="polite">'+(te?"వినడానికి Play నొక్కండి":"Press Play to hear your account summary")+'</div></section>';
+  return '<button id="portalVoiceMic" class="portal-voice-mic" type="button" onclick="collectProVoiceSpeak()" aria-label="'+(te?"ఖాతా వివరాలు వినండి":"Listen to account details")+'" title="'+(te?"మీ ఖాతా వివరాలు వినండి":"Listen to your account details")+'"><span class="mic-glyph" aria-hidden="true">🎙️</span></button>'+
+    '<div class="portal-voice-hint">'+(te?"వినడానికి మైక్ నొక్కండి":"Tap mic to listen")+'</div>';
 }
 
 function helpHtml(){
@@ -1074,8 +1084,8 @@ function portalView(){
   '<span class="badge sp'+(k.done?' o':'')+'">'+status+'</span></div></div>'+
   '<div class="portal-big big"><div><div class="n g countup-ready" data-count="'+pendTarget+'">'+inr(0)+'</div><div class="l">'+pt("remaining")+'</div></div><div><div class="n countup-ready" data-count="'+paidTarget+'">'+inr(0)+'</div><div class="l">'+pt("paidAmount")+'</div></div></div>'+
   '<div class="bar portal-progress"><b style="width:0%" data-progress="'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' '+pt("weeksPaid")+' / '+c.weeks+'</span><span class="sp">'+k.pct+'%</span></div>'+
-  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+' · Collection every '+weekdayName(c.collectionWeekday==null?4:c.collectionWeekday)+'</div>'+completion+'</div>'+
   collectProVoiceHtml()+
+  '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+' · '+(portalLang==="te"?"ప్రతి ":"Collection every ")+weekdayNameLocalized(c.collectionWeekday==null?4:c.collectionWeekday,portalLang)+(portalLang==="te"?" వారం":"")+'</div>'+completion+'</div>'+
   nextPaymentHtml(c)+
   '<div class="grid">'+[
    [pt("loanAmount"),inr(c.loan),pt("originalLoan")],

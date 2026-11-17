@@ -642,7 +642,24 @@ body:after{
 
 <style>
 .portal-remember-row{margin:10px 0 2px}.portal-check{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:12px;cursor:pointer;user-select:none}.portal-check input{width:16px;height:16px;accent-color:#FFC84A;cursor:pointer}
-</style></head><body>
+</style><style>
+
+/* CollectPro Voice Assistant — additive accessibility layer */
+.voice-assistant{margin:14px 0;padding:16px;border:1px solid rgba(113,151,255,.28);border-radius:18px;background:linear-gradient(135deg,rgba(31,54,105,.48),rgba(43,30,83,.42));box-shadow:0 10px 28px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.05)}
+.voice-head{display:flex;align-items:center;gap:12px}
+.voice-icon{width:46px;height:46px;flex:0 0 46px;border-radius:15px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,#315fbd,#7548b8);box-shadow:0 5px 18px rgba(66,103,214,.28)}
+.voice-title{font-weight:800;font-size:15px;color:#F2F4FF}
+.voice-sub{font-size:11px;color:#B6BEDB;margin-top:2px}
+.voice-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.voice-controls .btn{flex:1;min-width:90px;text-align:center}
+.voice-controls .btn.voice-play{background:linear-gradient(135deg,#E9C56A,#C99A3D);border-color:#E2B957;color:#211A0A}
+.voice-speed{display:flex;align-items:center;gap:9px;margin-top:10px;color:#B6BEDB;font-size:11px}
+.voice-speed select{background:rgba(8,13,32,.72);color:#F2F4FF;border:1px solid rgba(255,255,255,.16);border-radius:9px;padding:6px 9px}
+.voice-status{font-size:11px;color:#AFC6FF;margin-top:8px;min-height:16px}
+@media(max-width:420px){.voice-assistant{padding:13px}.voice-controls .btn{min-width:78px;padding:9px 8px;font-size:11px}}
+
+</style>
+</head><body>
 <div class="wrap">
  <div class="top"><div class="brand" onclick="go(\'\')" aria-label="CollectPro home">
   <span class="brand-word">Collect<i>Pro</i></span>
@@ -966,6 +983,76 @@ function nextPaymentHtml(c){
   return '<div class="next-payment-card"><div class="next-payment-cal"><span>'+monthShort+'</span><b>'+calDay+'</b></div><div class="next-payment-main"><div class="k">'+(portalLang==="te"?"తదుపరి చెల్లింపు":"Next Payment")+'</div><div class="d">'+esc(n.dateText)+'</div><div class="s">'+(portalLang==="te"?"వారం ":"Week ")+n.week+(portalLang==="te"?" · ప్రతి వారం చెల్లింపు":" · Your scheduled weekly payment")+'</div></div><div class="next-payment-amt"><b>'+inr(n.amount)+'</b><small>'+pt("weeklyAmount")+'</small></div></div>';
 }
 
+
+/* CollectPro Voice Assistant: speaks only the currently authenticated customer's own portalData. */
+var collectProVoiceUtterance=null;
+function collectProVoiceText(){
+  if(!portalData)return "";
+  var c=portalData,k=calc(c),n=portalNextPayment(c);
+  var te=portalLang==="te";
+  var paidWeeks=Number(k.paidW)||0;
+  var remainingWeeks=Math.max(0,Number(k.pendW)||0);
+  var paidAmount=Math.round(Number(k.paid)||0);
+  var remainingAmount=Math.round(Number(k.pend)||0);
+  var weekday=n?weekdayName(new Date(n.date+"T00:00:00").getDay()):"";
+  var dateText=n?new Date(n.date+"T00:00:00").toLocaleDateString(te?"te-IN":"en-IN",{day:"numeric",month:"long",year:"numeric"}):"";
+  if(te){
+    var s="నమస్కారం "+(c.name||"")+" గారు. కలెక్ట్ ప్రో ఖాతా వివరాలు. ";
+    s+="మీరు ఇప్పటివరకు "+paidWeeks+" వారాలు చెల్లించారు. ";
+    s+="ఇంకా చెల్లించాల్సిన వారాలు "+remainingWeeks+". ";
+    s+="మీరు చెల్లించిన మొత్తం "+paidAmount+" రూపాయలు. ";
+    s+="ఇంకా చెల్లించాల్సిన మొత్తం "+remainingAmount+" రూపాయలు. ";
+    if(n){s+="మీ తదుపరి చెల్లింపు తేదీ "+dateText+". "+weekday+" వారం రోజు. చెల్లించాల్సిన మొత్తం "+Math.round(n.amount)+" రూపాయలు.";}
+    else{s+="అభినందనలు. మీ ఖాతా పూర్తయింది. చెల్లించాల్సిన మొత్తం ఏమీ లేదు.";}
+    return s+" ధన్యవాదాలు.";
+  }
+  var e="Hello "+(c.name||"")+". Here are your CollectPro account details. ";
+  e+="You have paid "+paidWeeks+" weeks. ";
+  e+="Your remaining payable weeks are "+remainingWeeks+". ";
+  e+="Your total paid amount is "+paidAmount+" rupees. ";
+  e+="Your remaining payable amount is "+remainingAmount+" rupees. ";
+  if(n){e+="Your next payment date is "+dateText+". The payment weekday is "+weekday+". The amount due is "+Math.round(n.amount)+" rupees.";}
+  else{e+="Congratulations. Your account is completed and there is no remaining payment.";}
+  return e+" Thank you.";
+}
+function collectProVoiceSpeak(){
+  if(!portalData)return;
+  if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){
+    var msg=portalLang==="te"?"ఈ ఫోన్ లేదా బ్రౌజర్‌లో వాయిస్ సదుపాయం అందుబాటులో లేదు.":"Voice playback is not supported on this device or browser.";
+    var el=document.getElementById("voiceStatus");if(el)el.textContent=msg;return;
+  }
+  window.speechSynthesis.cancel();
+  collectProVoiceUtterance=new SpeechSynthesisUtterance(collectProVoiceText());
+  collectProVoiceUtterance.lang=portalLang==="te"?"te-IN":"en-IN";
+  var rateEl=document.getElementById("voiceRate");
+  collectProVoiceUtterance.rate=rateEl?Number(rateEl.value)||0.85:0.85;
+  collectProVoiceUtterance.pitch=1;
+  collectProVoiceUtterance.onstart=function(){var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"మీ ఖాతా వివరాలు చదువుతున్నాము…":"Reading your account details…";};
+  collectProVoiceUtterance.onend=function(){var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"వివరాలు పూర్తయ్యాయి. మళ్లీ వినడానికి Play నొక్కండి.":"Finished. Press Play to listen again.";};
+  collectProVoiceUtterance.onerror=function(){var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"వాయిస్ ప్లే కాలేదు. మళ్లీ ప్రయత్నించండి.":"Could not play voice. Please try again.";};
+  window.speechSynthesis.speak(collectProVoiceUtterance);
+}
+function collectProVoicePause(){
+  if("speechSynthesis" in window && window.speechSynthesis.speaking)window.speechSynthesis.pause();
+  var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"వాయిస్ పాజ్ అయింది.":"Voice paused.";
+}
+function collectProVoiceResume(){
+  if("speechSynthesis" in window && window.speechSynthesis.paused)window.speechSynthesis.resume();
+  var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"మళ్లీ కొనసాగుతోంది…":"Resuming…";
+}
+function collectProVoiceStop(){
+  if("speechSynthesis" in window)window.speechSynthesis.cancel();
+  var el=document.getElementById("voiceStatus");if(el)el.textContent=portalLang==="te"?"వాయిస్ ఆపివేయబడింది.":"Voice stopped.";
+}
+function collectProVoiceHtml(){
+  var te=portalLang==="te";
+  return '<section class="voice-assistant" aria-label="CollectPro Voice Assistant">'+
+    '<div class="voice-head"><div class="voice-icon" aria-hidden="true">🔊</div><div><div class="voice-title">'+(te?"నా ఖాతా వివరాలు వినండి":"Listen to My Account")+'</div><div class="voice-sub">'+(te?"మీ ఖాతా వివరాలు వాయిస్‌లో వినవచ్చు":"Hear your account details spoken aloud")+'</div></div></div>'+
+    '<div class="voice-controls"><button class="btn voice-play" type="button" onclick="collectProVoiceSpeak()">▶ '+(te?"వినండి":"Play")+'</button><button class="btn" type="button" onclick="collectProVoicePause()">Ⅱ '+(te?"పాజ్":"Pause")+'</button><button class="btn" type="button" onclick="collectProVoiceResume()">▶ '+(te?"కొనసాగించు":"Resume")+'</button><button class="btn" type="button" onclick="collectProVoiceStop()">■ '+(te?"ఆపు":"Stop")+'</button></div>'+
+    '<div class="voice-speed"><span>'+(te?"వాయిస్ వేగం":"Voice speed")+'</span><select id="voiceRate" aria-label="Voice speed"><option value="0.7">'+(te?"నెమ్మదిగా":"Slow")+'</option><option value="0.85" selected>'+(te?"సాధారణం":"Normal")+'</option><option value="1">'+(te?"వేగంగా":"Fast")+'</option></select></div>'+
+    '<div class="voice-status" id="voiceStatus" aria-live="polite">'+(te?"వినడానికి Play నొక్కండి":"Press Play to hear your account summary")+'</div></section>';
+}
+
 function helpHtml(){
   var te=portalLang==="te";
   return '<div class="need-help"><div class="need-help-head"><div class="need-help-icon">🆘</div><div><b>'+(te?"సహాయం కావాలా?":"Need Help?")+'</b><small>'+(te?"మా సపోర్ట్ టీమ్‌ను సంప్రదించండి":"Contact our support team")+'</small></div></div><div class="need-help-phone">📞 +91 8106611452</div><div class="need-help-actions"><a class="btn pri" href="tel:+918106611452">'+(te?"కాల్ చేయండి":"Call Now")+'</a><a class="btn" target="_blank" rel="noopener" href="https://wa.me/918106611452">'+(te?"WhatsApp":"WhatsApp")+'</a></div></div>';
@@ -988,6 +1075,7 @@ function portalView(){
   '<div class="portal-big big"><div><div class="n g countup-ready" data-count="'+pendTarget+'">'+inr(0)+'</div><div class="l">'+pt("remaining")+'</div></div><div><div class="n countup-ready" data-count="'+paidTarget+'">'+inr(0)+'</div><div class="l">'+pt("paidAmount")+'</div></div></div>'+
   '<div class="bar portal-progress"><b style="width:0%" data-progress="'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' '+pt("weeksPaid")+' / '+c.weeks+'</span><span class="sp">'+k.pct+'%</span></div>'+
   '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+' · Collection every '+weekdayName(c.collectionWeekday==null?4:c.collectionWeekday)+'</div>'+completion+'</div>'+
+  collectProVoiceHtml()+
   nextPaymentHtml(c)+
   '<div class="grid">'+[
    [pt("loanAmount"),inr(c.loan),pt("originalLoan")],

@@ -1056,17 +1056,16 @@ function collectProVoiceSetState(speaking){
   }
 }
 function collectProVoiceChooseFemaleTeluguVoice(voices){
-  var telugu=voices.filter(function(v){return /^te(-|$)/i.test(String(v.lang||""));});
+  var telugu=voices.filter(function(v){return /^te([_-]|$)/i.test(String(v.lang||"").trim());});
   if(!telugu.length)return null;
-  /* Prefer clearly named female Telugu voices when the device exposes that information. */
-  var femaleHints=/female|woman|kalpana|swara|hema|lekha|priya|ananya|aditi/i;
-  var female=telugu.find(function(v){return femaleHints.test(String(v.name||""));});
-  return female||telugu[0];
+  /* Prefer a voice whose display name identifies it as female, otherwise use a Telugu voice only. */
+  var femaleHints=/female|woman|girl|kalpana|swara|hema|lekha|priya|ananya|aditi/i;
+  return telugu.find(function(v){return femaleHints.test(String(v.name||""));})||telugu[0];
 }
 function collectProVoiceSpeak(){
   if(!portalData)return;
   if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){
-    alert("ఈ పరికరంలో వాయిస్ సదుపాయం అందుబాటులో లేదు. Chrome బ్రౌజర్‌లో ప్రయత్నించండి.");
+    alert("ఈ పరికరంలో తెలుగు వాయిస్ సదుపాయం అందుబాటులో లేదు. Chrome లేదా Google Speech Services లో Telugu voice install చేసి మళ్లీ ప్రయత్నించండి.");
     return;
   }
   if(window.speechSynthesis.speaking||window.speechSynthesis.pending){
@@ -1074,21 +1073,35 @@ function collectProVoiceSpeak(){
   }
   var text=collectProVoiceText();
   if(!text)return;
+
+  /* Never allow the browser's English default voice to read Telugu text. */
+  var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
+  var selected=collectProVoiceChooseFemaleTeluguVoice(voices);
+  if(!selected){
+    alert("మీ ఫోన్‌లో Telugu Text-to-Speech voice install కాలేదు. Android Settings → Text-to-speech output → Preferred engine (Google Speech Services) → Install voice data → Telugu ఎంచుకోండి. తర్వాత మళ్లీ ప్రయత్నించండి.");
+    return;
+  }
+  if(!/^te([_-]|$)/i.test(String(selected.lang||""))){
+    alert("Telugu voice దొరకలేదు. దయచేసి మీ ఫోన్‌లో Telugu voice install చేయండి.");
+    return;
+  }
+
   window.speechSynthesis.cancel();
   var utterance=new SpeechSynthesisUtterance(text);
   collectProVoiceUtterance=utterance;
-  utterance.lang="te-IN";                 // Always Telugu, regardless of dashboard language.
-  utterance.rate=0.84;                    // Gentle conversational pace.
-  utterance.pitch=1.12;                   // Slightly warmer/higher tone; not a guarantee of female identity.
+  utterance.lang="te-IN";
+  utterance.voice=selected;             // Explicit Telugu voice; no English fallback.
+  utterance.rate=0.82;                  // Calm, conversational pace.
+  utterance.pitch=1.16;                 // Softer/higher tone; actual female voice depends on installed voice.
   utterance.volume=1;
-  var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
-  var selected=collectProVoiceChooseFemaleTeluguVoice(voices);
-  if(selected)utterance.voice=selected;
   utterance.onstart=function(){collectProVoiceSetState(true);};
   utterance.onend=function(){collectProVoiceSetState(false);};
   utterance.onerror=function(ev){
     collectProVoiceSetState(false);
     console.warn("CollectPro Telugu speech error:",ev&&ev.error);
+    if(ev&&ev.error==="language-unavailable"){
+      alert("Telugu voice ప్రస్తుతం అందుబాటులో లేదు. ఫోన్‌లో Telugu voice data install చేసి మళ్లీ ప్రయత్నించండి.");
+    }
   };
   window.speechSynthesis.speak(utterance);
 }

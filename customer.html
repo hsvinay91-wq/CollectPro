@@ -682,6 +682,17 @@ body:after{
 @keyframes collectProMicBars{from{height:3px}to{height:10px}}
 @media(max-width:700px){.portal-voice-wrap{right:58px;top:48%;gap:6px}.portal-voice-mic{width:44px;height:44px;border-radius:21px}.portal-voice-mic .mic-svg{width:20px;height:20px}.portal-voice-mic:before,.portal-voice-mic:after{border-radius:26px}.portal-voice-hint{font-size:9px}}
 @media(max-width:420px){.portal-voice-wrap{right:48px;top:46%}.portal-voice-mic{width:42px;height:42px;border-radius:18px}.portal-voice-mic .mic-svg{width:19px;height:19px}}
+@media(max-width:700px){
+ .portal-hero>.row:first-child{display:block}
+ .portal-status-row{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:9px!important;margin:11px 0 0!important;width:100%}
+ .portal-status-row .sp{margin-left:0!important}
+ .portal-voice-wrap{position:static!important;right:auto!important;top:auto!important;transform:none!important;margin:0!important;display:flex;flex:0 0 auto;align-items:center!important;gap:0!important}
+ .portal-voice-mic{width:36px!important;height:36px!important;border-radius:13px!important}
+ .portal-voice-mic .mic-svg{width:17px!important;height:17px!important}
+ .portal-voice-mic:before,.portal-voice-mic:after{inset:-5px!important;border-radius:16px!important}
+ .portal-voice-hint{display:none}
+ .portal-status-row .portal-lang{margin:0!important}
+}
 @media(prefers-reduced-motion:reduce){.portal-voice-mic:before,.portal-voice-mic:after,.portal-voice-mic.is-speaking .mic-bars i{animation:none!important}}
 
 </style>
@@ -1292,12 +1303,12 @@ function portalView(){
   '<div class="portal-welcome">'+pt("welcome")+' 👋</div>'+
   '<h1 class="portal-name">'+esc(c.name)+'</h1>'+
   '<div class="portal-subtitle">'+pt("subtitle")+'</div>'+
-  '</div><div class="row sp" style="align-self:flex-start">'+
+  '</div><div class="row portal-status-row" style="align-self:flex-start">'+
+  collectProVoiceHtml()+
   '<button class="btn portal-lang" onclick="togglePortalLang()">'+pt("language")+'</button>'+
-  '<span class="badge sp'+(k.done?' o':'')+'">'+status+'</span></div></div>'+
+  '<span class="badge'+(k.done?' o':'')+'">'+status+'</span></div></div>'+
   '<div class="portal-big big"><div><div class="n g countup-ready" data-count="'+pendTarget+'">'+inr(0)+'</div><div class="l">'+pt("remaining")+'</div></div><div><div class="n countup-ready" data-count="'+paidTarget+'">'+inr(0)+'</div><div class="l">'+pt("paidAmount")+'</div></div></div>'+
   '<div class="bar portal-progress"><b style="width:0%" data-progress="'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;color:#C9C6D6"><span>'+k.paidW+' '+pt("weeksPaid")+' / '+c.weeks+'</span><span class="sp">'+k.pct+'%</span></div>'+
-  collectProVoiceHtml()+
   '<div style="margin-top:12px;font-size:11px;color:#AFAABE">'+pt("customerId")+': '+esc(c.customerId||"")+' · '+(portalLang==="te"?"ప్రతి ":"Collection every ")+weekdayNameLocalized(c.collectionWeekday==null?4:c.collectionWeekday,portalLang)+(portalLang==="te"?" వారం":"")+'</div>'+completion+'</div>'+
   nextPaymentHtml(c)+
   '<div class="grid">'+[

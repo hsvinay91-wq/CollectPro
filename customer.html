@@ -659,6 +659,32 @@ body:after{
 @media(max-width:420px){.voice-assistant{padding:13px}.voice-controls .btn{min-width:78px;padding:9px 8px;font-size:11px}}
 
 </style>
+<style>
+
+/* CollectPro Voice Assistant — premium right-side mic, A+B Telugu voice */
+.portal-page .hero{position:relative}
+.portal-voice-wrap{position:absolute;z-index:8;right:34px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:10px}
+.portal-voice-mic{position:relative;width:78px;height:78px;border:1px solid rgba(255,224,153,.72);border-radius:26px;display:grid;place-items:center;cursor:pointer;color:#fff;background:linear-gradient(145deg,#F1C65F 0%,#C58B32 45%,#7650C6 100%);box-shadow:0 12px 30px rgba(0,0,0,.32),0 0 22px rgba(224,176,75,.32),inset 0 1px 0 rgba(255,255,255,.45);transition:transform .22s ease,box-shadow .22s ease;isolation:isolate}
+.portal-voice-mic:hover{transform:translateY(-3px) scale(1.045);box-shadow:0 16px 34px rgba(0,0,0,.38),0 0 32px rgba(224,176,75,.48),inset 0 1px 0 rgba(255,255,255,.55)}
+.portal-voice-mic:focus-visible{outline:3px solid #fff0b8;outline-offset:5px}
+.portal-voice-mic:before,.portal-voice-mic:after{content:"";position:absolute;inset:-9px;border:1.5px solid rgba(244,204,112,.75);border-radius:31px;z-index:-1;animation:collectProMicHalo 2.4s ease-out infinite}
+.portal-voice-mic:after{animation-delay:1.2s}
+.portal-voice-mic .mic-svg{width:34px;height:34px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.portal-voice-mic .mic-bars{position:absolute;bottom:9px;display:flex;align-items:center;gap:3px;height:9px}
+.portal-voice-mic .mic-bars i{display:block;width:3px;height:4px;border-radius:4px;background:#fff7dc;opacity:.9}
+.portal-voice-mic.is-speaking .mic-bars i{animation:collectProMicBars .55s ease-in-out infinite alternate}
+.portal-voice-mic.is-speaking .mic-bars i:nth-child(2){animation-delay:.12s}
+.portal-voice-mic.is-speaking .mic-bars i:nth-child(3){animation-delay:.24s}
+.portal-voice-mic.is-speaking .mic-bars i:nth-child(4){animation-delay:.08s}
+.portal-voice-mic.is-speaking{background:linear-gradient(145deg,#F5D77D,#D69A36 52%,#8B60D4);box-shadow:0 0 0 7px rgba(239,194,91,.12),0 0 38px rgba(239,194,91,.55)}
+.portal-voice-hint{font-size:10px;line-height:1.35;color:#E8D8A8;white-space:nowrap;text-shadow:0 2px 8px #070B1D;text-align:center}
+@keyframes collectProMicHalo{0%{transform:scale(.88);opacity:.85}100%{transform:scale(1.5);opacity:0}}
+@keyframes collectProMicBars{from{height:3px}to{height:10px}}
+@media(max-width:700px){.portal-voice-wrap{right:20px;top:48%;gap:7px}.portal-voice-mic{width:62px;height:62px;border-radius:21px}.portal-voice-mic .mic-svg{width:28px;height:28px}.portal-voice-mic:before,.portal-voice-mic:after{border-radius:26px}.portal-voice-hint{font-size:9px}}
+@media(max-width:420px){.portal-voice-wrap{right:14px;top:46%}.portal-voice-mic{width:54px;height:54px;border-radius:18px}.portal-voice-mic .mic-svg{width:25px;height:25px}}
+@media(prefers-reduced-motion:reduce){.portal-voice-mic:before,.portal-voice-mic:after,.portal-voice-mic.is-speaking .mic-bars i{animation:none!important}}
+
+</style>
 </head><body>
 <div class="wrap">
  <div class="top"><div class="brand" onclick="go(\'\')" aria-label="CollectPro home">
@@ -990,47 +1016,57 @@ function nextPaymentHtml(c){
 }
 
 
-/* CollectPro Voice Assistant: one-tap speech playback for the authenticated customer only. */
+/* CollectPro Voice Assistant — A+B warm, polite conversational Telugu female target voice. */
 var collectProVoiceUtterance=null;
 var collectProVoiceActive=false;
 function collectProVoiceText(){
   if(!portalData)return "";
-  var c=portalData,k=calc(c),n=portalNextPayment(c),te=portalLang==="te";
+  var c=portalData,k=calc(c),n=portalNextPayment(c);
   var paidWeeks=Number(k.paidW)||0;
   var remainingWeeks=Math.max(0,Number(k.pendW)||0);
   var paidAmount=Math.round(Number(k.paid)||0);
   var remainingAmount=Math.round(Number(k.pend)||0);
-  var weekday=n?weekdayNameLocalized(new Date(n.date+"T00:00:00").getDay(),portalLang):"";
-  var collectionDay=weekdayNameLocalized(c.collectionWeekday==null?4:c.collectionWeekday,portalLang);
-  var dateText=n?new Date(n.date+"T00:00:00").toLocaleDateString(te?"te-IN":"en-IN",{day:"numeric",month:"long",year:"numeric"}):"";
-  if(te){
-    var s="నమస్కారం "+(c.name||"")+" గారు. కలెక్ట్ ప్రో ఖాతా వివరాలు. ";
-    s+="మీరు ఇప్పటివరకు "+paidWeeks+" వారాలు చెల్లించారు. ";
-    s+="ఇంకా చెల్లించాల్సిన వారాలు "+remainingWeeks+". ";
-    s+="మీరు చెల్లించిన మొత్తం "+paidAmount+" రూపాయలు. ";
-    s+="ఇంకా చెల్లించాల్సిన మొత్తం "+remainingAmount+" రూపాయలు. ";
-    s+="మీరు సాధారణంగా "+collectionDay+" వారం రోజు చెల్లిస్తారు. ";
-    if(n){s+="మీ తదుపరి చెల్లింపు తేదీ "+dateText+". "+weekday+" చెల్లింపు రోజు. చెల్లించాల్సిన మొత్తం "+Math.round(n.amount)+" రూపాయలు.";}
-    else{s+="అభినందనలు. మీ ఖాతా పూర్తయింది. చెల్లించాల్సిన మొత్తం ఏమీ లేదు.";}
-    return s+" ధన్యవాదాలు.";
+  var totalWeeks=Math.max(0,Number(c.weeks)||0);
+  var collectionDay=weekdayNameLocalized(c.collectionWeekday==null?4:c.collectionWeekday,"te");
+  var nextDay=n?weekdayNameLocalized(new Date(n.date+"T00:00:00").getDay(),"te"):"";
+  var dateText=n?new Date(n.date+"T00:00:00").toLocaleDateString("te-IN",{day:"numeric",month:"long",year:"numeric"}):"";
+  var s="నమస్కారం "+(c.name||"")+" గారు! ఎలా ఉన్నారండి? ";
+  s+="మీ కలెక్ట్ ప్రో ఖాతా వివరాలు చెప్తాను వినండి. ";
+  s+="మొత్తం "+totalWeeks+" వారాలకు గాను, మీరు ఇప్పటివరకు "+paidWeeks+" వారాలు కట్టారండి. ";
+  s+="మీరు ఇప్పటివరకు మొత్తం "+paidAmount+" రూపాయలు చెల్లించారు. ";
+  s+="ఇంకా "+remainingWeeks+" వారాలు కట్టాల్సి ఉందండి. ";
+  s+="మిగిలిన మొత్తం "+remainingAmount+" రూపాయలు ఉందండి. ";
+  s+="మీ కలెక్షన్ ప్రతి "+collectionDay+" ఉంటుందండి. ";
+  if(n){
+    s+="మీ తదుపరి చెల్లింపు తేదీ "+dateText+". ";
+    s+="అది "+nextDay+" రోజు వస్తుందండి. ";
+    s+="ఆ రోజు చెల్లించాల్సిన మొత్తం "+Math.round(n.amount)+" రూపాయలు.";
+  }else{
+    s+="అభినందనలు అండి! మీ ఖాతా పూర్తిగా చెల్లించబడింది. ఇక కట్టాల్సిన మొత్తం ఏమీ లేదు.";
   }
-  var e="Hello "+(c.name||"")+". Here are your CollectPro account details. ";
-  e+="You have paid "+paidWeeks+" weeks. Your remaining payable weeks are "+remainingWeeks+". ";
-  e+="Your total paid amount is "+paidAmount+" rupees. Your remaining payable amount is "+remainingAmount+" rupees. ";
-  e+="Your regular collection day is "+collectionDay+". ";
-  if(n){e+="Your next payment date is "+dateText+". The payment weekday is "+weekday+". The amount due is "+Math.round(n.amount)+" rupees.";}
-  else{e+="Congratulations. Your account is completed and there is no remaining payment.";}
-  return e+" Thank you.";
+  return s+" ధన్యవాదాలు అండి. మీ రోజు బాగుండాలి!";
 }
 function collectProVoiceSetState(speaking){
   collectProVoiceActive=!!speaking;
   var b=document.getElementById("portalVoiceMic");
-  if(b){b.classList.toggle("is-speaking",!!speaking);b.setAttribute("aria-label",speaking?(portalLang==="te"?"వాయిస్ ఆపండి":"Stop account voice"):(portalLang==="te"?"ఖాతా వివరాలు వినండి":"Listen to account details"));}
+  if(b){
+    b.classList.toggle("is-speaking",!!speaking);
+    b.setAttribute("aria-label",speaking?"వాయిస్ ఆపండి":"మీ ఖాతా వివరాలు తెలుగులో వినండి");
+    b.title=speaking?"వాయిస్ ఆపడానికి మళ్లీ నొక్కండి":"మీ ఖాతా వివరాలు వినడానికి నొక్కండి";
+  }
+}
+function collectProVoiceChooseFemaleTeluguVoice(voices){
+  var telugu=voices.filter(function(v){return /^te(-|$)/i.test(String(v.lang||""));});
+  if(!telugu.length)return null;
+  /* Prefer clearly named female Telugu voices when the device exposes that information. */
+  var femaleHints=/female|woman|kalpana|swara|hema|lekha|priya|ananya|aditi/i;
+  var female=telugu.find(function(v){return femaleHints.test(String(v.name||""));});
+  return female||telugu[0];
 }
 function collectProVoiceSpeak(){
   if(!portalData)return;
   if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){
-    alert(portalLang==="te"?"ఈ పరికరంలో వాయిస్ సదుపాయం లేదు. Chrome లేదా మరో ఆధునిక బ్రౌజర్‌లో ప్రయత్నించండి.":"Voice playback is not supported on this device. Please try Chrome or another modern browser.");
+    alert("ఈ పరికరంలో వాయిస్ సదుపాయం అందుబాటులో లేదు. Chrome బ్రౌజర్‌లో ప్రయత్నించండి.");
     return;
   }
   if(window.speechSynthesis.speaking||window.speechSynthesis.pending){
@@ -1039,28 +1075,29 @@ function collectProVoiceSpeak(){
   var text=collectProVoiceText();
   if(!text)return;
   window.speechSynthesis.cancel();
-  collectProVoiceUtterance=new SpeechSynthesisUtterance(text);
-  var lang=portalLang==="te"?"te-IN":"en-IN";
-  collectProVoiceUtterance.lang=lang;
-  collectProVoiceUtterance.rate=0.86;
-  collectProVoiceUtterance.pitch=1;
-  /* Pick a matching installed voice when available; browser default remains a fallback. */
+  var utterance=new SpeechSynthesisUtterance(text);
+  collectProVoiceUtterance=utterance;
+  utterance.lang="te-IN";                 // Always Telugu, regardless of dashboard language.
+  utterance.rate=0.88;                    // Gentle conversational pace.
+  utterance.pitch=1.08;                   // Slightly warmer/higher tone; not a guarantee of female identity.
+  utterance.volume=1;
   var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
-  var wanted=voices.find(function(v){return String(v.lang||"").toLowerCase()===lang.toLowerCase();})||
-             voices.find(function(v){return String(v.lang||"").toLowerCase().indexOf(portalLang==="te"?"te":"en-in")===0;});
-  if(wanted)collectProVoiceUtterance.voice=wanted;
-  collectProVoiceUtterance.onstart=function(){collectProVoiceSetState(true);};
-  collectProVoiceUtterance.onend=function(){collectProVoiceSetState(false);};
-  collectProVoiceUtterance.onerror=function(ev){
+  var selected=collectProVoiceChooseFemaleTeluguVoice(voices);
+  if(selected)utterance.voice=selected;
+  utterance.onstart=function(){collectProVoiceSetState(true);};
+  utterance.onend=function(){collectProVoiceSetState(false);};
+  utterance.onerror=function(ev){
     collectProVoiceSetState(false);
-    console.warn("CollectPro speech playback error:",ev&&ev.error);
+    console.warn("CollectPro Telugu speech error:",ev&&ev.error);
   };
-  window.speechSynthesis.speak(collectProVoiceUtterance);
+  window.speechSynthesis.speak(utterance);
 }
 function collectProVoiceHtml(){
-  var te=portalLang==="te";
-  return '<button id="portalVoiceMic" class="portal-voice-mic" type="button" onclick="collectProVoiceSpeak()" aria-label="'+(te?"ఖాతా వివరాలు వినండి":"Listen to account details")+'" title="'+(te?"మీ ఖాతా వివరాలు వినండి":"Listen to your account details")+'"><span class="mic-glyph" aria-hidden="true">🎙️</span></button>'+
-    '<div class="portal-voice-hint">'+(te?"వినడానికి మైక్ నొక్కండి":"Tap mic to listen")+'</div>';
+  return '<div class="portal-voice-wrap">'+
+    '<button id="portalVoiceMic" class="portal-voice-mic" type="button" onclick="collectProVoiceSpeak()" aria-label="మీ ఖాతా వివరాలు తెలుగులో వినండి" title="మీ ఖాతా వివరాలు వినడానికి నొక్కండి">'+
+    '<svg class="mic-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3" fill="white"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5M8.5 21.5h7" stroke="white" stroke-width="1.8" stroke-linecap="round"/><path d="M4 9.5v2a8 8 0 0 0 16 0v-2" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity=".75"/></svg>'+
+    '<span class="mic-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>'+
+    '<div class="portal-voice-hint">వినడానికి ఇక్కడ నొక్కండి</div></div>';
 }
 
 function helpHtml(){

@@ -4,9 +4,9 @@
 <meta name="theme-color" content="#0C1022">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="CollectPro">
+<meta name="apple-mobile-web-app-title" content="EKADHARA">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>Ekadhara Financial Services – Admin</title>
+<title>EKADHARA Financial Services — Weekly Collections</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -699,6 +699,33 @@ body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:non
  .portal-status-row .badge{margin-left:0!important}
 }
 
+
+
+/* EKADHARA brand identity — native vector mark, not a raster logo */
+.ek-brand{display:flex!important;align-items:center;gap:12px;min-width:0;text-decoration:none;cursor:pointer;animation:none!important}
+.ek-mark{width:54px;height:54px;display:grid;place-items:center;flex:none;border-radius:16px;background:linear-gradient(145deg,rgba(255,211,105,.16),rgba(14,24,58,.55));border:1px solid rgba(231,188,83,.48);box-shadow:0 0 0 3px rgba(231,188,83,.045),0 8px 25px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.12)}
+.ek-mark svg{width:47px;height:47px;filter:drop-shadow(0 2px 5px rgba(235,178,53,.35))}
+.ek-word-lockup{display:flex;flex-direction:column;gap:2px;line-height:1}
+.ek-word{font:500 clamp(25px,3vw,34px)/.98 'Instrument Serif',Georgia,serif;letter-spacing:1.2px;color:#FFF9E9;text-shadow:0 2px 16px rgba(0,0,0,.35)}
+.ek-sub{font:800 9px/1.3 Manrope,sans-serif;letter-spacing:2.45px;color:#E8BD55;text-shadow:0 0 12px rgba(232,189,85,.16)}
+.ek-brand:after{content:"";position:absolute;left:0;bottom:-10px;width:min(100%,300px);height:1px;background:linear-gradient(90deg,rgba(231,188,83,.8),rgba(231,188,83,.08),transparent)}
+.top{position:relative;align-items:center;min-height:68px;padding:7px 2px 13px;gap:16px}
+.top .row#topActions{justify-content:flex-end;gap:8px}
+.top .row#topActions .btn{white-space:nowrap}
+.ek-dashboard-brand{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;gap:25px;min-height:190px;margin:2px 0 22px;padding:26px 22px;overflow:hidden;border:1px solid rgba(224,179,73,.48);border-radius:23px;background:radial-gradient(ellipse at 50% 0%,rgba(255,210,104,.12),transparent 54%),linear-gradient(115deg,#07152e,#0b1d3c 48%,#071329);box-shadow:0 18px 48px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.08)}
+.ek-dashboard-brand:before,.ek-dashboard-brand:after{content:"";position:absolute;z-index:-1;pointer-events:none;border:1px solid rgba(225,177,67,.34);border-color:rgba(225,177,67,.45) transparent transparent transparent;border-radius:50%;width:70%;height:90px;bottom:-49px;filter:drop-shadow(0 -5px 7px rgba(255,191,64,.3));transform:rotate(-4deg)}
+.ek-dashboard-brand:after{width:62%;bottom:-62px;transform:rotate(4deg);opacity:.55}
+.ek-dashboard-emblem{width:112px;height:112px;flex:none;display:grid;place-items:center;border-radius:27px;background:linear-gradient(145deg,rgba(255,219,130,.14),rgba(3,12,32,.35));border:1px solid rgba(239,196,94,.55);box-shadow:0 0 0 5px rgba(232,188,83,.045),0 10px 35px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.14)}
+.ek-dashboard-emblem svg{width:98px;height:98px;filter:drop-shadow(0 3px 8px rgba(255,190,58,.42))}
+.ek-dashboard-brand>span:last-child{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.ek-dashboard-brand b{font:500 clamp(38px,6vw,66px)/.95 'Instrument Serif',Georgia,serif;letter-spacing:2.3px;color:#FFF9E9;text-shadow:0 4px 24px rgba(0,0,0,.45)}
+.ek-dashboard-brand small{margin-top:11px;font:800 clamp(10px,1.35vw,14px)/1.4 Manrope,sans-serif;letter-spacing:clamp(2px,.45vw,5px);color:#E9BD55}
+.ek-dashboard-brand em{margin-top:10px;color:#D7DDF0;font:italic 14px Manrope,sans-serif;letter-spacing:.8px}
+.dashboard-head .dash-kicker{color:#E8BD55}
+@media(max-width:700px){.top{align-items:center;flex-direction:row;flex-wrap:wrap}.ek-mark{width:45px;height:45px;border-radius:13px}.ek-mark svg{width:40px;height:40px}.ek-word{font-size:27px}.ek-sub{font-size:8px;letter-spacing:1.8px}.top .row#topActions{width:100%;justify-content:flex-start;flex-wrap:wrap}.ek-dashboard-brand{min-height:140px;gap:13px;padding:18px 12px;margin-bottom:16px;border-radius:18px}.ek-dashboard-emblem{width:75px;height:75px;border-radius:19px}.ek-dashboard-emblem svg{width:66px;height:66px}.ek-dashboard-brand b{font-size:clamp(29px,8vw,43px);letter-spacing:1px}.ek-dashboard-brand small{font-size:8px;letter-spacing:1.7px;margin-top:7px}.ek-dashboard-brand em{font-size:10px;margin-top:7px}}
+@media(max-width:390px){.ek-brand{gap:8px}.ek-mark{width:40px;height:40px}.ek-mark svg{width:36px;height:36px}.ek-word{font-size:24px}.ek-sub{font-size:7px;letter-spacing:1.35px}.ek-dashboard-emblem{width:62px;height:62px}.ek-dashboard-emblem svg{width:55px;height:55px}.ek-dashboard-brand{gap:10px}}
+@media(prefers-reduced-motion:reduce){.ek-brand,.ek-dashboard-brand{animation:none!important}}
+
 </style><style>
 
 /* CollectPro customer portal control alignment — mic left, language/status right */
@@ -731,78 +758,25 @@ body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:non
   .portal-status-row .portal-lang{margin-left:auto!important}
 }
 
-
-/* ===== Ekadhara Financial Services — reference theme (navy + gold) ===== */
-:root,:root[data-theme="light"],:root[data-theme="dark"]{--bg:#040A1C;--card:rgba(9,19,46,.9);--ink:#0A1431;--ink2:#0F1E48;--text:#FFFFFF;--muted:#B4BDD6;--line:rgba(233,185,73,.30);--gold:#E9B949;--paid:#22C55E;--miss:#FF8A3D;--pend:#25335F;--in:rgba(255,255,255,.05);--onink:#fff;--violet:#E9B949;--cyan:#E9B949}
-body{background:radial-gradient(ellipse at 0% 100%,rgba(233,185,73,.26),transparent 42%),radial-gradient(ellipse at 100% 8%,rgba(233,185,73,.16),transparent 38%),linear-gradient(160deg,#030816,#071433 55%,#040A1C)!important;color:#fff}
-.eka-mini{width:44px;height:44px;flex:none;filter:drop-shadow(0 2px 10px rgba(233,185,73,.45))}
-.brand{display:flex!important;align-items:center;gap:10px;animation:none!important;text-shadow:none!important}
-.brand-word{font:700 22px/1 Cinzel,Georgia,serif;letter-spacing:2px;color:#F5F1E6;display:flex;flex-direction:column;gap:3px}
-.brand-word small{font:700 8px/1 Cinzel,Georgia,serif;letter-spacing:3px;color:#E9B949}
-.eka-banner{display:flex;align-items:center;justify-content:center;gap:18px;padding:22px 16px;margin:0 0 18px;border:1px solid rgba(233,185,73,.35);border-radius:22px;background:radial-gradient(ellipse at 15% 120%,rgba(233,185,73,.35),transparent 55%),radial-gradient(ellipse at 90% -20%,rgba(233,185,73,.22),transparent 50%),linear-gradient(135deg,#091431,#050B1F);box-shadow:0 20px 50px rgba(0,0,0,.45)}
-.eka-big{width:92px;height:92px;flex:none;filter:drop-shadow(0 4px 18px rgba(233,185,73,.5))}
-.eka-name{font:700 clamp(28px,7vw,50px)/1 Cinzel,Georgia,serif;letter-spacing:3px;color:#F5F1E6;text-shadow:0 2px 14px rgba(233,185,73,.25)}
-.eka-sub{display:flex;align-items:center;gap:10px;margin-top:8px;font:700 clamp(10px,2.6vw,16px) Cinzel,Georgia,serif;letter-spacing:4px;color:#E9B949}.eka-sub i{flex:1;height:2px;background:linear-gradient(90deg,transparent,#E9B949)}.eka-sub i:last-child{transform:scaleX(-1)}
-.eka-tag{margin-top:8px;font:italic 400 clamp(12px,3vw,17px) Georgia,serif;color:#F5F1E6;text-align:center}
-.btn{background:linear-gradient(180deg,#0C1838,#070F26)!important;border:1px solid rgba(233,185,73,.35)!important;color:#fff!important;border-radius:14px!important}
-.btn.pri{background:linear-gradient(180deg,#F6CD62,#C8901F)!important;border-color:#F6CD62!important;color:#1A1204!important;font-weight:800}
-.stat,.sec,.cust,.dashboard-card,.monthly-panel,.modal{background:linear-gradient(160deg,rgba(13,26,60,.92),rgba(6,13,34,.95))!important;border:1px solid rgba(233,185,73,.28)!important;border-radius:18px!important;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-.hero{background:linear-gradient(135deg,#0B1A40,#050B1F 65%)!important;border:1px solid rgba(233,185,73,.4)!important}
-.grid>.stat:nth-child(4n+1){background:linear-gradient(135deg,#1457D6,#0A2A74 70%)!important;border-color:#5FA2FF!important}
-.grid>.stat:nth-child(4n+2){background:linear-gradient(135deg,#8A6414,#2E2108 75%)!important;border-color:#E9B949!important}
-.grid>.stat:nth-child(4n+3){background:linear-gradient(135deg,#0F9A3F,#054120 75%)!important;border-color:#37E07A!important}
-.grid>.stat:nth-child(4n+4){background:linear-gradient(135deg,#A8202F,#40080F 75%)!important;border-color:#FF5B6B!important}
-.grid>.stat .l,.grid>.stat .s{color:rgba(255,255,255,.88)!important}.grid>.stat .v{color:#fff;font-weight:700}
-.dash-kicker{color:#E9B949!important}h1,h2,h3{color:#fff}
-.badge{background:#0B6B33!important;color:#fff!important;border:1px solid #22C55E!important}.badge.o{background:#1D4FD8!important;border-color:#5FA2FF!important}
-input,select,textarea{background:rgba(255,255,255,.06)!important;color:#fff!important;border-color:rgba(233,185,73,.3)!important}
-.av{background:linear-gradient(135deg,#F6CD62,#C8901F)!important;color:#1A1204!important}
-
-/* ===== Ekadhara dashboard UI (sidebar layout) ===== */
-.eka-side,.eka-bar,.eka-ov{display:none}
-body.adm .eka-side{display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;width:224px;z-index:60;background:linear-gradient(180deg,#081333,#040A1C 70%);border-right:1px solid rgba(233,185,73,.3);padding:14px 12px;overflow:auto}
-body.adm .eka-side:after{content:"";position:absolute;left:0;right:0;bottom:0;height:150px;background:radial-gradient(ellipse at 0% 100%,rgba(233,185,73,.4),transparent 65%);pointer-events:none}
-.eka-sb{text-align:center;padding:4px 0 14px}.eka-sb .eka-big{width:78px;height:78px;margin:0 auto}.eka-sb .eka-name{font-size:23px;letter-spacing:2px}.eka-sb .eka-sub{font-size:8.5px;letter-spacing:2px;margin-top:5px}.eka-sb .eka-tag{font-size:11px;margin-top:5px}
-.eka-nav{display:flex;flex-direction:column;gap:6px;margin-top:8px;position:relative;z-index:1}
-.eka-nav a,.eka-foot a{display:flex;align-items:center;gap:14px;padding:11px 14px;border-radius:12px;color:#F5F1E6;font:600 15px Manrope,sans-serif;cursor:pointer}
-.eka-nav a.on{background:linear-gradient(180deg,#F6CD62,#C8901F);color:#1A1204;box-shadow:0 6px 18px rgba(233,185,73,.3)}
-.eka-nav a:not(.on):hover,.eka-foot a:hover{background:rgba(233,185,73,.12)}
-.eka-foot{margin-top:auto;position:relative;z-index:1;padding-top:12px;display:flex;flex-direction:column;gap:2px}.eka-foot a{font-size:13px;color:#B4BDD6;padding:8px 14px}
-body.adm .wrap{max-width:none;margin:0 0 0 224px;padding:0 22px 40px}
-body.adm .wrap>.top,body.adm .wrap>.eka-banner{display:none}
-body.adm .eka-bar{display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:40;margin:0 -22px 16px;padding:12px 22px;background:rgba(5,11,31,.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(233,185,73,.25)}
-.eka-hb{display:none;background:none;border:0;color:#fff;cursor:pointer;padding:0}
-.eka-tt{display:flex;flex-direction:column;line-height:1.15;min-width:0}.eka-tt b{font:700 22px Manrope,sans-serif;color:#fff}.eka-tt small{font-size:12px;color:#B4BDD6;white-space:nowrap}
-.eka-search{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 1 380px;border:1px solid rgba(233,185,73,.4);border-radius:99px;padding:0 14px;background:rgba(255,255,255,.04);color:#B4BDD6}
-.eka-search input{border:0!important;background:none!important;outline:0;padding:10px 0!important;width:100%;font-size:13px}
-.eka-bell{position:relative;background:none;border:0;color:#fff;cursor:pointer}.eka-bell i{position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:9px;background:#FF4D5E}
-.eka-add{white-space:nowrap}.eka-me{display:flex;align-items:center;gap:8px;font-weight:700;color:#fff}.eka-me .av{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;font-style:normal}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
-.kpi{display:flex;align-items:center;gap:14px;padding:18px;border-radius:16px;border:1px solid;color:#fff}.kpi small{display:block;font-size:14px;color:rgba(255,255,255,.9)}.kpi b{font:700 26px/1.2 Manrope,sans-serif}
-.kpi.k1{background:linear-gradient(135deg,#1457D6,#0A2A74);border-color:#5FA2FF}.kpi.k2{background:linear-gradient(135deg,#8A6414,#2E2108);border-color:#E9B949}.kpi.k3{background:linear-gradient(135deg,#0F9A3F,#054120);border-color:#37E07A}.kpi.k4{background:linear-gradient(135deg,#A8202F,#40080F);border-color:#FF5B6B}
-.qa{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
-.qa button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;border-radius:16px;border:1px solid rgba(233,185,73,.3);background:linear-gradient(180deg,#0C1838,#050B1F);color:#fff;font:600 14px Manrope,sans-serif;cursor:pointer}
-.qa button.pri{background:linear-gradient(180deg,#F6CD62,#C8901F);color:#1A1204;border-color:#F6CD62}
-.two{display:grid;grid-template-columns:1.55fr 1fr;gap:16px}.two.coll{grid-template-columns:1fr}
-.ep{border:1px solid rgba(233,185,73,.4);border-radius:18px;padding:14px 16px;background:linear-gradient(160deg,rgba(13,26,60,.9),rgba(5,11,31,.95));min-width:0;overflow:hidden}
-.eph{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.eph span{display:flex;align-items:center;gap:10px;font:700 19px Manrope,sans-serif;color:#fff}.eph span .ic{color:#E9B949}.eph a{color:#E9B949;font-weight:700;font-size:13px;cursor:pointer}
-.et{overflow-x:auto}.etr{display:grid;grid-template-columns:1.5fr 1.6fr .8fr .8fr .9fr;gap:8px;align-items:center;padding:11px 8px;min-width:560px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px;cursor:pointer}
-.etr.h{background:rgba(255,255,255,.06);border-radius:8px;color:#B4BDD6;cursor:default}.etr .n{display:flex;align-items:center;gap:8px;font-weight:600}.etr .av{width:26px;height:26px;display:grid;place-items:center;border-radius:50%;font:700 12px Manrope;font-style:normal;flex:none}
-.pill{display:inline-block;padding:6px 18px;border-radius:99px;background:#0B6B33;border:1px solid #22C55E;font-size:12px;color:#fff}.pill.b{background:#1D4FD8;border-color:#5FA2FF}
-.eu{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}.eu span{flex:1;font-weight:600}.eu em{font-style:normal;font-weight:700}
-.dt{display:flex;flex-direction:column;align-items:center;min-width:46px;padding:4px 0;border-radius:8px;background:linear-gradient(180deg,#8A6414,#4A3409);border:1px solid #E9B949;font:700 17px/1 Manrope;color:#fff}.dt small{font-size:10px;font-weight:600}
-@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.qa{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr}}
-@media(max-width:900px){body.adm .eka-side{transform:translateX(-100%);transition:transform .25s}body.eka-open .eka-side{transform:none}body.adm.eka-open .eka-ov{display:block;position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.55)}body.adm .wrap{margin-left:0;padding:0 14px 40px}body.adm .eka-bar{margin:0 -14px 14px;padding:10px 14px;gap:10px}.eka-hb{display:block}.eka-search,.eka-me span{display:none}.eka-add{margin-left:auto}.eka-tt b{font-size:18px}.qa{grid-template-columns:repeat(2,1fr)}.kpi b{font-size:20px}.kpi .ic{width:30px;height:30px}}
 </style>
-<link rel="icon" type="image/svg+xml" href="./ekadhara-icon.svg"><link rel="apple-touch-icon" href="./ekadhara-icon-512.png"><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
-</head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="ekg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4B8"/><stop offset=".45" stop-color="#F2B93B"/><stop offset="1" stop-color="#A9690F"/></linearGradient></defs><symbol id="ek-mark" viewBox="0 0 100 100"><g fill="url(#ekg)" stroke="none"><path d="M12 74C3 40 40 12 92 25C52 22 22 42 20 80Z"/><path d="M24 30H62V41H36V47H56V57H36V65H62V76H24Z" transform="skewX(-6) translate(5 0)"/><rect x="66" y="35" width="4.5" height="10" rx="1"/><rect x="72.5" y="29" width="4.5" height="16" rx="1"/><rect x="79" y="22" width="4.5" height="23" rx="1"/><path d="M62 40L73 30L79 33L90 18L92 27L95 14L82 15L87 19L79 28L73 25Z"/><path d="M60 70L71 62L79 64L88 59L95 66L87 78L77 82L66 78Z"/></g><g fill="none" stroke="#071230" stroke-width="1.6" stroke-linecap="round"><path d="M71 63L77 70L84 66M76 76L82 73M80 79L86 75"/></g><path d="M16 84C10 56 38 30 88 36" fill="none" stroke="url(#ekg)" stroke-width="1.6" stroke-linecap="round" opacity=".8"/></symbol></svg>
+</head><body>
 <div class="wrap">
- <div class="top"><div class="brand" onclick="go('')" aria-label="Ekadhara home"><svg class="eka-mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#ek-mark"/></svg><span class="brand-word">EKADHARA<small>FINANCIAL SERVICES</small></span>
+ <div class="top"><div class="brand ek-brand" onclick="go('')" aria-label="EKADHARA Financial Services home">
+  <span class="ek-mark" aria-hidden="true">
+   <svg viewBox="0 0 100 100" role="img" focusable="false">
+    <defs><linearGradient id="ekGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF0A6"/><stop offset=".28" stop-color="#F7C94F"/><stop offset=".62" stop-color="#D99520"/><stop offset="1" stop-color="#FFF0A6"/></linearGradient></defs>
+    <path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekGold)" stroke-width="4.2" stroke-linecap="round"/>
+    <path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekGold)" stroke="#FFE6A0" stroke-width="1.1"/>
+    <path d="M17 70C34 59 50 47 72 25" fill="none" stroke="url(#ekGold)" stroke-width="5.5" stroke-linecap="round"/>
+    <path d="M65 25L78 20L75 34" fill="none" stroke="url(#ekGold)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="52" y="58" width="5" height="10" rx="1" fill="#FFE18A"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFE18A"/>
+    <path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="#F7D77C" stroke="#6C4511" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M46 69l5 5m2-1l5 4m2-5l5 4" stroke="#6C4511" stroke-width="1.6" stroke-linecap="round"/>
+   </svg>
+  </span>
+  <span class="ek-word-lockup"><span class="ek-word">EKADHARA</span><span class="ek-sub">FINANCIAL SERVICES</span></span>
 </div>
   <div class="row" id="topActions"></div></div>
- <aside class="eka-side"><div class="eka-sb"><svg class="eka-big" viewBox="0 0 100 100" aria-hidden="true"><use href="#ek-mark"/></svg><div class="eka-name">EKADHARA</div><div class="eka-sub"><i></i>FINANCIAL SERVICES<i></i></div><div class="eka-tag">One Trusted Financial Journey.</div></div><nav class="eka-nav" id="ekaNav"></nav><div class="eka-foot" id="ekaFoot"></div></aside><div class="eka-ov" onclick="ekaClose()"></div>
- <div class="eka-bar" id="ekaBar"></div>
- <div class="eka-banner"><svg class="eka-big" viewBox="0 0 100 100" aria-hidden="true"><use href="#ek-mark"/></svg><div class="eka-bt"><div class="eka-name">EKADHARA</div><div class="eka-sub"><i></i>FINANCIAL SERVICES<i></i></div><div class="eka-tag">One Trusted Financial Journey.</div></div></div>
  <div id="app"></div>
 </div>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
@@ -1567,7 +1541,7 @@ function dashboardView(){
  function chart(arr,title,kind){var maxC=Math.max.apply(null,arr.map(function(m){return m.collection}).concat([1]));var maxP=maxC;return '<div class="monthly-panel"><div class="monthly-panel-head"><div><h3>'+title+'</h3><p>'+ (kind==='current'?'Last 6 months · dated current payments.':'Last 6 months · dated completed-loan payments.') +'</p></div><div class="mini-kpi"><b>'+inr(arr.reduce(function(s,m){return s+m.collection},0))+'</b><span>collection</span><b>'+inr(arr.reduce(function(s,m){return s+m.profit},0))+'</b><span>profit</span></div></div><div class="monthly-chart">'+arr.map(function(m){var ch=Math.round((m.collection/maxC)*145),ph=Math.round((m.profit/maxP)*145);return '<div class="month-col"><div class="month-value">'+(m.collection?inr(m.collection):'₹0')+'</div><div class="month-bars"><div class="month-bar collection" style="height:'+ch+'px" title="'+m.label+' collection '+inr(m.collection)+'"></div><div class="month-bar profit" style="height:'+ph+'px" title="'+m.label+' profit '+inr(m.profit)+'"></div></div><div class="month-label">'+m.label+'</div></div>'}).join('')+'</div><div class="month-legend"><span style="--c:#5D9DFF">Collection</span><span style="--c:#24A97E">Allocated loan margin</span></div><div class="monthly-table"><div class="monthly-row head"><span>Month</span><span>Collection</span><span>Profit</span><span>Payments</span></div>'+arr.map(function(m){return '<div class="monthly-row"><b>'+m.label+'</b><b class="collection-num">'+inr(m.collection)+'</b><b class="profit-num">'+inr(m.profit)+'</b><span>'+m.paidWeeks+'</span></div>'}).join('')+'</div></div>'}
  var cards=[['Current Allocated Margin',inr(currentProfit),'All-time allocated loan margin'],['Historical Allocated Margin',inr(historicalProfit),'All-time completed loans'],['Current Collected',inr(currentCollected),'All-time active-loan receipts'],['Historical Collected',inr(historicalCollected),'All-time completed-loan receipts'],['Weekly Collection',inr(weeklyCollection),'Current customer run-rate'],['Weekly Expected Margin',inr(weeklyProfit),'Expected profit from current weekly collections'],['Monthly Collection Run-rate',inr(monthlyRunRate),'₹ weekly × 52 ÷ 12'],['Monthly Expected Margin',inr(monthlyProfitRunRate),'Expected current-business profit'],['Total Pending',inr(totals.pending),'Active/current loans'],['Active Customers',activeDB.filter(function(c){return !calc(c).done}).length,'Current collection accounts']];
  var catRows=[['Prime Customers','1–3 pending weeks',totals.prime,'Best-performing active accounts'],['Standard Customers','4–5 pending weeks',totals.standard,'Medium-range accounts'],['At-Risk Customers','6+ pending weeks',totals.risk,'Follow-up required'],['Healthy Customers','0 pending weeks',totals.healthy,'No pending weeks']];
- return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">Ekadhara Analytics</div><h1>Business Dashboard</h1><p>Current business profit, historical profit and collection run-rates are shown separately for clear decisions.</p></div><button class="btn" onclick="go(\'\')">← Back to Customers</button></div>'+
+ return '<div class="dashboard-page"><div class="ek-dashboard-brand"><span class="ek-dashboard-emblem"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekDashGold)" stroke-width="4.2" stroke-linecap="round"/><path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekDashGold)"/><path d="M17 70C34 59 50 47 72 25L78 20L75 34" fill="none" stroke="url(#ekDashGold)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="52" y="58" width="5" height="10" rx="1" fill="#FFE18A"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFE18A"/><path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="#F7D77C" stroke="#6C4511" stroke-width="1.5" stroke-linejoin="round"/><defs><linearGradient id="ekDashGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF0A6"/><stop offset=".5" stop-color="#D99520"/><stop offset="1" stop-color="#FFF0A6"/></linearGradient></defs></svg></span><span><b>EKADHARA</b><small>FINANCIAL SERVICES</small><em>One Trusted Financial Journey</em></span></div><div class="dashboard-head"><div><div class="dash-kicker">EKADHARA Analytics</div><h1>Business Dashboard</h1><p>Current business profit, historical profit and collection run-rates are shown separately for clear decisions.</p></div><button class="btn" onclick="go(\'\')">← Back to Customers</button></div>'+
  '<div class="grid dashboard-cards">'+cards.map(function(s){return '<div class="stat dashboard-card"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join('')+'</div>'+
  cpAuditHTML(months)+
  '<div class="sec monthly-profit-wrap"><div class="monthly-profit-head"><div><h2>Current vs Historical Performance</h2><p>Current payments and completed/old loans are calculated separately. The business model uses the actual cutting amount on each loan.</p></div><div class="profit-model"><b>Contract margin allocation · before expenses</b><br>₹10K−₹500 → ₹9.5K given → ₹2.5K profit; Yalamanda: 10 weeks, ₹0 cutting → ₹0 profit.</div></div><div class="dashboard-split-charts">'+chart(months.current,'Current Loans','current')+chart(months.historical,'Historical / Completed Loans','historical')+'</div><div class="monthly-note"><b>Profit formula:</b> Contract margin = Total payable − (Loan amount − cutting). Allocated margin = receipts × contract margin ÷ total payable; this is not net cash profit and excludes expenses. Weekly expected margin = weekly amount × contract margin rate. Monthly run-rate = weekly × 52 ÷ 12. Yalamanda is treated as 10 weeks with ₹0 cutting, so its profit is ₹0 when ₹3,000 × 10 = ₹30,000 is repaid on a ₹30,000 loan.</div></div>'+
@@ -1577,51 +1551,8 @@ function dashboardView(){
  '<div class="sec"><div class="dash-title"><div><h2>Current Customer Performance</h2><p>Only active/current customers are shown here.</p></div><span class="dash-live">● Live</span></div><div class="performance-list">'+activeDB.slice().sort(function(a,b){return calc(b).miss-calc(a).miss}).map(function(c){var k=calc(c),cat=dashboardCategory(k.miss,k.done);return '<div class="performance-row" onclick="go(this.dataset.id)" data-id="'+c.id+'"><div class="perf-avatar">'+esc((c.name||'?').charAt(0).toUpperCase())+'</div><div class="perf-main"><b>'+esc(c.name)+'</b><small>'+k.miss+' pending week'+(k.miss===1?'':'s')+' · '+k.paidW+'/'+c.weeks+' paid</small></div><span class="perf-cat '+cat.key+'">'+cat.name+'</span><strong>'+inr(k.pend)+'</strong><span class="perf-arrow">›</span></div>'}).join('')+'</div></div></div></div>';
 }
 
-/* ===== Ekadhara admin shell: sidebar + dashboard home (reference UI) ===== */
-var EKA_IC={home:"M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z",users:"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8",layers:"M12 2 2 7l10 5 10-5zM2 17l10 5 10-5M2 12l10 5 10-5",chart:"M12 20V10M18 20V4M6 20v-4",check:"M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3",gear:"M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6",plus:"M12 5v14M5 12h14",wallet:"M3 7h15a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3zM3 7l2-3h11M17 14h2",down:"M12 3v12M7 10l5 5 5-5M4 21h16",msg:"M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.2A8 8 0 1 1 21 12z",search:"M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.3-4.3",bell:"M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0",menu:"M3 6h18M3 12h18M3 18h18",hour:"M6 2h12M6 22h12M7 2c0 6 5 6 5 10s-5 4-5 10M17 2c0 6-5 6-5 10s5 4 5 10",cal:"M3 5h18v16H3zM3 10h18M8 2v6M16 2v6",out:"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",rupee:"M6 4h12M6 9h12M6 4c8 0 8 9 0 9l8 7"};
-function ekaIc(n,s){s=s||20;return '<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="'+EKA_IC[n]+'"/></svg>'}
-function ekaAdm(){return !(CUSTOMER_MODE||location.hash==="#portal")&&!(cloudConfigured()&&!adminSession)}
-function ekaClose(){document.body.classList.remove("eka-open")}
-function ekaGo(h){if(h)location.hash=h;else go('');ekaClose()}
-function ekaCur(){return DB.filter(function(c){return c.isActive!==false})}
-function ekaSearch(v){q=String(v||"").toLowerCase();if(location.hash==="#customers"&&$("lst"))list();else location.hash="#customers"}
-function ekaRemind(){var c=ekaCur().filter(function(c){return overdueSummary(c).count>0&&String(c.phone||"").replace(/\D/g,"").length>=10})[0];if(!c){alert("No overdue customers with a phone number.");return}window.open(wa(c,calc(c)),"_blank")}
-function ekaShell(){
- var on=ekaAdm();document.body.classList.toggle("adm",on);if(!on)return;
- var nav=$("ekaNav");
- if(nav&&!nav.innerHTML){
-  nav.innerHTML=[["home","home","Dashboard","ekaGo('')"],["cust","users","Customers","ekaGo('#customers')"],["coll","layers","Collections","ekaGo('#collections')"],["rep","chart","Reports","ekaGo('#dashboard')"],["done","check","Completed","ekaGo('#completed')"],["set","gear","Settings","backup();ekaClose()"]].map(function(x){return '<a data-k="'+x[0]+'" onclick="'+x[3]+'">'+ekaIc(x[1],22)+'<span>'+x[2]+'</span></a>'}).join("");
-  $("ekaFoot").innerHTML='<a onclick="portal()">'+ekaIc("users",18)+'<span>Customer Portal</span></a>'+(cloudReady&&adminSession?'<a onclick="adminLogout()">'+ekaIc("out",18)+'<span>Logout</span></a>':'');
-  $("ekaBar").innerHTML='<button class="eka-hb" onclick="document.body.classList.toggle(\'eka-open\')" aria-label="Menu">'+ekaIc("menu",26)+'</button><div class="eka-tt"><b id="ekaT"></b><small id="ekaS"></small></div><label class="eka-search">'+ekaIc("search",18)+'<input placeholder="Search customer, mobile or ID..." oninput="ekaSearch(this.value)"></label><button class="eka-bell" aria-label="Alerts" onclick="ekaRemind()">'+ekaIc("bell",20)+'<i></i></button><button class="btn pri eka-add" onclick="custForm()">+ Add</button><div class="eka-me"><i class="av">A</i><span>Admin</span></div>';
- }
- var h=location.hash,key,t;
- if(h===""||h==="#"){key="home";t=["Dashboard","Welcome back, Admin"]}
- else if(h==="#customers"){key="cust";t=["Customers","Search and manage accounts"]}
- else if(h.indexOf("#customer/")===0){key="cust";t=["Customer","Account details"]}
- else if(h==="#collections"){key="coll";t=["Collections","Recent and upcoming payments"]}
- else if(h==="#dashboard"){key="rep";t=["Reports","Business analytics"]}
- else if(h.indexOf("#completed")===0){key="done";t=["Completed","Closed loan accounts"]}
- else{key="";t=["Dashboard","Welcome back, Admin"]}
- if($("ekaT")){$("ekaT").textContent=t[0];$("ekaS").textContent=t[1]}
- [].forEach.call(document.querySelectorAll(".eka-nav a"),function(a){a.classList.toggle("on",a.getAttribute("data-k")===key)});
-}
-function ekaBanner(){return '<div class="eka-banner"><svg class="eka-big" viewBox="0 0 100 100" aria-hidden="true"><use href="#ek-mark"/></svg><div class="eka-bt"><div class="eka-name">EKADHARA</div><div class="eka-sub"><i></i>FINANCIAL SERVICES<i></i></div><div class="eka-tag">One Trusted Financial Journey.</div></div></div>'}
-function ekaRecent(lim){
- var L=ekaCur().slice().sort(function(a,b){return String(b.date||"")<String(a.date||"")?-1:1}).slice(0,lim);
- return '<div class="ep"><div class="eph"><span>'+ekaIc("layers",22)+'Recent Collections</span><a onclick="ekaGo(\'#collections\')">View All →</a></div><div class="et"><div class="etr h"><span>Customer</span><span>Plan</span><span>Amount</span><span>Paid Weeks</span><span>Status</span></div>'+
- (L.length?L.map(function(c){var k=calc(c);return '<div class="etr" onclick="go(\''+c.id+'\')"><span class="n"><i class="av">'+esc(String(c.name||"?").charAt(0).toUpperCase())+'</i>'+esc(c.name)+'</span><span>'+inr(k.payable)+' ('+c.weeks+' Weeks)</span><span>'+inr(c.perWeek)+'</span><span>'+k.paidW+' / '+c.weeks+'</span><span><b class="pill'+(k.done?' b':'')+'">'+(k.done?'Completed':'Active')+'</b></span></div>'}).join(""):'<div class="empty">No customers yet.</div>')+'</div></div>'}
-function ekaUp(lim){
- var U=ekaCur().filter(function(c){return !calc(c).done}).map(function(c){var n=typeof portalNextPayment==="function"?portalNextPayment(c):null;return n&&n.date?{c:c,n:n}:null}).filter(Boolean).sort(function(a,b){return a.n.date<b.n.date?-1:1}).slice(0,lim);
- return '<div class="ep"><div class="eph"><span>'+ekaIc("cal",22)+'Upcoming Collections</span><a onclick="ekaGo(\'#collections\')">View All →</a></div>'+(U.length?U.map(function(x){var d=new Date(x.n.date+"T00:00:00");return '<div class="eu" onclick="go(\''+x.c.id+'\')"><b class="dt"><small>'+d.toLocaleDateString("en-IN",{month:"short"})+'</small>'+d.getDate()+'</b><span>'+esc(x.c.name)+'</span><em>'+inr(x.n.amount)+'</em></div>'}).join(""):'<div class="empty">No upcoming collections.</div>')+'</div>'}
-function ekaHome(){
- var cur=ekaCur(),T={pay:0,paid:0,pend:0};cur.forEach(function(c){var k=calc(c);T.pay+=k.payable||0;T.paid+=k.paid||0;T.pend+=k.pend||0});
- var K=[["k1","users","Total Customers",cur.length],["k2","layers","Total Payable",inr(T.pay)],["k3","rupee","Total Collected",inr(T.paid)],["k4","hour","Remaining",inr(T.pend)]];
- var Q=[["pri","plus","Add Customer","custForm()"],["","wallet","Record Collection","ekaGo('#customers')"],["","chart","View Reports","dashboard()"],["","down","Export Data","backup()"],["","msg","Send Reminder","ekaRemind()"]];
- return ekaBanner()+'<div class="kpis">'+K.map(function(x){return '<div class="kpi '+x[0]+'">'+ekaIc(x[1],40)+'<div><small>'+x[2]+'</small><b>'+x[3]+'</b></div></div>'}).join("")+'</div><div class="qa">'+Q.map(function(x){return '<button class="'+x[0]+'" onclick="'+x[3]+'">'+ekaIc(x[1],26)+'<span>'+x[2]+'</span></button>'}).join("")+'</div><div class="two">'+ekaRecent(4)+ekaUp(4)+'</div>'}
-function ekaColl(){return '<div class="two coll">'+ekaRecent(200)+ekaUp(200)+'</div>'}
-
 function render(){
- topActions();ekaShell();
+ topActions();
  var a=$("app");
  if(CUSTOMER_MODE){a.innerHTML=portalView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
@@ -1630,7 +1561,6 @@ function render(){
  if(location.hash==="#completed"||location.hash.indexOf("#completed/")===0){a.innerHTML=completedView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
 
- if(!view&&ekaAdm()){var eh=location.hash;if(eh===""||eh==="#"){a.innerHTML=ekaHome();return}if(eh==="#collections"){a.innerHTML=ekaColl();return}}
  if(!view){
   var currentDB=DB.filter(function(c){return c.isActive!==false});var T=currentDB.reduce(function(t,c){var k=calc(c);t.paid+=k.paid;t.pend+=k.pend;t.pw+=k.pendW;return t},{paid:0,pend:0,pw:0});
   a.innerHTML='<div class="grid">'+[["Total customers",currentDB.length,"Current collection accounts"],["Total collected",inr(T.paid),"Recorded payments"],["Total pending",inr(T.pend),"Outstanding amount"],["Pending weeks",T.pw,"Across all customers"]].map(function(s){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
@@ -1717,7 +1647,7 @@ function reactivateHistoricalCustomer(customerId){
 }
 function completedCustomerView(g){
  var t=historyGroupTotals(g);
- return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">Ekadhara Records</div><h1>'+esc(g.name)+'</h1><p>All completed/old loans for this customer are stored separately from the current customer account.</p></div><div class="row"><button class="btn" onclick="completedPage()">← Completed customers</button><button class="btn" onclick="reactivateHistoricalCustomer(this.dataset.cid)" data-cid="'+esc(g.customerId)+'">＋ New Loan for Customer</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+
+ return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>'+esc(g.name)+'</h1><p>All completed/old loans for this customer are stored separately from the current customer account.</p></div><div class="row"><button class="btn" onclick="completedPage()">← Completed customers</button><button class="btn" onclick="reactivateHistoricalCustomer(this.dataset.cid)" data-cid="'+esc(g.customerId)+'">＋ New Loan for Customer</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+
  '<div class="hero"><div class="row"><div><h1>'+esc(g.name)+'</h1><small>'+esc(g.customerId||"Old customer")+' · '+esc(g.phone||"No contact")+'</small></div><span class="badge o">Completed history</span></div>'+
  '<div class="big"><div><div class="n">'+inr(t.collected)+'</div><div class="l">Historical collected</div></div><div><div class="n g">'+inr(t.profit)+'</div><div class="l">Historical profit</div></div></div>'+
  '<div class="l" style="margin-top:12px;font-size:12.5px;color:#B9B6C8">'+t.loans+' completed loan'+(t.loans===1?'':'s')+' · Total principal '+inr(t.loan)+'</div></div>'+
@@ -1765,7 +1695,7 @@ function completedView(){
  var totalLoans=records.length,totalCollected=0,totalProfit=0;
  records.forEach(function(x){var k=loanRecordCalc(x.h);totalCollected+=k.paid;totalProfit+=loanProfit(x.h,k)});
  var unique={};records.forEach(function(x){var h=x.h,c=x.c||{};var key=historyCustomerKey({customerId:h.customerId||c.customerId,name:h.name||c.name,phone:h.phone||c.phone});unique[key]=1});
- return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">Ekadhara Records</div><h1>Completed Customers</h1><p>Every completed/old loan is shown as a separate record. If the same customer had 2 past loans, they appear as 2 separate records. Editing or deleting an old record never changes the current customer account.</p></div><div class="row"><button class="btn" onclick="go(\'\')">← Current Customers</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+ 
+ return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>Completed Customers</h1><p>Every completed/old loan is shown as a separate record. If the same customer had 2 past loans, they appear as 2 separate records. Editing or deleting an old record never changes the current customer account.</p></div><div class="row"><button class="btn" onclick="go(\'\')">← Current Customers</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+ 
  '<div class="grid dashboard-cards"><div class="stat dashboard-card"><div class="l">Completed records</div><div class="v">'+totalLoans+'</div><div class="s">One card per completed loan</div></div><div class="stat dashboard-card"><div class="l">Historical customers</div><div class="v">'+Object.keys(unique).length+'</div><div class="s">A customer can have multiple records</div></div><div class="stat dashboard-card"><div class="l">Historical collected</div><div class="v">'+inr(totalCollected)+'</div><div class="s">Completed/old loan collections</div></div><div class="stat dashboard-card"><div class="l">Historical profit</div><div class="v">'+inr(totalProfit)+'</div><div class="s">Business analytics</div></div></div>'+ 
  '<div class="sec"><div class="ph-head"><div><h2>Completed / Old Loan Records</h2><p style="margin-bottom:0">Each past loan stays independent. Same customer name or ID does not merge these records.</p></div><span class="loan-history-badge">'+totalLoans+' records</span></div>'+ 
  (records.length?'<div id="completedCustomerList">'+records.map(completedRecordCard).join("")+'</div>':'<div class="empty">No completed/old loans yet.<br><br><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div>')+ 

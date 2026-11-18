@@ -807,8 +807,128 @@ body .modal{background:linear-gradient(155deg,#17214F,#070C26);border:1px solid 
 .ek-admin-gate-logo{margin:0 auto 16px}
 @media(max-width:560px){.ek-portal-logo{width:68px;height:68px;flex-basis:68px;border-radius:19px}.ek-portal-logo svg{width:61px;height:61px}}
 </style>
+<style>
+/* ===== Ekadhara dashboard UI (sidebar layout) ===== */
+.eka-side,.eka-bar,.eka-ov{display:none}
+body.adm .eka-side{display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;width:224px;z-index:60;background:linear-gradient(180deg,#081333,#040A1C 70%);border-right:1px solid rgba(233,185,73,.3);padding:14px 12px;overflow:auto}
+body.adm .eka-side:after{content:"";position:absolute;left:0;right:0;bottom:0;height:150px;background:radial-gradient(ellipse at 0% 100%,rgba(233,185,73,.4),transparent 65%);pointer-events:none}
+.eka-sb{text-align:center;padding:4px 0 14px}.eka-sb .eka-big{width:78px;height:78px;margin:0 auto}.eka-sb .eka-name{font-size:23px;letter-spacing:2px}.eka-sb .eka-sub{font-size:8.5px;letter-spacing:2px;margin-top:5px}.eka-sb .eka-tag{font-size:11px;margin-top:5px}
+.eka-nav{display:flex;flex-direction:column;gap:6px;margin-top:8px;position:relative;z-index:1}
+.eka-nav a,.eka-foot a{display:flex;align-items:center;gap:14px;padding:11px 14px;border-radius:12px;color:#F5F1E6;font:600 15px Manrope,sans-serif;cursor:pointer}
+.eka-nav a.on{background:linear-gradient(180deg,#F6CD62,#C8901F);color:#1A1204;box-shadow:0 6px 18px rgba(233,185,73,.3)}
+.eka-nav a:not(.on):hover,.eka-foot a:hover{background:rgba(233,185,73,.12)}
+.eka-foot{margin-top:auto;position:relative;z-index:1;padding-top:12px;display:flex;flex-direction:column;gap:2px}.eka-foot a{font-size:13px;color:#B4BDD6;padding:8px 14px}
+body.adm .wrap{max-width:none;margin:0 0 0 224px;padding:0 22px 40px}
+body.adm .wrap>.top,body.adm .wrap>.eka-banner{display:none}
+body.adm .eka-bar{display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:40;margin:0 -22px 16px;padding:12px 22px;background:rgba(5,11,31,.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(233,185,73,.25)}
+.eka-hb{display:none;background:none;border:0;color:#fff;cursor:pointer;padding:0}
+.eka-tt{display:flex;flex-direction:column;line-height:1.15;min-width:0}.eka-tt b{font:700 22px Manrope,sans-serif;color:#fff}.eka-tt small{font-size:12px;color:#B4BDD6;white-space:nowrap}
+.eka-search{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 1 380px;border:1px solid rgba(233,185,73,.4);border-radius:99px;padding:0 14px;background:rgba(255,255,255,.04);color:#B4BDD6}
+.eka-search input{border:0!important;background:none!important;outline:0;padding:10px 0!important;width:100%;font-size:13px}
+.eka-bell{position:relative;background:none;border:0;color:#fff;cursor:pointer}.eka-bell i{position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:9px;background:#FF4D5E}
+.eka-add{white-space:nowrap}.eka-me{display:flex;align-items:center;gap:8px;font-weight:700;color:#fff}.eka-me .av{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;font-style:normal}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.kpi{display:flex;align-items:center;gap:14px;padding:18px;border-radius:16px;border:1px solid;color:#fff}.kpi small{display:block;font-size:14px;color:rgba(255,255,255,.9)}.kpi b{font:700 26px/1.2 Manrope,sans-serif}
+.kpi.k1{background:linear-gradient(135deg,#1457D6,#0A2A74);border-color:#5FA2FF}.kpi.k2{background:linear-gradient(135deg,#8A6414,#2E2108);border-color:#E9B949}.kpi.k3{background:linear-gradient(135deg,#0F9A3F,#054120);border-color:#37E07A}.kpi.k4{background:linear-gradient(135deg,#A8202F,#40080F);border-color:#FF5B6B}
+.qa{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.qa button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;border-radius:16px;border:1px solid rgba(233,185,73,.3);background:linear-gradient(180deg,#0C1838,#050B1F);color:#fff;font:600 14px Manrope,sans-serif;cursor:pointer}
+.qa button.pri{background:linear-gradient(180deg,#F6CD62,#C8901F);color:#1A1204;border-color:#F6CD62}
+.two{display:grid;grid-template-columns:1.55fr 1fr;gap:16px}.two.coll{grid-template-columns:1fr}
+.ep{border:1px solid rgba(233,185,73,.4);border-radius:18px;padding:14px 16px;background:linear-gradient(160deg,rgba(13,26,60,.9),rgba(5,11,31,.95));min-width:0;overflow:hidden}
+.eph{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.eph span{display:flex;align-items:center;gap:10px;font:700 19px Manrope,sans-serif;color:#fff}.eph span .ic{color:#E9B949}.eph a{color:#E9B949;font-weight:700;font-size:13px;cursor:pointer}
+.et{overflow-x:auto}.etr{display:grid;grid-template-columns:1.5fr 1.6fr .8fr .8fr .9fr;gap:8px;align-items:center;padding:11px 8px;min-width:560px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px;cursor:pointer}
+.etr.h{background:rgba(255,255,255,.06);border-radius:8px;color:#B4BDD6;cursor:default}.etr .n{display:flex;align-items:center;gap:8px;font-weight:600}.etr .av{width:26px;height:26px;display:grid;place-items:center;border-radius:50%;font:700 12px Manrope;font-style:normal;flex:none}
+.pill{display:inline-block;padding:6px 18px;border-radius:99px;background:#0B6B33;border:1px solid #22C55E;font-size:12px;color:#fff}.pill.b{background:#1D4FD8;border-color:#5FA2FF}
+.eu{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}.eu span{flex:1;font-weight:600}.eu em{font-style:normal;font-weight:700}
+.dt{display:flex;flex-direction:column;align-items:center;min-width:46px;padding:4px 0;border-radius:8px;background:linear-gradient(180deg,#8A6414,#4A3409);border:1px solid #E9B949;font:700 17px/1 Manrope;color:#fff}.dt small{font-size:10px;font-weight:600}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.qa{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr}}
+@media(max-width:900px){body.adm .eka-side{transform:translateX(-100%);transition:transform .25s}body.eka-open .eka-side{transform:none}body.adm.eka-open .eka-ov{display:block;position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.55)}body.adm .wrap{margin-left:0;padding:0 14px 40px}body.adm .eka-bar{margin:0 -14px 14px;padding:10px 14px;gap:10px}.eka-hb{display:block}.eka-search,.eka-me span{display:none}.eka-add{margin-left:auto}.eka-tt b{font-size:18px}.qa{grid-template-columns:repeat(2,1fr)}.kpi b{font-size:20px}.kpi .ic{width:30px;height:30px}}
+/* ===== Ekadhara premium app shell ===== */
+.eka-tabs{display:none}
+.eka-banner{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:22px;padding:24px 18px;margin:0 0 16px;border-radius:24px;border:1px solid rgba(242,185,59,.4);background:radial-gradient(ellipse at 12% 130%,rgba(242,185,59,.42),transparent 55%),radial-gradient(ellipse at 92% -30%,rgba(242,185,59,.26),transparent 50%),linear-gradient(135deg,#0B1738,#050B1F);box-shadow:0 30px 70px -28px rgba(0,0,0,.9),0 0 70px -25px rgba(242,185,59,.35),inset 0 1px 0 rgba(255,255,255,.1)}
+.eka-banner:after{content:"";position:absolute;inset:-50% -20%;background:linear-gradient(115deg,transparent 42%,rgba(255,236,170,.12) 50%,transparent 58%);transform:translateX(-60%);animation:ekSheen 8s ease-in-out infinite;pointer-events:none}
+.eka-big{width:92px;height:92px;flex:none;filter:drop-shadow(0 4px 20px rgba(242,185,59,.55))}
+.eka-name{font:700 clamp(28px,6vw,50px)/1 Cinzel,Georgia,serif;letter-spacing:3px;color:#F8F2E2;text-shadow:0 2px 18px rgba(242,185,59,.3)}
+.eka-sub{display:flex;align-items:center;gap:10px;margin-top:8px;font:700 clamp(9px,2.4vw,15px) Cinzel,Georgia,serif;letter-spacing:4px;color:#F2B93B}.eka-sub i{flex:1;height:2px;background:linear-gradient(90deg,transparent,#F2B93B)}.eka-sub i:last-child{transform:scaleX(-1)}
+.eka-tag{margin-top:8px;font:italic 400 clamp(12px,2.8vw,17px) Georgia,serif;color:#F8F2E2;text-align:center}
+body.adm .eka-side{background:linear-gradient(185deg,rgba(14,24,60,.96),rgba(4,8,24,.98) 75%);box-shadow:20px 0 60px -30px rgba(0,0,0,.9)}
+.eka-nav a{transition:background .25s,transform .2s}.eka-nav a:not(.on):hover{transform:translateX(4px)}
+.eka-nav a.on{box-shadow:0 10px 26px -8px rgba(242,185,59,.55),inset 0 1px 0 rgba(255,255,255,.5)}
+body.adm .eka-bar{background:rgba(5,10,30,.7);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%)}
+.eka-search:focus-within{border-color:#F2B93B;box-shadow:0 0 0 3px rgba(242,185,59,.16),0 0 28px rgba(242,185,59,.15)}
+body .kpi{position:relative;overflow:hidden;box-shadow:0 22px 44px -20px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.22);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+body .kpi:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.16),transparent 40%);pointer-events:none}
+body .kpi:hover{transform:translateY(-6px);box-shadow:0 30px 60px -20px rgba(0,0,0,.9),0 0 36px -8px currentColor}
+body .kpi .ic{padding:9px;box-sizing:content-box;border-radius:14px;background:rgba(255,255,255,.14);flex:none}
+body .qa button{transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,border-color .25s}body .qa button:hover{transform:translateY(-4px);border-color:#F2B93B;box-shadow:0 16px 34px -14px rgba(242,185,59,.5)}body .qa button:active{transform:scale(.96)}
+body .ep{background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 22px 44px -22px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.07)}
+.etr{transition:background .2s}.etr:not(.h):hover,.eu:hover{background:rgba(242,185,59,.07)}
+.ins{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.ring-card{display:flex;align-items:center;gap:18px}.rc small,.mini small{display:block;font:700 11px Manrope;letter-spacing:.5px;text-transform:uppercase;color:#AEB7D8}.rc b{font:400 40px/1.1 'Instrument Serif',serif;background:linear-gradient(180deg,#fff,#F8DC8E 80%);-webkit-background-clip:text;background-clip:text;color:transparent}.rc span,.mini span{font-size:12px;color:#AEB7D8}
+.mini{display:flex;flex-direction:column;justify-content:center}.mini b{font:400 44px/1.1 'Instrument Serif',serif;color:#fff}.mini b.warn{color:#FFB267}
+@media(max-width:1100px){.ins{grid-template-columns:1fr 1fr}.ring-card{grid-column:1/-1}}
+@media(max-width:900px){
+ body.adm .eka-tabs{display:flex;position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:50;height:66px;align-items:center;justify-content:space-around;padding:0 6px;border-radius:24px;background:rgba(8,14,38,.84);backdrop-filter:blur(20px) saturate(170%);-webkit-backdrop-filter:blur(20px) saturate(170%);border:1px solid rgba(242,185,59,.32);box-shadow:0 24px 60px rgba(0,0,0,.7)}
+ .eka-tabs a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font:600 10px Manrope,sans-serif;color:#9AA6C7;cursor:pointer;transition:color .2s}.eka-tabs a.on{color:#F2B93B}
+ .eka-tabs a.fab{flex:none;width:58px;height:58px;margin-top:-30px;justify-content:center;border-radius:50%;color:#1A1204;background:linear-gradient(135deg,#FFE9A0,#F2B93B 50%,#B8741A);box-shadow:0 14px 30px -6px rgba(242,185,59,.75),0 0 0 6px rgba(6,10,28,.95)}
+ body.adm .wrap{padding-bottom:104px}.eka-add,.eka-hb{display:none!important}.eka-big{width:64px;height:64px}.eka-banner{gap:14px;padding:18px 12px}.ins{grid-template-columns:1fr 1fr}
+}
+/* ===== Mobile perfect-fit ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{max-width:100%;overflow-x:hidden}
+body{min-height:100vh;min-height:100dvh}
+img,svg,video,canvas{max-width:100%}
+.wrap,#app{max-width:100%;box-sizing:border-box}
+body .modal{max-width:calc(100vw - 24px);max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow-y:auto;box-sizing:border-box}
+input,select,textarea{max-width:100%;box-sizing:border-box}
+@media(max-width:900px){
+ body.adm .eka-side{width:min(84vw,300px);height:100vh;height:100dvh;padding-top:max(14px,env(safe-area-inset-top))}
+ body.adm .eka-bar{padding-top:max(10px,env(safe-area-inset-top))}
+ body.adm .wrap{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+ body.adm .eka-bar{margin-left:calc(-1*max(12px,env(safe-area-inset-left)));margin-right:calc(-1*max(12px,env(safe-area-inset-right)));padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+}
+@media(max-width:700px){
+ body.adm .wrap{padding-bottom:calc(98px + env(safe-area-inset-bottom))}
+ .eka-tt{flex:1}.eka-tt b{font-size:17px}.eka-tt small{font-size:11px;overflow:hidden;text-overflow:ellipsis}
+ .eka-me{margin-left:auto}.eka-bell{margin-left:auto}.eka-me{margin-left:0}
+ .eka-banner{flex-direction:column;gap:8px;padding:16px 12px;border-radius:20px;text-align:center}.eka-big{width:60px;height:60px}.eka-name{font-size:clamp(24px,8.4vw,34px);letter-spacing:2px}.eka-sub{letter-spacing:2px;font-size:clamp(8px,2.6vw,11px)}.eka-tag{font-size:12px;margin-top:4px}
+ .kpis{gap:10px}.kpi{flex-direction:column;align-items:flex-start;gap:8px;padding:14px;min-width:0}.kpi small{font-size:12px}.kpi b{font-size:clamp(17px,5.4vw,22px);word-break:break-word}.kpi .ic{width:24px;height:24px;padding:7px}
+ .qa{gap:10px}.qa button{padding:14px 6px;font-size:12.5px;min-width:0}.qa button:last-child{grid-column:1/-1;flex-direction:row;justify-content:center;gap:10px}.qa button .ic{width:22px;height:22px}
+ .ins{gap:10px}.ins .ep{padding:12px}.ring-card{gap:12px}.ring-card svg{width:86px;height:86px;flex:none}.rc{min-width:0}.rc b{font-size:34px}.mini b{font-size:36px}
+ .two{gap:12px}.ep{padding:12px;border-radius:16px}.eph span{font-size:16px;gap:8px}.eph span .ic{width:20px;height:20px}
+ .et{overflow-x:visible}.etr{min-width:0;grid-template-columns:1.5fr .8fr .8fr .9fr;gap:6px;padding:10px 4px;font-size:12px}
+ .etr>span:nth-child(2){display:none}.etr .av{display:none}.etr .n{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+ .pill{padding:4px 8px;font-size:10.5px}
+ .eu{gap:10px;padding:10px 0}.dt{min-width:42px;font-size:15px}
+ body .stat .v,body .portal-stat .v{font-size:clamp(24px,7vw,30px)}
+}
+@media(max-width:360px){.eka-name{font-size:24px}.qa button{font-size:11.5px}.kpi b{font-size:17px}}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* short & friendly dashboard */
+.qa{grid-template-columns:1fr!important;margin-bottom:14px}
+.qa button,.qa button:last-child{flex-direction:row!important;justify-content:center;gap:10px;padding:13px 16px!important;grid-column:auto}
+.two{grid-template-columns:1fr!important}
+.kpis{margin-bottom:12px}
+@media(min-width:901px){.qa{grid-template-columns:260px!important}}
+</style>
+<style>
+/* popups (Add / Edit customer, payments…) always sit above sidebar, top bar and tab bar */
+html body #ov,html body .ov{z-index:300!important;position:fixed;inset:0;align-items:flex-start;justify-content:center;overflow-y:auto;overscroll-behavior:contain;padding:max(18px,env(safe-area-inset-top)) 16px max(18px,env(safe-area-inset-bottom))!important;box-sizing:border-box}
+html body #ov .modal,html body .ov .modal{width:100%!important;max-width:760px!important;margin:auto!important;box-sizing:border-box;max-height:none;overflow:visible}
+body:has(.ov.on){overflow:hidden}
+.ov.on~.eka-tabs,body:has(.ov.on) .eka-tabs{visibility:hidden}
+@media(max-width:700px){
+ html body #ov,html body .ov{padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))!important}
+ html body #ov .modal,html body .ov .modal{max-width:100%!important;padding:16px!important;border-radius:18px}
+ .modal .fg{grid-template-columns:1fr!important}
+ input,select,textarea{font-size:16px!important}
+}
+</style>
 </head><body>
-<div class="wrap">
+<aside class="eka-side"><div class="eka-sb"><svg class="eka-big" viewBox="0 0 100 100" aria-hidden="true"><use href="#ekSym"/></svg><div class="eka-name">EKADHARA</div><div class="eka-sub"><i></i>FINANCIAL SERVICES<i></i></div><div class="eka-tag">One Trusted Financial Journey.</div></div><nav class="eka-nav" id="ekaNav"></nav><div class="eka-foot" id="ekaFoot"></div></aside><div class="eka-ov" onclick="ekaClose()"></div><nav class="eka-tabs" id="ekaTabs"></nav>
+<div class="wrap"><div class="eka-bar" id="ekaBar"></div>
  <div class="top"><div class="brand ek-brand" onclick="go('')" aria-label="EKADHARA Financial Services home">
   <span class="ek-mark" aria-hidden="true">
    <svg viewBox="0 0 100 100" role="img" aria-label="EKADHARA emblem" focusable="false">
@@ -1598,8 +1718,50 @@ function dashboardView(){
  '<div class="sec"><div class="dash-title"><div><h2>Current Customer Performance</h2><p>Only active/current customers are shown here.</p></div><span class="dash-live">● Live</span></div><div class="performance-list">'+activeDB.slice().sort(function(a,b){return calc(b).miss-calc(a).miss}).map(function(c){var k=calc(c),cat=dashboardCategory(k.miss,k.done);return '<div class="performance-row" onclick="go(this.dataset.id)" data-id="'+c.id+'"><div class="perf-avatar">'+esc((c.name||'?').charAt(0).toUpperCase())+'</div><div class="perf-main"><b>'+esc(c.name)+'</b><small>'+k.miss+' pending week'+(k.miss===1?'':'s')+' · '+k.paidW+'/'+c.weeks+' paid</small></div><span class="perf-cat '+cat.key+'">'+cat.name+'</span><strong>'+inr(k.pend)+'</strong><span class="perf-arrow">›</span></div>'}).join('')+'</div></div></div></div>';
 }
 
+/* ===== Ekadhara admin shell: sidebar + dashboard home (reference UI) ===== */
+var EKA_IC={home:"M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z",users:"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8",layers:"M12 2 2 7l10 5 10-5zM2 17l10 5 10-5M2 12l10 5 10-5",chart:"M12 20V10M18 20V4M6 20v-4",check:"M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3",gear:"M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6",plus:"M12 5v14M5 12h14",wallet:"M3 7h15a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3zM3 7l2-3h11M17 14h2",down:"M12 3v12M7 10l5 5 5-5M4 21h16",msg:"M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.2A8 8 0 1 1 21 12z",search:"M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.3-4.3",bell:"M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0",menu:"M3 6h18M3 12h18M3 18h18",hour:"M6 2h12M6 22h12M7 2c0 6 5 6 5 10s-5 4-5 10M17 2c0 6-5 6-5 10s5 4 5 10",cal:"M3 5h18v16H3zM3 10h18M8 2v6M16 2v6",out:"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",rupee:"M6 4h12M6 9h12M6 4c8 0 8 9 0 9l8 7"};
+function ekaIc(n,s){s=s||20;return '<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="'+EKA_IC[n]+'"/></svg>'}
+function ekaAdm(){return !(CUSTOMER_MODE||location.hash==="#portal")&&!(cloudConfigured()&&!adminSession)}
+function ekaClose(){document.body.classList.remove("eka-open")}
+function ekaGo(h){if(h)location.hash=h;else go('');ekaClose()}
+function ekaCur(){return DB.filter(function(c){return c.isActive!==false})}
+function ekaSearch(v){q=String(v||"").toLowerCase();if(location.hash==="#customers"&&$("lst"))list();else location.hash="#customers"}
+function ekaRemind(){var c=ekaCur().filter(function(c){return overdueSummary(c).count>0&&String(c.phone||"").replace(/\D/g,"").length>=10})[0];if(!c){alert("No overdue customers with a phone number.");return}window.open(wa(c,calc(c)),"_blank")}
+function ekaShell(){
+ ekaSprite();var on=ekaAdm();document.body.classList.toggle("adm",on);if(!on)return;
+ var nav=$("ekaNav");
+ if(nav&&!nav.innerHTML){
+  nav.innerHTML=[["home","home","Dashboard","ekaGo('')"],["cust","users","Customers","ekaGo('#customers')"],["coll","layers","Collections","ekaGo('#collections')"],["rep","chart","Reports","ekaGo('#dashboard')"],["done","check","Completed","ekaGo('#completed')"],["set","gear","Settings","backup();ekaClose()"]].map(function(x){return '<a data-k="'+x[0]+'" onclick="'+x[3]+'">'+ekaIc(x[1],22)+'<span>'+x[2]+'</span></a>'}).join("");
+  $("ekaFoot").innerHTML='<a onclick="portal()">'+ekaIc("users",18)+'<span>Customer Portal</span></a>'+(cloudReady&&adminSession?'<a onclick="adminLogout()">'+ekaIc("out",18)+'<span>Logout</span></a>':'');
+  $("ekaTabs").innerHTML=[["home","home","Home","ekaGo('')"],["cust","users","Customers","ekaGo('#customers')"],["add","plus","","custForm()"],["coll","layers","Collections","ekaGo('#collections')"],["menu","menu","Menu","document.body.classList.toggle('eka-open')"]].map(function(x){return '<a data-k="'+x[0]+'" class="'+(x[0]==="add"?"fab":"")+'" onclick="'+x[3]+'">'+ekaIc(x[1],x[0]==="add"?28:22)+(x[2]?'<span>'+x[2]+'</span>':"")+'</a>'}).join("");
+  $("ekaBar").innerHTML='<button class="eka-hb" onclick="document.body.classList.toggle(\'eka-open\')" aria-label="Menu">'+ekaIc("menu",26)+'</button><div class="eka-tt"><b id="ekaT"></b><small id="ekaS"></small></div><label class="eka-search">'+ekaIc("search",18)+'<input placeholder="Search customer, mobile or ID..." oninput="ekaSearch(this.value)"></label><button class="eka-bell" aria-label="Alerts" onclick="ekaRemind()">'+ekaIc("bell",20)+'<i></i></button><button class="btn pri eka-add" onclick="custForm()">+ Add</button><div class="eka-me"><i class="av">A</i><span>Admin</span></div>';
+ }
+ var h=location.hash,key,t;
+ if(h===""||h==="#"){key="home";t=["Dashboard","Welcome back, Admin"]}
+ else if(h==="#customers"){key="cust";t=["Customers","Search and manage accounts"]}
+ else if(h.indexOf("#customer/")===0){key="cust";t=["Customer","Account details"]}
+ else if(h==="#collections"){key="coll";t=["Collections","Recent and upcoming payments"]}
+ else if(h==="#dashboard"){key="rep";t=["Reports","Business analytics"]}
+ else if(h.indexOf("#completed")===0){key="done";t=["Completed","Closed loan accounts"]}
+ else{key="";t=["Dashboard","Welcome back, Admin"]}
+ if($("ekaT")){$("ekaT").textContent=t[0];$("ekaS").textContent=t[1]}
+ [].forEach.call(document.querySelectorAll(".eka-nav a,.eka-tabs a"),function(a){a.classList.toggle("on",a.getAttribute("data-k")===key)});
+}
+function ekaBanner(){return '<div class="eka-banner"><svg class="eka-big" viewBox="0 0 100 100" aria-hidden="true"><use href="#ekSym"/></svg><div class="eka-bt"><div class="eka-name">EKADHARA</div><div class="eka-sub"><i></i>FINANCIAL SERVICES<i></i></div><div class="eka-tag">One Trusted Financial Journey.</div></div></div>'}
+function ekaRecent(lim){
+ var L=ekaCur().slice().sort(function(a,b){return String(b.date||"")<String(a.date||"")?-1:1}).slice(0,lim);
+ return '<div class="ep"><div class="eph"><span>'+ekaIc("layers",22)+'Recent Collections</span><a onclick="ekaGo(\'#collections\')">View All →</a></div><div class="et"><div class="etr h"><span>Customer</span><span>Plan</span><span>Amount</span><span>Paid Weeks</span><span>Status</span></div>'+
+ (L.length?L.map(function(c){var k=calc(c);return '<div class="etr" onclick="go(\''+c.id+'\')"><span class="n"><i class="av">'+esc(String(c.name||"?").charAt(0).toUpperCase())+'</i>'+esc(c.name)+'</span><span>'+inr(k.payable)+' ('+c.weeks+' Weeks)</span><span>'+inr(c.perWeek)+'</span><span>'+k.paidW+' / '+c.weeks+'</span><span><b class="pill'+(k.done?' b':'')+'">'+(k.done?'Completed':'Active')+'</b></span></div>'}).join(""):'<div class="empty">No customers yet.</div>')+'</div></div>'}
+function ekaHome(){
+ var cur=ekaCur(),T={pay:0,paid:0,pend:0};cur.forEach(function(c){var k=calc(c);T.pay+=k.payable||0;T.paid+=k.paid||0;T.pend+=k.pend||0});
+ var K=[["k1","users","Total Customers",cur.length],["k2","layers","Total Payable",inr(T.pay)],["k3","rupee","Total Collected",inr(T.paid)],["k4","hour","Remaining",inr(T.pend)]];
+ var Q=[["pri","plus","Add Customer","custForm()"]];
+ return ekaBanner()+'<div class="kpis">'+K.map(function(x){return '<div class="kpi '+x[0]+'">'+ekaIc(x[1],40)+'<div><small>'+x[2]+'</small><b>'+x[3]+'</b></div></div>'}).join("")+'</div><div class="qa">'+Q.map(function(x){return '<button class="'+x[0]+'" onclick="'+x[3]+'">'+ekaIc(x[1],26)+'<span>'+x[2]+'</span></button>'}).join("")+'</div><div class="two">'+ekaRecent(5)+'</div>'}
+function ekaColl(){return '<div class="two coll">'+ekaRecent(200)+'</div>'}
+
+function ekaSprite(){if(document.getElementById("ekSym"))return;var s=document.querySelector(".ek-mark svg");if(!s)return;var d=document.createElement("div");d.innerHTML='<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ekSym" viewBox="0 0 100 100">'+s.innerHTML+'</symbol></svg>';document.body.insertBefore(d.firstChild,document.body.firstChild)}
 function render(){
- topActions();
+ topActions();ekaShell();
  var a=$("app");
  if(CUSTOMER_MODE){a.innerHTML=portalView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
@@ -1608,6 +1770,7 @@ function render(){
  if(location.hash==="#completed"||location.hash.indexOf("#completed/")===0){a.innerHTML=completedView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
 
+ if(!view&&ekaAdm()){var eh=location.hash;if(eh===""||eh==="#"){a.innerHTML=ekaHome();return}if(eh==="#collections"){a.innerHTML=ekaColl();return}}
  if(!view){
   var currentDB=DB.filter(function(c){return c.isActive!==false});var T=currentDB.reduce(function(t,c){var k=calc(c);t.paid+=k.paid;t.pend+=k.pend;t.pw+=k.pendW;return t},{paid:0,pend:0,pw:0});
   a.innerHTML='<div class="grid">'+[["Total customers",currentDB.length,"Current collection accounts"],["Total collected",inr(T.paid),"Recorded payments"],["Total pending",inr(T.pend),"Outstanding amount"],["Pending weeks",T.pw,"Across all customers"]].map(function(s){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+

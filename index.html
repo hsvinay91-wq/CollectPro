@@ -2386,4 +2386,101 @@ window.addEventListener("DOMContentLoaded",function(){
  new MutationObserver(function(){[].forEach.call(app.querySelectorAll(".stat .v,.dashboard-card .v,.portal-stat .v"),cu)}).observe(app,{childList:true,subtree:true});
 });
 </script>
+
+
+<style id="ekadhara-customer-login-viewport-fit">
+/* Customer login: fit the complete card inside the phone viewport without page scrolling.
+   Only the login screen is affected; the customer dashboard and admin screens are unchanged. */
+html:has(body.portal .portal-page > .sec > .ek-plate),
+html:has(body.portal .portal-page > .sec > .ek-plate) body {
+  height: 100%;
+  min-height: 0;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) {
+  height: 100vh;
+  height: 100svh;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .wrap {
+  width: 100%;
+  max-width: none;
+  height: 100vh;
+  height: 100svh;
+  min-height: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: max(12px, env(safe-area-inset-top)) 14px max(12px, env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec {
+  width: 100%;
+  max-width: 520px !important;
+  box-sizing: border-box;
+  margin: 0 auto !important;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec h1 {
+  margin-top: clamp(10px, 2.2vh, 18px) !important;
+  font-size: clamp(27px, 7vw, 34px) !important;
+  line-height: 1.12;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec > p {
+  margin-top: 7px !important;
+  font-size: clamp(12px, 3.4vw, 15px) !important;
+  line-height: 1.4;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .fg {
+  margin-top: clamp(12px, 2.5vh, 24px) !important;
+  gap: clamp(8px, 1.6vh, 13px);
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .portal-remember-row {
+  margin-top: clamp(8px, 1.7vh, 14px);
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .row {
+  margin-top: clamp(8px, 1.7vh, 14px);
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .note {
+  margin-top: clamp(8px, 1.7vh, 16px) !important;
+  line-height: 1.4;
+}
+@media (max-height: 700px) {
+  body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec {
+    padding: 11px !important;
+  }
+  body.portal:has(.portal-page > .sec > .ek-plate) .ek-plate {
+    padding: 8px 10px !important;
+    margin-bottom: 2px;
+  }
+  body.portal:has(.portal-page > .sec > .ek-plate) .ek-pl-logo {
+    width: 34px !important;
+    height: 34px !important;
+  }
+  body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .fg {
+    margin-top: 9px !important;
+    gap: 7px;
+  }
+  body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .note {
+    margin-top: 7px !important;
+  }
+}
+/* When the iPhone keyboard opens, allow the focused field to remain reachable. */
+body.portal:has(.portal-page > .sec > .ek-plate):has(#portal_cid:focus, #portal_pin:focus) {
+  height: 100dvh;
+  overflow: auto !important;
+}
+body.portal:has(.portal-page > .sec > .ek-plate):has(#portal_cid:focus, #portal_pin:focus) .wrap {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow-y: auto;
+  place-items: start center;
+}
+</style>
+
 </body></html>

@@ -941,6 +941,60 @@ body:has(.ov.on){overflow:hidden}
  input,select,textarea{font-size:16px!important}
 }
 </style>
+
+<style id="ekadhara-mobile-scroll-refinement">
+/* Mobile-only spacing refinement for Home and Customers screens. */
+@media (max-width:700px){
+  body.adm .wrap{padding-top:8px;padding-left:12px;padding-right:12px;padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+  body.adm .eka-bar{margin-bottom:8px;padding-top:7px;padding-bottom:7px}
+  /* Home: keep the complete brand lockup, but reduce its vertical footprint. */
+  body.adm .eka-banner{gap:4px;padding:8px 10px;margin-bottom:8px;border-radius:16px;min-height:0}
+  body.adm .eka-banner .eka-big{width:42px;height:42px}
+  body.adm .eka-banner .eka-name{font-size:clamp(22px,6.8vw,29px);line-height:1;letter-spacing:1.5px}
+  body.adm .eka-banner .eka-sub{margin-top:4px;gap:6px;font-size:8px;letter-spacing:1.5px;line-height:1}
+  body.adm .eka-banner .eka-tag{font-size:10px;line-height:1.2;margin-top:3px}
+  body.adm .kpis{gap:7px;margin-bottom:8px}
+  body.adm .kpi{padding:8px;gap:5px;border-radius:12px;min-height:0}
+  body.adm .kpi .ic{width:19px;height:19px;padding:5px;border-radius:9px}
+  body.adm .kpi small{font-size:9px;line-height:1.15}
+  body.adm .kpi b{font-size:clamp(15px,4.5vw,19px);line-height:1.08}
+  body.adm .qa{margin:0 0 8px;gap:6px}
+  body.adm .qa button,body.adm .qa button:last-child{min-height:42px;padding:8px 12px!important;font-size:12px}
+  body.adm .qa button .ic{width:19px;height:19px}
+  body.adm .two{gap:8px}
+  body.adm .ep{padding:9px;border-radius:15px}
+  body.adm .eph{margin-bottom:7px;font-size:14px;line-height:1.2}
+  body.adm .etr{min-height:0;padding-top:7px;padding-bottom:7px;font-size:10px;gap:5px}
+  body.adm .etr.h{padding-top:6px;padding-bottom:6px;font-size:9px}
+  body.adm .etr .av{width:25px;height:25px;font-size:10px}
+  body.adm .etr .pill{font-size:9px;padding:2px 5px}
+  /* Customers: compact search, filters and individual customer rows. */
+  body.adm #app>.sec{margin-top:6px;padding:11px;border-radius:16px}
+  body.adm #app>.sec h2{font-size:20px;line-height:1.15;margin-bottom:3px}
+  body.adm #app>.sec>p{font-size:11px;line-height:1.3;margin-bottom:8px}
+  body.adm #srch{min-height:42px;height:42px;padding:8px 12px;font-size:14px!important;border-radius:12px}
+  body.adm #chips{gap:5px!important;margin:7px 0 5px!important}
+  body.adm #chips .chip{padding:6px 9px;font-size:10px;line-height:1.1;border-radius:18px}
+  body.adm .cust{gap:8px;padding:8px 2px;min-height:0}
+  body.adm .cust .ring{width:38px;height:38px;flex:none}
+  body.adm .cust .av{width:28px;height:28px;font-size:11px}
+  body.adm .cust .m b{font-size:12px;line-height:1.25}
+  body.adm .cust .m small{font-size:9px;line-height:1.25;display:block}
+  body.adm .cust .amt{font-size:12px;line-height:1.2}
+  body.adm .cust .amt small{font-size:9px;line-height:1.2}
+  body.adm #app>.row{margin-top:8px!important;gap:6px}
+  body.adm #app>.row .btn{padding:5px 8px;font-size:10px}
+}
+@media (max-width:390px){
+  body.adm .eka-banner .eka-big{width:38px;height:38px}
+  body.adm .eka-banner{padding:7px 8px}
+  body.adm .kpi{padding:7px}
+  body.adm .cust{gap:6px}
+  body.adm .cust .ring{width:34px;height:34px}
+  body.adm .cust .av{width:25px;height:25px}
+}
+</style>
+
 </head><body>
 <aside class="eka-side"><div class="eka-sb"><svg class="eka-big" viewBox="0 0 100 100" aria-hidden="true"><use href="#ekSym"/></svg><div class="eka-name">EKADHARA</div><div class="eka-sub"><i></i>FINANCIAL SERVICES<i></i></div><div class="eka-tag">One Trusted Financial Journey.</div></div><nav class="eka-nav" id="ekaNav"></nav><div class="eka-foot" id="ekaFoot"></div></aside><div class="eka-ov" onclick="ekaClose()"></div><nav class="eka-tabs" id="ekaTabs"></nav>
 <div class="wrap"><div class="eka-bar" id="ekaBar"></div>

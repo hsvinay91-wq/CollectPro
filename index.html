@@ -2180,87 +2180,93 @@ async function saveP(cid,pid){
  if(pid){var p=c.pays.filter(function(x){return x.id===pid})[0];for(var k in o)p[k]=o[k]}else{o.id=uid();c.pays.push(o)}
  var savedPayment=Object.assign({},o);if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok){c.pays=previousPays;return}await autoArchiveCompletedCurrentLoans();await cloudLoad()}else{save();await autoArchiveCompletedCurrentLoans();save()}var updatedCustomer=DB.filter(function(x){return x.id===cid})[0]||c;close_();render();if(savedPayment.type==="paid"||savedPayment.type==="hist")showPaymentReceipt(updatedCustomer,savedPayment);
 }
-function paymentReceiptLink(c,p,balance){var phone=(c.phone||"").replace(/\D/g,"");if(phone.length===10)phone="91"+phone;var msg="Hi "+c.name+", your CollectPro payment receipt for Week "+p.week+": amount "+inr(p.amt)+", paid on "+fmt(p.date)+", remaining balance "+inr(balance)+". Please find the attached CollectPro receipt.";return "https://wa.me/"+phone+"?text="+encodeURIComponent(msg)}
-function receiptRoundRect(ctx,x,y,w,h,r,fill){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();if(fill)ctx.fill()}
-function receiptText(ctx,text,x,y,size,color,weight,align){ctx.font=(weight||"400")+" "+size+"px Arial, sans-serif";ctx.fillStyle=color||"#18233f";ctx.textAlign=align||"left";ctx.fillText(String(text==null?"":text),x,y)}
+var TE_MON=["జనవరి","ఫిబ్రవరి","మార్చి","ఏప్రిల్","మే","జూన్","జూలై","ఆగస్టు","సెప్టెంబర్","అక్టోబర్","నవంబర్","డిసెంబర్"];
+function teDateStr(s){if(!s)return"—";var d=new Date(String(s).length===10?s+"T00:00:00":s);return isNaN(d)?"—":d.getDate()+" "+TE_MON[d.getMonth()]+" "+d.getFullYear()}
+function teMethod(m){m=String(m||"");return /cash/i.test(m)?"నగదు":/upi|gpay|phonepe|paytm/i.test(m)?"UPI":(m||"—")}
+function paymentReceiptLink(c,p,balance){var phone=(c.phone||"").replace(/\D/g,"");if(phone.length===10)phone="91"+phone;var msg="నమస్కారం "+c.name+" గారు, మీ ఏకధార చెల్లింపు రసీదు (వారం "+p.week+"): "+inr(p.amt)+", "+teDateStr(p.date)+" న చెల్లించారు. మిగిలిన బాకీ "+inr(balance)+". రసీదు చిత్రం జతచేయబడింది. ధన్యవాదాలు!";return "https://wa.me/"+phone+"?text="+encodeURIComponent(msg)}
 function receiptCanvas(c,p,balance){
- var cv=document.createElement("canvas");cv.width=1080;cv.height=1900;
- var x=cv.getContext("2d"),terms=businessTerms(c),summary=calc(c),total=summary.paid,
- customerId=c.customerId||"—",
- due=p.dueDate||nextWeekDate(c.date,p.week,c.collectionWeekday==null?4:+c.collectionWeekday),
- dateDigits=String(p.date||"").replace(/\D/g,"");
- x.fillStyle="#eef0f5";x.fillRect(0,0,cv.width,cv.height);
- x.shadowColor="rgba(14,25,50,.16)";x.shadowBlur=30;x.shadowOffsetY=12;
- x.fillStyle="#fff";receiptRoundRect(x,42,34,996,1832,30,true);
- x.shadowColor="transparent";x.shadowBlur=0;x.shadowOffsetY=0;
- /* EKADHARA premium invoice header */
- var grad=x.createLinearGradient(52,42,1000,410);grad.addColorStop(0,"#07132F");grad.addColorStop(.55,"#12244B");grad.addColorStop(1,"#09142F");
- x.fillStyle=grad;receiptRoundRect(x,52,42,976,390,30,true);x.fillRect(52,360,976,72);
- /* emblem medallion */
- x.save();x.shadowColor="rgba(255,198,75,.34)";x.shadowBlur=24;
- var gold=x.createLinearGradient(95,78,190,190);gold.addColorStop(0,"#FFF4BD");gold.addColorStop(.28,"#FFD65C");gold.addColorStop(.62,"#C98218");gold.addColorStop(.84,"#F6C84D");gold.addColorStop(1,"#FFF1AE");
- x.fillStyle="rgba(255,211,105,.10)";x.strokeStyle="rgba(255,218,130,.72)";x.lineWidth=3;
- x.beginPath();x.arc(151,151,66,0,Math.PI*2);x.fill();x.stroke();x.restore();
- /* Detailed EKADHARA emblem, faithfully drawn as vector paths */
- x.save();x.translate(99,99);x.scale(1.04,1.04);x.lineCap="round";x.lineJoin="round";
- x.strokeStyle=gold;x.lineWidth=4.2;x.beginPath();x.moveTo(74,15);x.bezierCurveTo(59,5,34,9,20,25);x.bezierCurveTo(8,39,10,59,24,70);x.stroke();
- x.fillStyle=gold;x.strokeStyle="#FFE8A4";x.lineWidth=1.1;x.beginPath();x.moveTo(28,25);x.lineTo(68,25);x.lineTo(61,34);x.lineTo(43,34);x.lineTo(43,45);x.lineTo(61,45);x.lineTo(55,54);x.lineTo(43,54);x.lineTo(43,66);x.lineTo(69,66);x.lineTo(62,76);x.lineTo(28,76);x.closePath();x.fill();x.stroke();
- x.strokeStyle=gold;x.lineWidth=5;x.beginPath();x.moveTo(17,70);x.bezierCurveTo(34,59,50,47,72,25);x.lineTo(78,20);x.lineTo(75,34);x.stroke();
- x.fillStyle="#FFF0A6";x.fillRect(52,58,5,10);x.fillStyle="#F5C34D";x.fillRect(60,52,5,16);x.fillStyle="#FFF0A6";x.fillRect(68,45,5,23);
- x.fillStyle=gold;x.strokeStyle="#68400D";x.lineWidth=1.5;x.beginPath();x.moveTo(39,76);x.lineTo(47,69);x.lineTo(54,74);x.lineTo(61,69);x.lineTo(68,74);x.lineTo(60,82);x.lineTo(48,82);x.closePath();x.fill();x.stroke();
- x.strokeStyle="#68400D";x.lineWidth=1.6;x.beginPath();x.moveTo(46,69);x.lineTo(51,74);x.moveTo(53,73);x.lineTo(58,77);x.moveTo(60,69);x.lineTo(65,73);x.stroke();x.restore();
- receiptText(x,"EKADHARA",248,139,48,"#FFF8E6","700");
- receiptText(x,"FINANCIAL SERVICES",251,174,17,"#F3C85C","700");
- x.strokeStyle="rgba(255,218,130,.42)";x.lineWidth=2;x.beginPath();x.moveTo(250,194);x.lineTo(620,194);x.stroke();
- receiptText(x,"One Trusted Financial Journey.",251,221,16,"#C8D2E8","400");
- x.fillStyle="#1B9D78";receiptRoundRect(x,793,95,190,48,24,true);
- receiptText(x,"PAYMENT RECEIVED",888,126,14,"#fff","700","center");
- receiptText(x,"WEEKLY PAYMENT RECEIPT",104,282,27,"#D8E1F4","700");
- receiptText(x,inr(p.amt),104,359,62,"#FFF","700");
- receiptText(x,"AMOUNT RECEIVED",109,397,15,"#C5CEE2","700");
- var receiptNo="EKS-"+String(customerId).replace(/[^A-Za-z0-9]/g,"").slice(-10).toUpperCase()+"-W"+String(p.week)+"-"+(dateDigits||"DATE");
- function line(y){x.strokeStyle="#e5e8ef";x.lineWidth=2;x.beginPath();x.moveTo(104,y);x.lineTo(976,y);x.stroke()}
- function field(label,value,y,opts){
-   opts=opts||{};
-   var left=opts.x||108, width=opts.width||850, align=opts.align||"left";
-   receiptText(x,label.toUpperCase(),left,y,15,"#777f91","700",align);
-   var val=String(value==null||value===""?"—":value);
-   x.save();x.beginPath();x.rect(left,y+9,width,54);x.clip();
-   receiptText(x,val,left,y+48,23,"#18233f","600",align);x.restore();
- }
- field("Receipt number",receiptNo,478,{width:560});
- field("Payment date",fmt(p.date),478,{x:700,width:274,align:"right"});
- line(565);
- field("Received from / Customer name",c.name||"Customer",615);
- field("Customer ID",customerId,730);
- line(820);
- field("Payment week","Week "+p.week,865);
- field("Paid weeks",summary.paidW+" of "+terms.weeks+" weeks paid",980);
- field("Scheduled due date",due?fmt(due):"—",1095);
- field("Payment method",p.mode||"—",1210);
- x.fillStyle="#edf3fc";receiptRoundRect(x,100,1355,880,310,22,true);
- x.strokeStyle="#dbe4f2";x.lineWidth=2;x.stroke();
- receiptText(x,"ACCOUNT SUMMARY",132,1410,18,"#586782","700");
- receiptText(x,"Total payable",132,1475,18,"#555e70","400");
- receiptText(x,inr(summary.payable),500,1475,21,"#18233f","700","right");
- receiptText(x,"Total paid to date",132,1540,18,"#555e70","400");
- receiptText(x,inr(total),500,1540,21,"#18233f","700","right");
- receiptText(x,"Remaining balance",570,1475,18,"#555e70","400");
- receiptText(x,inr(balance),950,1475,22,"#18233f","700","right");
- line(1730);
- receiptText(x,"Thank you for choosing EKADHARA.",540,1780,19,"#59647A","700","center");
- receiptText(x,"FINANCIAL SERVICES  •  WEEKLY COLLECTIONS",540,1815,12,"#8B93A4","600","center");
+ var terms=businessTerms(c),summary=calc(c),weeks=Number(terms.weeks)||Number(c.weeks)||0,
+ customerId=c.customerId||"—",wd=c.collectionWeekday==null?4:+c.collectionWeekday,
+ due=p.dueDate||nextWeekDate(c.date,p.week,wd),dateDigits=String(p.date||"").replace(/\D/g,""),
+ W=1080,H=1490,S=Math.min(3,Math.sqrt(14e6/(W*H))),cv=document.createElement("canvas");
+ cv.width=Math.round(W*S);cv.height=Math.round(H*S);
+ var x=cv.getContext("2d");x.scale(S,S);
+ var SERIF="Georgia,'Times New Roman','Noto Serif Telugu',serif",SANS="'Segoe UI',Roboto,'Noto Sans Telugu','Nirmala UI','Gautami','Telugu Sangam MN',sans-serif",NAVY="#0E1A45",
+ GS=[[0,"#FFF4BD"],[.28,"#FFD65C"],[.6,"#C98218"],[.85,"#F6C84D"],[1,"#FFF0A6"]];
+ function T(t,px,py,size,col,wt,al,fam,ls,it){x.font=(it?"italic ":"")+(wt||400)+" "+size+"px "+(fam||SANS);x.fillStyle=col;x.textAlign=al||"left";try{x.letterSpacing=(ls||0)+"px"}catch(e){}x.fillText(String(t==null?"":t),px,py);try{x.letterSpacing="0px"}catch(e){}}
+ function RP(a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
+ function RR(a,b,w,h,r,fill,stroke,lw){RP(a,b,w,h,r);if(fill){x.fillStyle=fill;x.fill()}if(stroke){x.strokeStyle=stroke;x.lineWidth=lw||1.5;x.stroke()}}
+ function LG(x1,y1,x2,y2,st){var g=x.createLinearGradient(x1,y1,x2,y2);st.forEach(function(s){g.addColorStop(s[0],s[1])});return g}
+ function FT(t,maxW,size,wt){x.font=(wt||400)+" "+size+"px "+SANS;while(size>16&&x.measureText(t).width>maxW){size--;x.font=(wt||400)+" "+size+"px "+SANS}return size}
+ function KV(label,val,px,py,maxW,vs){T(label,px,py,18,"#6F7890",600);var v=String(val==null||val===""?"—":val);T(v,px,py+36,FT(v,maxW,vs||26,700),NAVY,700)}
+ function logo(px,py,s){x.save();x.translate(px,py);x.scale(s/100,s/100);var g=LG(0,0,100,100,GS);x.lineCap="round";x.lineJoin="round";
+  x.strokeStyle=g;x.lineWidth=4.2;x.stroke(new Path2D("M74 15C59 5 34 9 20 25 8 39 10 59 24 70"));
+  var e=new Path2D("M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z");x.fillStyle=g;x.fill(e);x.strokeStyle="#FFE8A4";x.lineWidth=1.1;x.stroke(e);
+  x.strokeStyle=g;x.lineWidth=5;x.stroke(new Path2D("M17 70C34 59 50 47 72 25L78 20L75 34"));
+  [[52,58,5,10,"#FFF0A6"],[60,52,5,16,"#F5C34D"],[68,45,5,23,"#FFF0A6"]].forEach(function(b){x.fillStyle=b[4];x.fillRect(b[0],b[1],b[2],b[3])});
+  var hs=new Path2D("M39 76l8-7 7 5 7-5 7 5-8 8H48z");x.fillStyle="#F7D77C";x.fill(hs);x.strokeStyle="#68400D";x.lineWidth=1.5;x.stroke(hs);x.lineWidth=1.6;x.stroke(new Path2D("M46 69l5 5m2-1l5 4m2-5l5 4"));x.restore()}
+ var receiptNo="EK-"+String(customerId).replace(/[^A-Za-z0-9]/g,"").slice(-10).toUpperCase()+"-W"+String(p.week)+"-"+(dateDigits||"DATE");
+ x.fillStyle=LG(0,0,0,H,[[0,"#E9ECF4"],[1,"#DCE1EE"]]);x.fillRect(0,0,W,H);
+ x.shadowColor="rgba(14,25,50,.2)";x.shadowBlur=44;x.shadowOffsetY=16;RR(36,36,W-72,H-72,36,"#fff");x.shadowColor="transparent";x.shadowBlur=0;x.shadowOffsetY=0;
+ x.save();RP(36,36,W-72,H-72,36);x.clip();
+ x.globalAlpha=.045;logo(200,420,680);x.globalAlpha=1;
+ /* header */
+ x.fillStyle=LG(0,36,W,300,[[0,"#13204F"],[1,"#050B22"]]);x.fillRect(36,36,W-72,264);
+ var rg=x.createRadialGradient(150,300,0,150,300,440);rg.addColorStop(0,"rgba(242,185,59,.38)");rg.addColorStop(1,"rgba(242,185,59,0)");x.fillStyle=rg;x.fillRect(36,36,W-72,264);
+ rg=x.createRadialGradient(1040,40,0,1040,40,360);rg.addColorStop(0,"rgba(242,185,59,.22)");rg.addColorStop(1,"rgba(242,185,59,0)");x.fillStyle=rg;x.fillRect(36,36,W-72,264);
+ x.strokeStyle=LG(36,0,W,0,GS);x.lineCap="round";x.globalAlpha=.5;x.lineWidth=3;x.beginPath();x.moveTo(36,286);x.bezierCurveTo(300,236,620,318,1044,244);x.stroke();x.globalAlpha=1;
+ RR(84,74,136,136,32,LG(84,74,220,210,[[0,"rgba(255,255,255,.14)"],[1,"rgba(255,255,255,.03)"]]),"rgba(242,185,59,.55)",2);logo(98,88,108);
+ T("EKADHARA",248,144,54,"#F8F2E2","700","left",SERIF,5);
+ T("FINANCIAL SERVICES",250,180,16,"#F2B93B",700,"left",SANS,4.5);
+ T("ఒక నమ్మకమైన ఆర్థిక ప్రయాణం",250,216,22,"#F3EBD3",400,"left",SANS,0,true);
+ RR(742,76,246,48,24,LG(742,76,988,124,[[0,"#25C48F"],[1,"#0E8F63"]]));T("చెల్లింపు అందింది",865,109,22,"#fff",700,"center",SANS);
+ T("రసీదు సంఖ్య",988,166,18,"#F2B93B",600,"right",SANS);T(receiptNo,988,194,18,"#fff",600,"right",SANS);
+ T("వారపు చెల్లింపు రసీదు",84,252,22,"#F2B93B",700,"left",SANS);
+ x.fillStyle=LG(36,0,W-36,0,GS);x.fillRect(36,300,W-72,5);
+ /* amount */
+ T("అందుకున్న మొత్తం",92,358,22,"#6F7890",600);
+ T(inr(p.amt),92,446,88,NAVY,"700","left",SERIF);
+ x.fillStyle=LG(92,0,232,0,GS);x.fillRect(92,466,140,6);
+ T("వారం "+p.week+(weeks?" / "+weeks:"")+"  ·  "+teDateStr(p.date)+" న చెల్లించారు",92,516,24,"#4A5570",500);
+ x.beginPath();x.arc(934,410,46,0,7);x.fillStyle=LG(888,364,980,456,[[0,"#25C48F"],[1,"#0E8F63"]]);x.fill();
+ x.strokeStyle="#fff";x.lineWidth=8;x.lineCap="round";x.lineJoin="round";x.beginPath();x.moveTo(913,412);x.lineTo(929,429);x.lineTo(957,393);x.stroke();
+ /* customer + payment info */
+ var cy=548;RR(92,cy,896,200,24,"#F6F8FC","#E1E7F2",2);
+ KV("కస్టమర్ పేరు",c.name||"Customer",120,cy+50,262,26);KV("కస్టమర్ ఐడి",customerId,412,cy+50,262);KV("ఫోన్ నంబర్",c.phone||"—",704,cy+50,262);
+ x.fillStyle="#E1E7F2";x.fillRect(120,cy+100,840,1.5);
+ KV("చెల్లింపు తేదీ",teDateStr(p.date),120,cy+142,262,24);KV("చెల్లింపు విధానం",teMethod(p.mode),412,cy+142,262,24);KV("గడువు తేదీ",due?teDateStr(due):"—",704,cy+142,262,24);
+ /* summary */
+ var ty=778;T("ఖాతా సారాంశం",92,ty+4,22,"#B07A12",700);
+ var rows=[["మొత్తం చెల్లించాల్సినది",inr(summary.payable),0],["ఇప్పటివరకు చెల్లించినది",inr(summary.paid),0],["ఈ చెల్లింపు (వారం "+p.week+")",inr(p.amt),1],["మిగిలిన బాకీ",inr(balance),2]],RH=60;
+ RP(92,ty+22,896,rows.length*RH,22);x.save();x.clip();
+ rows.forEach(function(r,i){var ry=ty+22+i*RH;x.fillStyle=r[2]===2?LG(92,0,988,0,[[0,"#13204F"],[1,"#0A1236"]]):r[2]===1?"#FFF3CF":(i%2?"#F6F8FC":"#fff");x.fillRect(92,ry,896,RH);
+  var dk=r[2]===2;T(r[0],120,ry+39,25,dk?"#F3EBD3":"#3A4560",r[2]?700:500);T(r[1],960,ry+40,dk?32:27,dk?"#FFD65C":NAVY,700,"right")});
+ x.restore();RP(92,ty+22,896,rows.length*RH,22);x.strokeStyle="#E1E7F2";x.lineWidth=2;x.stroke();
+ /* progress */
+ var py=ty+22+rows.length*RH+28,pct=Math.max(0,Math.min(100,Number(summary.pct)||0));
+ RR(92,py,896,182,24,"#F6F8FC","#E1E7F2",2);T("చెల్లింపు పురోగతి",120,py+42,22,"#B07A12",700);T(Math.round(pct)+"% పూర్తి",960,py+44,28,NAVY,700,"right",SERIF);
+ RR(120,py+62,840,22,11,"#DFE5F1");if(pct>0)RR(120,py+62,Math.max(22,840*pct/100),22,11,LG(120,0,960,0,GS));
+ T(weeks+" వారాల్లో "+summary.paidW+" చెల్లించారు"+(summary.pendW>0?" · "+summary.pendW+" వారాలు మిగిలాయి":" · రుణం పూర్తయింది"),120,py+124,23,"#4A5570",600);
+ var nxt=weeks&&(p.week||0)<weeks?nextWeekDate(c.date,(p.week||0)+1,wd):"";if(nxt)T("తదుపరి గడువు: "+teDateStr(nxt),120,py+160,23,NAVY,700);
+ /* footer */
+ var fy=H-36-172;x.fillStyle=LG(0,fy,W,fy+172,[[0,"#13204F"],[1,"#050B22"]]);x.fillRect(36,fy,W-72,172);
+ rg=x.createRadialGradient(120,fy+200,0,120,fy+200,400);rg.addColorStop(0,"rgba(242,185,59,.3)");rg.addColorStop(1,"rgba(242,185,59,0)");x.fillStyle=rg;x.fillRect(36,fy,W-72,172);
+ x.fillStyle=LG(36,0,W-36,0,GS);x.fillRect(36,fy,W-72,4);
+ logo(80,fy+28,96);T("EKADHARA",196,fy+74,34,"#F8F2E2","700","left",SERIF,4);T("FINANCIAL SERVICES",198,fy+102,14,"#F2B93B",700,"left",SANS,4);
+ T("మీ చెల్లింపునకు ధన్యవాదాలు",988,fy+72,28,"#F3EBD3",600,"right",SANS);T("ఇది కంప్యూటర్ ద్వారా రూపొందించిన రసీదు. సంతకం అవసరం లేదు.",988,fy+106,18,"#AAB3CE",400,"right");
+ T("ఏకధార · ఒక నమ్మకమైన ఆర్థిక ప్రయాణం",W/2,fy+150,19,"#F2B93B",500,"center",SANS);
+ x.restore();
  return cv;
 }
 var receiptDraft=null;
 function showPaymentReceipt(c,p){
- var balance=calc(c).pend,cv=receiptCanvas(c,p,balance),png=cv.toDataURL("image/png"),name="EKADHARA-Receipt-W"+p.week+"-"+String(p.date||"").replace(/[^0-9]/g,"")+".png";
+ var balance=calc(c).pend,cv=receiptCanvas(c,p,balance),png=cv.toDataURL("image/png"),name="Ekadhara-Receipt-W"+p.week+"-"+String(p.date||"").replace(/[^0-9]/g,"")+".png";
  receiptDraft={customer:Object.assign({},c),payment:Object.assign({},p),balance:balance,file:null,name:name};
  var link=paymentReceiptLink(c,p,balance);
- open_('<div class="row"><div><h2>EKADHARA payment receipt</h2><p style="color:var(--muted);font-size:13px">Week '+esc(p.week)+' · '+fmt(p.date)+'</p></div><button class="btn sm sp" onclick="close_()">Close</button></div><img alt="EKADHARA weekly payment receipt preview" src="'+png+'" style="display:block;width:100%;max-height:390px;object-fit:contain;background:#f1f0eb;border-radius:12px;margin:12px auto"><div class="row" style="justify-content:flex-end;margin-top:12px"><a class="btn" href="'+png+'" download="'+esc(name)+'">↓ Download PNG</a><button class="btn pri" id="receiptShareBtn" disabled onclick="shareReceiptImage()">Preparing image…</button><a class="btn" id="receiptWhatsAppFallback" style="display:none" target="_blank" rel="noopener" href="'+link+'">Open WhatsApp</a></div><small id="receiptStatus" style="display:block;color:var(--muted);margin-top:9px">Receipt includes the EKADHARA brand emblem and payment summary.</small>');
- cv.toBlob(function(blob){var share=$("receiptShareBtn"),fallback=$("receiptWhatsAppFallback"),status=$("receiptStatus");if(!blob){share.textContent="Image not ready";if(fallback)fallback.style.display="inline-block";if(status)status.textContent="Download the PNG and attach it in WhatsApp.";return}try{receiptDraft.file=new File([blob],name,{type:"image/png"})}catch(e){receiptDraft.file=null}if(share){share.disabled=false;share.textContent="Share receipt image"}var supported=!!(navigator.share&&navigator.canShare&&receiptDraft.file&&navigator.canShare({files:[receiptDraft.file]}));if(status)status.textContent=supported?"Tap Share receipt image, then choose WhatsApp and the customer chat.":"Your browser cannot attach images from this share button. Download the PNG, open WhatsApp, and attach it to the customer chat.";if(fallback)fallback.style.display=supported?"none":"inline-block"},"image/png");
+ open_('<div class="row"><div><h2>ఏకధార చెల్లింపు రసీదు</h2><p style="color:var(--muted);font-size:13px">వారం '+esc(p.week)+' · '+teDateStr(p.date)+'</p></div><button class="btn sm sp" onclick="close_()">మూసివేయి</button></div><img alt="ఏకధార వారపు చెల్లింపు రసీదు" src="'+png+'" style="display:block;width:100%;height:auto;max-height:min(560px,62vh);object-fit:contain;background:#e9ecf4;border-radius:12px;margin:12px auto"><div class="row" style="justify-content:flex-end;margin-top:12px"><a class="btn" href="'+png+'" download="'+esc(name)+'">↓ PNG డౌన్‌లోడ్</a><button class="btn pri" id="receiptShareBtn" disabled onclick="shareReceiptImage()">సిద్ధమవుతోంది…</button><a class="btn" id="receiptWhatsAppFallback" style="display:none" target="_blank" rel="noopener" href="'+link+'">WhatsApp తెరవండి</a></div><small id="receiptStatus" style="display:block;color:var(--muted);margin-top:9px">అధిక నాణ్యత రసీదు — జూమ్ చేసినా బ్లర్ అవ్వదు.</small>');
+ cv.toBlob(function(blob){var share=$("receiptShareBtn"),fallback=$("receiptWhatsAppFallback"),status=$("receiptStatus");if(!blob){share.textContent="చిత్రం సిద్ధం కాలేదు";if(fallback)fallback.style.display="inline-block";if(status)status.textContent="PNG డౌన్‌లోడ్ చేసి WhatsApp లో జతచేయండి.";return}try{receiptDraft.file=new File([blob],name,{type:"image/png"})}catch(e){receiptDraft.file=null}if(share){share.disabled=false;share.textContent="రసీదు షేర్ చేయండి"}var supported=!!(navigator.share&&navigator.canShare&&receiptDraft.file&&navigator.canShare({files:[receiptDraft.file]}));if(status)status.textContent=supported?"'రసీదు షేర్ చేయండి' నొక్కి, WhatsApp లో కస్టమర్ చాట్ ఎంచుకోండి.":"ఈ బ్రౌజర్ నుండి నేరుగా షేర్ కాదు. PNG డౌన్‌లోడ్ చేసి WhatsApp లో జతచేయండి.";if(fallback)fallback.style.display=supported?"none":"inline-block"},"image/png");
 }
-function shareReceiptImage(){if(!receiptDraft||!receiptDraft.file)return;var data={files:[receiptDraft.file],title:"EKADHARA payment receipt",text:"EKADHARA weekly payment receipt for "+receiptDraft.customer.name+", Week "+receiptDraft.payment.week+"."};if(!navigator.share||!navigator.canShare||!navigator.canShare({files:data.files})){var s=$("receiptStatus");if(s)s.textContent="Download the PNG and attach it in WhatsApp.";return}navigator.share(data).catch(function(e){if(e&&e.name!=="AbortError"){var s=$("receiptStatus");if(s)s.textContent="Could not open the share sheet. Download the PNG and share it from WhatsApp."}})}
+function shareReceiptImage(){if(!receiptDraft||!receiptDraft.file)return;var data={files:[receiptDraft.file],title:"ఏకధార చెల్లింపు రసీదు",text:receiptDraft.customer.name+" గారికి ఏకధార వారపు చెల్లింపు రసీదు — వారం "+receiptDraft.payment.week+"."};if(!navigator.share||!navigator.canShare||!navigator.canShare({files:data.files})){var s=$("receiptStatus");if(s)s.textContent="PNG డౌన్‌లోడ్ చేసి WhatsApp లో జతచేయండి.";return}navigator.share(data).catch(function(e){if(e&&e.name!=="AbortError"){var s=$("receiptStatus");if(s)s.textContent="షేర్ తెరవలేకపోయాం. PNG డౌన్‌లోడ్ చేసి WhatsApp నుండి షేర్ చేయండి."}})}
 
 function arm(key,b){if(armed===key)return true;armed=key;var t=b.textContent;b.textContent="Tap again";setTimeout(function(){if(armed===key){armed=null;b.textContent=t}},3000);return false}
 async function delP(cid,pid,b){if(!arm(pid,b))return;var c=DB.filter(function(x){return x.id===cid})[0];c.pays=c.pays.filter(function(x){return x.id!==pid});if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await cloudLoad()}else save();armed=null;render()}

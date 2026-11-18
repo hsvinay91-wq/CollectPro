@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0C1022">
+<meta name="theme-color" content="#060A1B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="EKADHARA">
@@ -759,20 +759,67 @@ body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:non
 }
 
 </style>
+<style id="ek-premium">
+/* ===== Ekadhara premium layer ===== */
+:root{--g1:#FFF1B0;--g2:#F2B93B;--g3:#B8741A;--glass:linear-gradient(155deg,rgba(28,40,88,.72),rgba(7,12,34,.84));--edge:linear-gradient(140deg,rgba(255,226,140,.7),rgba(255,226,140,.06) 38%,rgba(120,150,255,.28) 70%,rgba(255,226,140,.55))}
+html{scroll-behavior:smooth}::selection{background:rgba(242,185,59,.35);color:#fff}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:#050918}::-webkit-scrollbar-thumb{background:linear-gradient(#F2B93B,#7A4C10);border-radius:9px}
+body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:none;border-radius:50%;filter:blur(90px);opacity:.55}
+body::before{width:520px;height:520px;left:-160px;top:-120px;background:radial-gradient(circle,rgba(242,185,59,.34),transparent 65%);animation:ekA 18s ease-in-out infinite alternate}
+body::after{width:600px;height:600px;right:-200px;bottom:-160px;background:radial-gradient(circle,rgba(70,110,255,.3),transparent 65%);animation:ekB 22s ease-in-out infinite alternate}
+@keyframes ekA{to{transform:translate(120px,90px) scale(1.15)}}@keyframes ekB{to{transform:translate(-110px,-80px) scale(1.1)}}
+body .top{position:sticky;top:0;z-index:30;margin:0 -14px 18px;padding:10px 14px;background:rgba(6,10,28,.6);backdrop-filter:blur(16px) saturate(150%);-webkit-backdrop-filter:blur(16px) saturate(150%);border-bottom:1px solid rgba(242,185,59,.18)}
+body .stat,body .sec,body .cust,body .monthly-panel,body .portal-stat{position:relative;background:var(--glass);border:1px solid transparent;border-radius:20px;backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%);box-shadow:0 22px 44px -22px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.07);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+body .stat::before,body .sec::before,body .cust::before,body .monthly-panel::before,body .portal-stat::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:var(--edge);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);pointer-events:none}
+body .stat::after{content:"";position:absolute;left:20px;right:20px;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--g2),transparent);opacity:.85}
+body .stat:hover,body .portal-stat:hover{transform:translateY(-6px);box-shadow:0 30px 60px -22px rgba(242,185,59,.28),0 0 0 1px rgba(242,185,59,.25),inset 0 1px 0 rgba(255,255,255,.1)}
+body .stat .l{letter-spacing:.4px;text-transform:uppercase;font-size:11px;font-weight:700;color:#AEB7D8}
+body .stat .v,body .portal-stat .v{font-family:'Instrument Serif',serif;font-size:36px;letter-spacing:-.5px;background:linear-gradient(180deg,#fff 10%,#F8DC8E 75%,#E3A93C);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+body .hero{position:relative;overflow:hidden;background:radial-gradient(120% 140% at 0% 0%,rgba(242,185,59,.14),transparent 45%),linear-gradient(135deg,#17224F,#080D2A 70%);border:1px solid rgba(242,185,59,.35);box-shadow:0 30px 70px -25px rgba(0,0,0,.9),0 0 60px -20px rgba(242,185,59,.25),inset 0 1px 0 rgba(255,255,255,.1)}
+body .hero>*{position:relative;z-index:1}
+body .hero::after{content:"";position:absolute;inset:-40% -20%;background:linear-gradient(115deg,transparent 40%,rgba(255,236,170,.1) 50%,transparent 60%);transform:translateX(-60%);animation:ekSheen 8s ease-in-out infinite;pointer-events:none}
+@keyframes ekSheen{50%,100%{transform:translateX(60%)}}
+body .btn{position:relative;overflow:hidden;border-radius:13px;border:1px solid rgba(242,185,59,.3);background:linear-gradient(180deg,rgba(26,38,86,.9),rgba(9,15,40,.96));transition:transform .18s,box-shadow .25s,border-color .25s}
+body .btn:hover{border-color:rgba(242,185,59,.7);box-shadow:0 10px 26px -8px rgba(242,185,59,.35)}body .btn:active{transform:scale(.96)}
+body .btn.pri{background:linear-gradient(135deg,#FFE9A0,#F2B93B 45%,#B8741A);color:#1A1204;border-color:#FFE9A0;font-weight:800;box-shadow:0 10px 26px -8px rgba(242,185,59,.6),inset 0 1px 0 rgba(255,255,255,.55)}
+body .btn.pri::after{content:"";position:absolute;top:0;left:-80%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);transform:skewX(-20deg);animation:ekShine 4.5s ease-in-out infinite}
+@keyframes ekShine{0%,60%{left:-80%}100%{left:140%}}
+body input:focus,body select:focus,body textarea:focus{outline:0;border-color:var(--g2);box-shadow:0 0 0 3px rgba(242,185,59,.18),0 0 26px rgba(242,185,59,.15)}
+body .chip{border-radius:99px;transition:all .25s}body .chip.on{background:linear-gradient(135deg,#FFE9A0,#F2B93B);color:#1A1204;border-color:#FFE9A0;box-shadow:0 6px 18px -6px rgba(242,185,59,.6)}
+body .cust{cursor:pointer}body .cust:hover{transform:translateX(5px);box-shadow:0 18px 40px -20px rgba(242,185,59,.35),inset 0 1px 0 rgba(255,255,255,.08)}
+body .ring{filter:drop-shadow(0 0 8px rgba(242,185,59,.35))}
+body .badge{background:linear-gradient(135deg,rgba(25,214,160,.24),rgba(25,214,160,.08));border:1px solid rgba(25,214,160,.5);color:#7CF0CC;backdrop-filter:blur(6px);letter-spacing:.3px}
+body .badge.o{background:linear-gradient(135deg,rgba(255,157,61,.26),rgba(255,157,61,.08));border-color:rgba(255,157,61,.55);color:#FFC48A}
+body .strip .w{border-radius:12px;transition:transform .2s,box-shadow .2s}body .strip .w:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 8px 20px -6px rgba(0,0,0,.6)}
+body .ov{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:rgba(2,5,18,.66)}
+body .modal{background:linear-gradient(155deg,#17214F,#070C26);border:1px solid rgba(242,185,59,.38);box-shadow:0 40px 110px rgba(0,0,0,.75),0 0 60px -20px rgba(242,185,59,.3);animation:ekPop .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes ekPop{from{opacity:0;transform:translateY(18px) scale(.96)}}
+#app>*,.grid>*{animation:ekUp .65s cubic-bezier(.2,.8,.2,1) both}
+#app>*:nth-child(2),.grid>*:nth-child(2){animation-delay:.07s}#app>*:nth-child(3),.grid>*:nth-child(3){animation-delay:.14s}#app>*:nth-child(4),.grid>*:nth-child(4){animation-delay:.21s}#app>*:nth-child(n+5){animation-delay:.28s}
+@keyframes ekUp{from{opacity:0;transform:translateY(22px)}}
+@media(max-width:700px){body::before{width:300px;height:300px}body::after{width:340px;height:340px}body .stat .v,body .portal-stat .v{font-size:29px}body .top{margin:0 -12px 14px;padding:8px 12px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* EKADHARA detailed emblem — shared across header, customer login and admin gate */
+.ek-mark svg{width:100%;height:100%;display:block}
+.ek-portal-logo{width:76px;height:76px;display:grid;place-items:center;flex:0 0 76px;border-radius:22px;background:radial-gradient(circle at 35% 22%,rgba(255,222,132,.23),rgba(12,23,55,.92) 68%);border:1px solid rgba(245,202,94,.78);box-shadow:0 0 0 4px rgba(255,205,82,.055),0 10px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.18)}
+.ek-portal-logo svg{width:68px;height:68px;display:block;filter:drop-shadow(0 2px 5px rgba(255,194,63,.42))}
+.ek-admin-gate-logo{margin:0 auto 16px}
+@media(max-width:560px){.ek-portal-logo{width:68px;height:68px;flex-basis:68px;border-radius:19px}.ek-portal-logo svg{width:61px;height:61px}}
+</style>
 </head><body>
 <div class="wrap">
  <div class="top"><div class="brand ek-brand" onclick="go('')" aria-label="EKADHARA Financial Services home">
   <span class="ek-mark" aria-hidden="true">
-   <svg viewBox="0 0 100 100" role="img" focusable="false">
-    <defs><linearGradient id="ekGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF0A6"/><stop offset=".28" stop-color="#F7C94F"/><stop offset=".62" stop-color="#D99520"/><stop offset="1" stop-color="#FFF0A6"/></linearGradient></defs>
-    <path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekGold)" stroke-width="4.2" stroke-linecap="round"/>
-    <path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekGold)" stroke="#FFE6A0" stroke-width="1.1"/>
-    <path d="M17 70C34 59 50 47 72 25" fill="none" stroke="url(#ekGold)" stroke-width="5.5" stroke-linecap="round"/>
-    <path d="M65 25L78 20L75 34" fill="none" stroke="url(#ekGold)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
-    <rect x="52" y="58" width="5" height="10" rx="1" fill="#FFE18A"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFE18A"/>
-    <path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="#F7D77C" stroke="#6C4511" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M46 69l5 5m2-1l5 4m2-5l5 4" stroke="#6C4511" stroke-width="1.6" stroke-linecap="round"/>
-   </svg>
+   <svg viewBox="0 0 100 100" role="img" aria-label="EKADHARA emblem" focusable="false">
+<defs><linearGradient id="ekGoldHeader" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4BD"/><stop offset=".26" stop-color="#FFD65C"/><stop offset=".58" stop-color="#C98218"/><stop offset=".82" stop-color="#F6C84D"/><stop offset="1" stop-color="#FFF1AE"/></linearGradient><linearGradient id="ekGoldHeaderShine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8D9"/><stop offset="1" stop-color="#D99520"/></linearGradient></defs>
+<path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekGoldHeader)" stroke-width="4.2" stroke-linecap="round"/>
+<path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekGoldHeader)" stroke="#FFE8A4" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M17 70C34 59 50 47 72 25L78 20L75 34" fill="none" stroke="url(#ekGoldHeader)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="52" y="58" width="5" height="10" rx="1" fill="#FFF0A6"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFF0A6"/>
+<path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="url(#ekGoldHeaderShine)" stroke="#68400D" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M46 69l5 5m2-1l5 4m2-5l5 4" fill="none" stroke="#68400D" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
   </span>
   <span class="ek-word-lockup"><span class="ek-word">EKADHARA</span><span class="ek-sub">FINANCIAL SERVICES</span></span>
 </div>
@@ -1446,7 +1493,7 @@ function portalView(){
   '<div class="row" style="margin:14px 0"><button class="btn" id="installBtn" style="display:none" onclick="installApp()">Install CollectPro</button><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button></div>'+
   '</div>';
  }
- return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="row" style="justify-content:space-between"><div class="av" style="width:64px;height:64px;font-size:20px">CP</div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid",portalLang==="te"?"మీ పేరు":"Your Name","text","",'autocomplete="name"')+F("portal_pin",portalLang==="te"?"4-Digit PIN":"4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="current-password"')+'</div><div class="portal-remember-row"><label class="portal-check"><input id="portal_remember" type="checkbox" '+(portalRemember?"checked":"")+'><span>'+(portalLang==="te"?"ఈ పరికరంలో నన్ను గుర్తుంచుకో":"Remember me on this device")+'</span></label></div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
+ return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="row" style="justify-content:space-between"><span class="ek-portal-logo" aria-label="EKADHARA logo"><svg viewBox="0 0 100 100" role="img" aria-label="EKADHARA emblem" focusable="false"><defs><linearGradient id="ekGoldPortal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4BD"/><stop offset=".26" stop-color="#FFD65C"/><stop offset=".58" stop-color="#C98218"/><stop offset=".82" stop-color="#F6C84D"/><stop offset="1" stop-color="#FFF1AE"/></linearGradient><linearGradient id="ekGoldPortalShine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8D9"/><stop offset="1" stop-color="#D99520"/></linearGradient></defs><path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekGoldPortal)" stroke-width="4.2" stroke-linecap="round"/><path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekGoldPortal)" stroke="#FFE8A4" stroke-width="1.1" stroke-linejoin="round"/><path d="M17 70C34 59 50 47 72 25L78 20L75 34" fill="none" stroke="url(#ekGoldPortal)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="52" y="58" width="5" height="10" rx="1" fill="#FFF0A6"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFF0A6"/><path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="url(#ekGoldPortalShine)" stroke="#68400D" stroke-width="1.5" stroke-linejoin="round"/><path d="M46 69l5 5m2-1l5 4m2-5l5 4" fill="none" stroke="#68400D" stroke-width="1.6" stroke-linecap="round"/></svg></span><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid",portalLang==="te"?"మీ పేరు":"Your Name","text","",'autocomplete="name"')+F("portal_pin",portalLang==="te"?"4-Digit PIN":"4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="current-password"')+'</div><div class="portal-remember-row"><label class="portal-check"><input id="portal_remember" type="checkbox" '+(portalRemember?"checked":"")+'><span>'+(portalLang==="te"?"ఈ పరికరంలో నన్ను గుర్తుంచుకో":"Remember me on this device")+'</span></label></div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
 }
 function animateCustomerPortal(){
   if(!portalData)return;
@@ -1556,7 +1603,7 @@ function render(){
  var a=$("app");
  if(CUSTOMER_MODE){a.innerHTML=portalView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
- if(cloudConfigured() && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><div class="av" style="width:64px;height:64px;margin:0 auto 16px">CP</div><h1 style="font-size:34px">CollectPro Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
+ if(cloudConfigured() && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><span class="ek-portal-logo ek-admin-gate-logo" aria-label="EKADHARA logo"><svg viewBox="0 0 100 100" role="img" aria-label="EKADHARA emblem" focusable="false"><defs><linearGradient id="ekGoldAdmin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4BD"/><stop offset=".26" stop-color="#FFD65C"/><stop offset=".58" stop-color="#C98218"/><stop offset=".82" stop-color="#F6C84D"/><stop offset="1" stop-color="#FFF1AE"/></linearGradient><linearGradient id="ekGoldAdminShine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8D9"/><stop offset="1" stop-color="#D99520"/></linearGradient></defs><path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekGoldAdmin)" stroke-width="4.2" stroke-linecap="round"/><path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekGoldAdmin)" stroke="#FFE8A4" stroke-width="1.1" stroke-linejoin="round"/><path d="M17 70C34 59 50 47 72 25L78 20L75 34" fill="none" stroke="url(#ekGoldAdmin)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="52" y="58" width="5" height="10" rx="1" fill="#FFF0A6"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFF0A6"/><path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="url(#ekGoldAdminShine)" stroke="#68400D" stroke-width="1.5" stroke-linejoin="round"/><path d="M46 69l5 5m2-1l5 4m2-5l5 4" fill="none" stroke="#68400D" stroke-width="1.6" stroke-linecap="round"/></svg></span><h1 style="font-size:34px">CollectPro Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
  if(location.hash==="#dashboard"){a.innerHTML=dashboardView();return}
  if(location.hash==="#completed"||location.hash.indexOf("#completed/")===0){a.innerHTML=completedView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
@@ -2004,4 +2051,15 @@ var cpRenderBase=render;render=function(){cpRenderBase();cpDecorate();var a=$('a
 var cpOpenBase=open_;open_=function(html){cpOpenBase(html);cpDecorate()};
 
 startApp();
-</script></body></html>
+</script><script>
+/* animated count-up for summary numbers */
+window.addEventListener("DOMContentLoaded",function(){
+ var app=document.getElementById("app");if(!app||window.matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+ function cu(el){if(el.dataset.cu)return;var t=el.textContent.trim(),m=t.match(/^(₹?)([\d,]+)$/);if(!m)return;el.dataset.cu=1;
+  var end=+m[2].replace(/,/g,""),pre=m[1],c=t.indexOf(",")>-1;if(!end||end>1e10)return;
+  var s=performance.now();(function f(n){var p=Math.min(1,(n-s)/850),v=Math.round(end*(1-Math.pow(1-p,3)));
+   el.textContent=p<1?pre+((pre||c)?v.toLocaleString("en-IN"):v):t;if(p<1)requestAnimationFrame(f)})(s)}
+ new MutationObserver(function(){[].forEach.call(app.querySelectorAll(".stat .v,.dashboard-card .v,.portal-stat .v"),cu)}).observe(app,{childList:true,subtree:true});
+});
+</script>
+</body></html>

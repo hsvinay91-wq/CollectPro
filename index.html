@@ -1084,7 +1084,7 @@ body{-webkit-tap-highlight-color:transparent}
 </div>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <script>
-var KEY="collectpro_v19",HIST=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en",portalRemember=false,CUSTOMER_MODE=false,userMode=null;
+var KEY="collectpro_v19",HIST=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en",portalRemember=true,CUSTOMER_MODE=false,userMode=null;
 var SUPABASE_URL="https://haqjtrcwhuoqwqpoanij.supabase.co";
 var SUPABASE_PUBLISHABLE_KEY="sb_publishable_ASbs_DhL_rRfPWd1grUq6Q_7-I87djF";
 var sb=null;
@@ -1236,34 +1236,135 @@ async function startApp(){
   if(msg)msg.innerHTML='<div class="sec" style="max-width:560px;margin:40px auto;text-align:center"><h1 style="font-size:32px">Ekadhara</h1><p style="color:var(--miss);font-weight:700">Cloud library could not be loaded.</p><p>Please refresh the page or check your internet connection.</p><button class="btn pri" onclick="location.reload()">Refresh</button></div>';
 }
 
-async function initCloud(){
-  // Check for stored user mode
-  var storedMode=localStorage.getItem("ekadhara_user_mode");
-  if(storedMode){userMode=storedMode;CUSTOMER_MODE=userMode==="customer"}
-  if(!cloudConfigured()||!window.supabase){route();return}
-  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);cloudReady=true;
+var MODE_KEY="ekadhara_user_mode";
+var ADMIN_CREDS_KEY="ekadhara_admin_creds_v1";
+var authListenerBound=false;
 
-  // If user mode not set, show premium selector
+function getSavedMode(){
+  try{
+    var m=localStorage.getItem(MODE_KEY);
+    return (m==="admin"||m==="customer")?m:null;
+  }catch(e){return null}
+}
+function setSavedMode(mode){
+  userMode=mode;
+  CUSTOMER_MODE=(mode==="customer");
+  try{
+    if(mode)localStorage.setItem(MODE_KEY,mode);
+    else localStorage.removeItem(MODE_KEY);
+  }catch(e){}
+}
+function saveAdminCreds(email,pass){
+  try{localStorage.setItem(ADMIN_CREDS_KEY,JSON.stringify({email:email,pass:pass,savedAt:Date.now()}))}catch(e){}
+}
+function getAdminCreds(){
+  try{
+    var raw=localStorage.getItem(ADMIN_CREDS_KEY);
+    if(!raw)return null;
+    var d=JSON.parse(raw);
+    return (d&&d.email&&d.pass)?d:null;
+  }catch(e){return null}
+}
+function clearAdminCreds(){
+  try{localStorage.removeItem(ADMIN_CREDS_KEY)}catch(e){}
+}
+async function ensureAdminSession(){
+  if(!sb)return false;
+  var g=await sb.auth.getSession();
+  adminSession=g.data&&g.data.session?g.data.session:null;
+  if(adminSession)return true;
+  var creds=getAdminCreds();
+  if(creds){
+    var r=await sb.auth.signInWithPassword({email:creds.email,password:creds.pass});
+    if(!r.error&&r.data&&r.data.session){
+      adminSession=r.data.session;
+      return true;
+    }
+  }
+  return false;
+}
+function bindAuthListener(){
+  if(authListenerBound||!sb)return;
+  authListenerBound=true;
+  sb.auth.onAuthStateChange(function(_e,session){
+    adminSession=session;
+    if(userMode==="admin"){
+      if(session)cloudLoad();
+      else render();
+    }
+  });
+}
+
+async function initCloud(){
+  var storedMode=getSavedMode();
+  if(storedMode){
+    setSavedMode(storedMode);
+  }else if(/[?&]app=customer\b/.test(location.search)||location.hash==="#portal"){
+    setSavedMode("customer");
+  }
+  if(!cloudConfigured()||!window.supabase){
+    if(!userMode)showUserModeSelector();
+    route();
+    return;
+  }
+  if(!sb){
+    sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:window.localStorage}
+    });
+    cloudReady=true;
+  }
+  bindAuthListener();
+
   if(!userMode){
     showUserModeSelector();
+    render();
+    return;
   }
 
-  var onAuth=function(){sb.auth.onAuthStateChange(function(_e,session){adminSession=session;if(session)cloudLoad();else if(!CUSTOMER_MODE&&location.hash!=="#portal")render()})};
   var toPortal=function(){try{history.replaceState(null,"","#portal")}catch(e){location.hash="#portal"}};
-  var portalUrl=CUSTOMER_MODE||location.hash==="#portal"||/[?&]app=customer\b/.test(location.search),tried=false;
-  if(portalUrl&&location.hash!=="#portal")toPortal();                       /* installed app / customer link always opens the portal, never the admin gate */
-  if(portalUrl&&getPortalSession()){tried=true;if(await restorePortalSession()){onAuth();render();return}}
-  var g=await sb.auth.getSession();adminSession=g.data.session;
-  if(!adminSession&&!tried&&getPortalSession()){                            /* remember-me customer opened the plain URL or refreshed */
-    toPortal();tried=true;if(await restorePortalSession()){onAuth();render();return}
+  var clearPortalHash=function(){if(location.hash==="#portal"){try{history.replaceState(null,"","#")}catch(e){location.hash="#"}}};
+
+  if(userMode==="customer"){
+    CUSTOMER_MODE=true;
+    if(location.hash!=="#portal")toPortal();
+    if(getPortalSession()){
+      await restorePortalSession();
+    }
+    render();
+    return;
   }
-  if(CUSTOMER_MODE){await cloudLoad();return}
-  if(adminSession)await cloudLoad();else render();
-  onAuth();
+
+  // userMode === "admin"
+  CUSTOMER_MODE=false;
+  clearPortalHash();
+  var ok=await ensureAdminSession();
+  if(ok){
+    await cloudLoad();
+  }else{
+    render();
+  }
 }
-function adminLogin(){open_('<h2>Admin Login</h2><p style="color:var(--muted);font-size:13px">Sign in with the Admin email/password created in Supabase Authentication.</p><div class="fg">'+F("a_email","Admin email","email","")+F("a_pass","Password","password","")+'</div><div class="row"><button class="btn pri sp" onclick="doAdminLogin()">Login</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
-async function doAdminLogin(){var e=$("a_email").value.trim(),p=$("a_pass").value;if(!e||!p){$("err").textContent="Enter email and password.";return}var r=await sb.auth.signInWithPassword({email:e,password:p});if(r.error)$("err").textContent=r.error.message;else close_()}
-async function adminLogout(){if(sb)await sb.auth.signOut();}
+function adminLogin(){
+  var saved=getAdminCreds();
+  open_('<h2>Admin Login</h2><p style="color:var(--muted);font-size:13px">Sign in with your Admin credentials. They will be saved locally so reopening the app opens Admin directly.</p><div class="fg">'+F("a_email","Admin email","email",saved?saved.email:"",'autocomplete="username"')+F("a_pass","Password","password",saved?saved.pass:"",'autocomplete="current-password"')+'</div><div class="row"><button class="btn" onclick="switchPortalMode()">Switch Role</button><button class="btn pri sp" onclick="doAdminLogin()">Login &amp; Remember</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
+}
+async function doAdminLogin(){
+  var e=$("a_email").value.trim(),p=$("a_pass").value;
+  if(!e||!p){$("err").textContent="Enter email and password.";return}
+  var r=await sb.auth.signInWithPassword({email:e,password:p});
+  if(r.error){$("err").textContent=r.error.message;return}
+  saveAdminCreds(e,p);
+  setSavedMode("admin");
+  adminSession=r.data.session;
+  close_();
+  await cloudLoad();
+}
+async function adminLogout(){
+  clearAdminCreds();
+  adminSession=null;
+  if(sb)await sb.auth.signOut();
+  render();
+}
 
 var $=function(i){return document.getElementById(i)};
 var inr=function(n){return "₹"+Math.round(n||0).toLocaleString("en-IN")};
@@ -1389,8 +1490,8 @@ function trackerItems(c,asOf){
 function overdueSummary(c,asOf){var today=asOf?new Date(asOf):new Date();today.setHours(0,0,0,0);var ages=trackerItems(c,today).reduce(function(a,x){if(x.status!=="unpaid"&&x.status!=="carry")return a;var due=nextWeekDate(c.date,x.week,c.collectionWeekday),dt=due?new Date(due+"T00:00:00"):null;if(dt&&dt<today)a.push(Math.ceil((today-dt)/604800000));return a},[]);return {count:ages.length,oldest:ages.length?Math.max.apply(null,ages):0}}
 
 function strip(c){return trackerItems(c).map(function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""});}
-function portal(){location.hash="#portal"}
-function portalAdmin(){location.hash="#"}
+function portal(){selectMode("customer")}
+function portalAdmin(){selectMode("admin")}
 var PORTAL_SESSION_KEY="collectpro_portal_session_v2";
 function savePortalSession(token){
   if(!portalRemember||!token)return;
@@ -1427,7 +1528,8 @@ async function portalLogin(){
  if(!/^\d{4}$/.test(pin)){$("perr").textContent=portalLang==="te"?"PIN 4 అంకెలుగా ఉండాలి.":"PIN must be exactly 4 digits.";return}
  if(!sb){$("perr").textContent=pt("cloud");return}
  try{
-   portalRemember=!!$("portal_remember").checked;
+   var rememberEl=$("portal_remember");
+   portalRemember=rememberEl?!!rememberEl.checked:true;
    var r;
    if(portalRemember){
      r=await sb.rpc("collectpro_customer_login_remember",{p_customer_id:name,p_pin:pin});
@@ -1437,6 +1539,7 @@ async function portalLogin(){
    if(r.error){$("perr").textContent=r.error.message;return}
    var row=Array.isArray(r.data)?r.data[0]:r.data;
    if(!row){$("perr").textContent=pt("invalid");return}
+   setSavedMode("customer");
    portalData=mapRow(row);portalError="";
    if(portalRemember&&row.remember_token)savePortalSession(row.remember_token);else clearPortalSession();
    render();
@@ -1771,10 +1874,10 @@ function portalView(){
   ].map(function(x){return '<div class="stat portal-stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
   '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+
   paymentHistoryHtml(c,false)+helpHtml()+
-  '<div class="row" style="margin:14px 0"><button class="btn" id="installBtn" style="display:none" onclick="installApp()">Install Ekadhara App</button><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button></div>'+
+  '<div class="row" style="margin:14px 0"><button class="btn" id="installBtn" style="display:none" onclick="installApp()">Install Ekadhara App</button><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button><button class="btn" onclick="switchPortalMode()">'+(portalLang==="te"?"Admin / Portal మార్చండి":"Switch Portal")+'</button></div>'+
   '</div>';
  }
- return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="ek-plate"><svg class="ek-pl-logo" viewBox="0 0 100 100" aria-hidden="true"><use href="#ekSym"/></svg><div class="ek-pl-txt"><b>EKADHARA</b><small>FINANCIAL SERVICES</small></div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid",portalLang==="te"?"మీ పేరు":"Your Name","text","",'autocomplete="name"')+F("portal_pin",portalLang==="te"?"4-Digit PIN":"4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="current-password"')+'</div><div class="portal-remember-row"><label class="portal-check"><input id="portal_remember" type="checkbox" '+(portalRemember?"checked":"")+'><span>'+(portalLang==="te"?"ఈ పరికరంలో నన్ను గుర్తుంచుకో":"Remember me on this device")+'</span></label></div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
+ return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="ek-plate"><svg class="ek-pl-logo" viewBox="0 0 100 100" aria-hidden="true"><use href="#ekSym"/></svg><div class="ek-pl-txt"><b>EKADHARA</b><small>FINANCIAL SERVICES</small></div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid",portalLang==="te"?"మీ పేరు":"Your Name","text","",'autocomplete="name"')+F("portal_pin",portalLang==="te"?"4-Digit PIN":"4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="current-password"')+'</div><div class="portal-remember-row"><label class="portal-check"><input id="portal_remember" type="checkbox" '+(portalRemember?"checked":"")+'><span>'+(portalLang==="te"?"ఈ పరికరంలో నన్ను గుర్తుంచుకో":"Remember me on this device")+'</span></label></div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn sm" onclick="switchPortalMode()">'+(portalLang==="te"?"Admin / Portal మార్చండి":"Switch Portal (Admin / Customer)")+'</button></div></div></div>';
 }
 function animateCustomerPortal(){
   if(!portalData)return;
@@ -1793,22 +1896,50 @@ function animateCustomerPortal(){
 }
 function route(){var m=location.hash.match(/^#customer\/(.+)$/);view=m?m[1]:"";armed=null;if(CUSTOMER_MODE||location.hash==="#portal"){view="";render();return}render();window.scrollTo(0,0)}
 function showUserModeSelector(){
-  var html='<div id="modeSelector" style="position:fixed;inset:0;background:radial-gradient(circle at center, rgba(13, 24, 58, 0.95), rgba(7, 12, 34, 0.98));z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:\'Manrope\',sans-serif"><div style="background:linear-gradient(135deg,rgba(18,25,60,0.8),rgba(12,18,47,0.9));border:1px solid rgba(242,185,59,0.3);border-radius:28px;padding:48px 36px;max-width:440px;width:100%;text-align:center;color:#F5F1E6;box-shadow:0 30px 60px rgba(0,0,0,0.5);animation:ekPop .4s cubic-bezier(.2,.8,.2,1.2)"><h2 style="font:400 32px \'Instrument Serif\',serif;margin-bottom:8px;color:#FFC84A;">EKADHARA</h2><p style="font-size:15px;margin-bottom:40px;opacity:0.8;letter-spacing:0.5px;">SELECT PORTAL ACCESS</p><div style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px"><button onclick="selectMode(\'admin\')" style="background:linear-gradient(135deg,#FFD96A,#FFB82E);color:#1A1204;border:none;padding:18px;border-radius:16px;font-weight:800;font-size:16px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s">Admin Portal</button><button onclick="selectMode(\'customer\')" style="background:rgba(255,255,255,0.05);color:#F5F1E6;border:1px solid rgba(255,255,255,0.1);padding:18px;border-radius:16px;font-weight:600;font-size:16px;cursor:pointer;transition:transform 0.2s,background 0.2s">Customer Portal</button></div><p style="font-size:12px;opacity:0.5;line-height:1.5;">Access is restricted based on your role.</p></div></div>';
-  document.body.insertAdjacentHTML('afterEnd',html);
-  // Add premium animation keyframes if not exists
+  if(document.getElementById('modeSelector'))return;
+  var html='<div id="modeSelector" style="position:fixed;inset:0;background:radial-gradient(circle at center, rgba(13, 24, 58, 0.96), rgba(7, 12, 34, 0.99));z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:\'Manrope\',sans-serif"><div style="background:linear-gradient(135deg,rgba(18,25,60,0.88),rgba(12,18,47,0.95));border:1px solid rgba(242,185,59,0.35);border-radius:28px;padding:44px 32px;max-width:440px;width:100%;text-align:center;color:#F5F1E6;box-shadow:0 30px 60px rgba(0,0,0,0.55);animation:ekPop .4s cubic-bezier(.2,.8,.2,1.2)"><h2 style="font:400 32px \'Instrument Serif\',serif;margin-bottom:8px;color:#FFC84A;">EKADHARA</h2><p style="font-size:14px;margin-bottom:34px;opacity:0.82;letter-spacing:0.8px;">SELECT PORTAL ACCESS</p><div style="display:flex;flex-direction:column;gap:14px;margin-bottom:26px"><button onclick="selectMode(\'admin\')" style="background:linear-gradient(135deg,#FFD96A,#FFB82E);color:#1A1204;border:none;padding:18px;border-radius:16px;font-weight:800;font-size:16px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s">Admin Portal</button><button onclick="selectMode(\'customer\')" style="background:rgba(255,255,255,0.06);color:#F5F1E6;border:1px solid rgba(255,255,255,0.16);padding:18px;border-radius:16px;font-weight:600;font-size:16px;cursor:pointer;transition:transform 0.2s,background 0.2s">Customer Portal</button></div><p style="font-size:12px;opacity:0.6;line-height:1.5;">Your selected portal &amp; login stay saved on this device until you switch.</p></div></div>';
+  document.body.insertAdjacentHTML('beforeend',html);
   if(!document.getElementById('modeSelectorStyles')){var style=document.createElement('style');style.id='modeSelectorStyles';style.textContent='@keyframes ekPop{from{opacity:0;transform:translateY(20px) scale(0.98)}to{opacity:1;transform:none}}';document.head.appendChild(style)}
 }
-function selectMode(mode){
-  userMode=mode;
-  CUSTOMER_MODE=mode==='customer';
-  localStorage.setItem('ekadhara_user_mode',mode);
+async function selectMode(mode){
+  setSavedMode(mode);
   closeModeSelector();
-  // Rerun init to proceed
-  if(window.initCloud){window.initCloud()}else{initCloud()}
+  if(mode==='customer'){
+    try{history.replaceState(null,"","#portal")}catch(e){location.hash="#portal"}
+    if(sb&&getPortalSession()&&!portalData){
+      await restorePortalSession();
+    }
+    render();
+    return;
+  }
+  // Admin selected
+  if(location.hash==="#portal"){
+    try{history.replaceState(null,"","#")}catch(e){location.hash="#"}
+  }
+  if(sb){
+    var ok=await ensureAdminSession();
+    if(ok){
+      await cloudLoad();
+    }else{
+      render();
+      adminLogin();
+    }
+  }else{
+    render();
+  }
 }
 function closeModeSelector(){
   var selector=document.getElementById('modeSelector');
   if(selector){selector.remove()}
+}
+function switchPortalMode(){
+  close_();
+  ekaClose();
+  setSavedMode(null);
+  if(location.hash==="#portal"){
+    try{history.replaceState(null,"","#")}catch(e){location.hash="#"}
+  }
+  showUserModeSelector();
 }
 function go(v){var h=v?"#customer/"+v:"";if(location.hash===h||(!v&&(location.hash===""||location.hash==="#")))route();else location.hash=h||"#"}
 window.addEventListener("hashchange",route);
@@ -1911,7 +2042,7 @@ function ekaShell(){
  var nav=$("ekaNav");
  if(nav&&!nav.innerHTML){
   nav.innerHTML=[["home","home","Dashboard","ekaGo('')"],["cust","users","Customers","ekaGo('#customers')"],["coll","layers","Collections","ekaGo('#collections')"],["rep","chart","Reports","ekaGo('#dashboard')"],["done","check","Completed","ekaGo('#completed')"],["set","gear","Settings","backup();ekaClose()"]].map(function(x){return '<a data-k="'+x[0]+'" onclick="'+x[3]+'">'+ekaIc(x[1],22)+'<span>'+x[2]+'</span></a>'}).join("");
-  $("ekaFoot").innerHTML='<a onclick="portal()">'+ekaIc("users",18)+'<span>Customer Portal</span></a>'+(cloudReady&&adminSession?'<a onclick="adminLogout()">'+ekaIc("out",18)+'<span>Logout</span></a>':'');
+  $("ekaFoot").innerHTML='<a onclick="portal()">'+ekaIc("users",18)+'<span>Customer Portal</span></a><a onclick="switchPortalMode()">'+ekaIc("gear",18)+'<span>Switch Portal Role</span></a>'+(cloudReady&&adminSession?'<a onclick="adminLogout()">'+ekaIc("out",18)+'<span>Logout</span></a>':'');
   $("ekaTabs").innerHTML=[["home","home","Home","ekaGo('')"],["cust","users","Customers","ekaGo('#customers')"],["add","plus","","custForm()"],["coll","layers","Collections","ekaGo('#collections')"],["menu","menu","Menu","document.body.classList.toggle('eka-open')"]].map(function(x){return '<a data-k="'+x[0]+'" class="'+(x[0]==="add"?"fab":"")+'" onclick="'+x[3]+'">'+ekaIc(x[1],x[0]==="add"?28:22)+(x[2]?'<span>'+x[2]+'</span>':"")+'</a>'}).join("");
   $("ekaBar").innerHTML='<button class="eka-hb" onclick="document.body.classList.toggle(\'eka-open\')" aria-label="Menu">'+ekaIc("menu",26)+'</button><div class="eka-tt"><b id="ekaT"></b><small id="ekaS"></small></div><label class="eka-search">'+ekaIc("search",18)+'<input placeholder="Search customer, mobile or ID..." oninput="ekaSearch(this.value)"></label><button class="eka-bell" aria-label="Alerts" onclick="ekaRemind()">'+ekaIc("bell",20)+'<i></i></button><button class="btn pri eka-add" onclick="custForm()">+ Add</button><div class="eka-me"><i class="av">A</i><span>Admin</span></div>';
  }
@@ -1944,7 +2075,7 @@ function render(){
  var a=$("app");
  if(CUSTOMER_MODE){a.innerHTML=portalView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
- if(cloudConfigured() && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><span class="ek-portal-logo ek-admin-gate-logo" aria-label="EKADHARA logo"><svg viewBox="0 0 100 100" role="img" aria-label="EKADHARA emblem" focusable="false"><defs><linearGradient id="ekGoldAdmin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4BD"/><stop offset=".26" stop-color="#FFD65C"/><stop offset=".58" stop-color="#C98218"/><stop offset=".82" stop-color="#F6C84D"/><stop offset="1" stop-color="#FFF1AE"/></linearGradient><linearGradient id="ekGoldAdminShine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8D9"/><stop offset="1" stop-color="#D99520"/></linearGradient></defs><path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekGoldAdmin)" stroke-width="4.2" stroke-linecap="round"/><path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekGoldAdmin)" stroke="#FFE8A4" stroke-width="1.1" stroke-linejoin="round"/><path d="M17 70C34 59 50 47 72 25L78 20L75 34" fill="none" stroke="url(#ekGoldAdmin)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="52" y="58" width="5" height="10" rx="1" fill="#FFF0A6"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFF0A6"/><path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="url(#ekGoldAdminShine)" stroke="#68400D" stroke-width="1.5" stroke-linejoin="round"/><path d="M46 69l5 5m2-1l5 4m2-5l5 4" fill="none" stroke="#68400D" stroke-width="1.6" stroke-linecap="round"/></svg></span><h1 style="font-size:34px">Ekadhara Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
+ if(cloudConfigured() && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><span class="ek-portal-logo ek-admin-gate-logo" aria-label="EKADHARA logo"><svg viewBox="0 0 100 100" role="img" aria-label="EKADHARA emblem" focusable="false"><defs><linearGradient id="ekGoldAdmin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4BD"/><stop offset=".26" stop-color="#FFD65C"/><stop offset=".58" stop-color="#C98218"/><stop offset=".82" stop-color="#F6C84D"/><stop offset="1" stop-color="#FFF1AE"/></linearGradient><linearGradient id="ekGoldAdminShine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8D9"/><stop offset="1" stop-color="#D99520"/></linearGradient></defs><path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekGoldAdmin)" stroke-width="4.2" stroke-linecap="round"/><path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekGoldAdmin)" stroke="#FFE8A4" stroke-width="1.1" stroke-linejoin="round"/><path d="M17 70C34 59 50 47 72 25L78 20L75 34" fill="none" stroke="url(#ekGoldAdmin)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="52" y="58" width="5" height="10" rx="1" fill="#FFF0A6"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFF0A6"/><path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="url(#ekGoldAdminShine)" stroke="#68400D" stroke-width="1.5" stroke-linejoin="round"/><path d="M46 69l5 5m2-1l5 4m2-5l5 4" fill="none" stroke="#68400D" stroke-width="1.6" stroke-linecap="round"/></svg></span><h1 style="font-size:34px">Ekadhara Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button><button class="btn" onclick="switchPortalMode()">Switch Role</button></div></div>';return}
  if(location.hash==="#dashboard"){a.innerHTML=dashboardView();return}
  if(location.hash==="#completed"||location.hash.indexOf("#completed/")===0){a.innerHTML=completedView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}

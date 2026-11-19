@@ -2755,37 +2755,60 @@ body.portal:has(.ek-plate) .portal-page > .sec {
  window.addEventListener("DOMContentLoaded",hint);
 })();
 </script>
+
 <style id="ekadhara-android-customer-dashboard-scroll">
+/* Android installed PWA customer dashboard scrolling fix */
 @media (display-mode: standalone) and (max-width: 700px) {
 
-  body.portal:has(.portal-page):not(:has(.ek-plate)) {
+  html:has(body.portal .portal-page:not(:has(.ek-plate))) {
     height: auto !important;
-    min-height: 100dvh !important;
+    min-height: 100% !important;
     max-height: none !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    position: relative !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
+    overscroll-behavior-y: auto !important;
   }
 
-  body.portal:has(.portal-page):not(:has(.ek-plate)) .wrap {
+  html:has(body.portal .portal-page:not(:has(.ek-plate))) body.portal {
     height: auto !important;
     min-height: 100dvh !important;
     max-height: none !important;
     overflow: visible !important;
+    position: static !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  html:has(body.portal .portal-page:not(:has(.ek-plate))) body.portal .wrap {
     display: block !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow: visible !important;
+    flex: none !important;
     touch-action: pan-y !important;
   }
 
-  body.portal:has(.portal-page):not(:has(.ek-plate)) #app,
-  body.portal:has(.portal-page):not(:has(.ek-plate)) .portal-page {
+  html:has(body.portal .portal-page:not(:has(.ek-plate))) body.portal #app {
+    display: block !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
+    flex: none !important;
+    touch-action: pan-y !important;
+  }
+
+  html:has(body.portal .portal-page:not(:has(.ek-plate))) body.portal .portal-page {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    flex: none !important;
     touch-action: pan-y !important;
   }
 }
 </style>
+
 </body></html>

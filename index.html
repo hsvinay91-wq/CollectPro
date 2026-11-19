@@ -2755,4 +2755,37 @@ body.portal:has(.ek-plate) .portal-page > .sec {
  window.addEventListener("DOMContentLoaded",hint);
 })();
 </script>
+<style id="ekadhara-android-customer-dashboard-scroll">
+@media (display-mode: standalone) and (max-width: 700px) {
+
+  body.portal:has(.portal-page):not(:has(.ek-plate)) {
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    position: relative !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+
+  body.portal:has(.portal-page):not(:has(.ek-plate)) .wrap {
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: block !important;
+    touch-action: pan-y !important;
+  }
+
+  body.portal:has(.portal-page):not(:has(.ek-plate)) #app,
+  body.portal:has(.portal-page):not(:has(.ek-plate)) .portal-page {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    touch-action: pan-y !important;
+  }
+}
+</style>
 </body></html>

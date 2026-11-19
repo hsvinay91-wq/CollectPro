@@ -995,6 +995,48 @@ body:has(.ov.on){overflow:hidden}
 }
 </style>
 
+<style>
+/* ===== Customer portal: brand inside the card + animated hero background ===== */
+body.portal .top .ek-brand,body.portal .top .brand{display:none!important}
+body.portal .top:not(:has(#topActions>*)){display:none!important}
+.ek-plate{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;width:100%;box-sizing:border-box;padding:14px 16px;margin-bottom:6px;border-radius:22px;background:#070C26;box-shadow:0 16px 36px -18px rgba(0,0,0,.85),0 0 40px -16px rgba(242,185,59,.45)}
+.ek-plate:before{content:"";position:absolute;z-index:-3;left:50%;top:50%;width:260%;aspect-ratio:1;transform:translate(-50%,-50%) rotate(0);background:conic-gradient(from 0deg,transparent 0 62%,rgba(255,226,140,.95) 78%,transparent 92%);animation:ekPlateSpin 6s linear infinite}
+.ek-plate:after{content:"";position:absolute;z-index:-2;inset:1.6px;border-radius:20.5px;background:radial-gradient(120% 140% at 0% 0%,rgba(242,185,59,.22),transparent 55%),radial-gradient(90% 120% at 100% 100%,rgba(70,110,255,.22),transparent 60%),linear-gradient(135deg,#111F52,#060B24 80%)}
+.ek-pl-logo{width:56px;height:56px;flex:none;filter:drop-shadow(0 0 14px rgba(242,185,59,.6));animation:ekFloat 4s ease-in-out infinite}
+.ek-pl-txt{min-width:0;flex:1 1 130px}.ek-pl-txt b{display:block;font:700 clamp(21px,6.2vw,30px)/1 Cinzel,Georgia,serif;letter-spacing:2.5px;color:#F8F2E2;white-space:nowrap;text-shadow:0 2px 16px rgba(242,185,59,.35)}
+.ek-pl-txt small{display:block;margin-top:6px;font:700 clamp(8px,2.4vw,11px) Cinzel,Georgia,serif;letter-spacing:3.2px;color:#F2B93B;white-space:nowrap}
+.ek-plate>.btn{margin-left:auto;position:relative;z-index:1}
+@keyframes ekPlateSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}@keyframes ekFloat{50%{transform:translateY(-3px) scale(1.04)}}
+body .portal-hero::before{content:none!important;display:none!important}
+.hero-brand{position:absolute;right:22px;bottom:18px;display:flex;align-items:center;gap:14px;max-width:calc(100% - 44px);opacity:.2;pointer-events:none;z-index:0!important;animation:ekHb 7s ease-in-out infinite}
+.hero-brand svg{width:clamp(64px,12vw,120px);height:auto;flex:none;filter:drop-shadow(0 0 20px rgba(242,185,59,.7))}
+.hero-brand b{display:block;font:700 clamp(20px,4vw,40px)/1 Cinzel,Georgia,serif;letter-spacing:3px;color:#F8F2E2;white-space:nowrap}
+.hero-brand small{display:block;margin-top:6px;font:700 clamp(7px,1.2vw,11px) Cinzel,Georgia,serif;letter-spacing:3px;color:#F2B93B;white-space:nowrap}
+@keyframes ekHb{0%,100%{transform:translateY(0);opacity:.17}50%{transform:translateY(-8px);opacity:.3}}
+@media(max-width:700px){.hero-brand{right:14px;bottom:12px;gap:10px;opacity:.16}.hero-brand svg{width:56px}.hero-brand b{font-size:21px;letter-spacing:2px}.hero-brand small{font-size:7px;letter-spacing:2px}}
+@media(prefers-reduced-motion:reduce){.ek-plate:before,.ek-pl-logo,.hero-brand{animation:none!important}}
+</style>
+
+<style id="ekadhara-portal-mobile-header-fix">
+/* Login brand row: keep the logo, wordmark and language control on one clean line. */
+@media(max-width:560px){
+  body.portal .ek-plate{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:8px!important;padding:10px 10px!important;border-radius:18px!important;min-width:0!important}
+  body.portal .ek-pl-logo{width:clamp(36px,11vw,44px)!important;height:clamp(36px,11vw,44px)!important;flex:0 0 auto!important}
+  body.portal .ek-pl-txt{flex:1 1 0!important;min-width:0!important;overflow:hidden!important}
+  body.portal .ek-pl-txt b{font-size:clamp(15px,4.7vw,20px)!important;letter-spacing:1px!important;line-height:1.08!important;white-space:nowrap!important}
+  body.portal .ek-pl-txt small{font-size:clamp(6px,1.9vw,8px)!important;letter-spacing:1.15px!important;margin-top:4px!important;white-space:nowrap!important}
+  body.portal .ek-plate>.btn{flex:0 0 auto!important;margin:0!important;padding:7px 9px!important;font-size:10px!important;line-height:1.2!important;white-space:nowrap!important;min-width:0!important}
+  body.portal .portal-page>.sec{padding:13px!important}
+}
+@media(max-width:360px){
+  body.portal .ek-plate{gap:6px!important;padding:9px 8px!important}
+  body.portal .ek-pl-logo{width:35px!important;height:35px!important}
+  body.portal .ek-pl-txt b{font-size:15px!important;letter-spacing:.7px!important}
+  body.portal .ek-pl-txt small{font-size:6px!important;letter-spacing:.8px!important}
+  body.portal .ek-plate>.btn{padding:6px 7px!important;font-size:9px!important}
+}
+</style>
+
 </head><body>
 <aside class="eka-side"><div class="eka-sb"><svg class="eka-big" viewBox="0 0 100 100" aria-hidden="true"><use href="#ekSym"/></svg><div class="eka-name">EKADHARA</div><div class="eka-sub"><i></i>FINANCIAL SERVICES<i></i></div><div class="eka-tag">One Trusted Financial Journey.</div></div><nav class="eka-nav" id="ekaNav"></nav><div class="eka-foot" id="ekaFoot"></div></aside><div class="eka-ov" onclick="ekaClose()"></div><nav class="eka-tabs" id="ekaTabs"></nav>
 <div class="wrap"><div class="eka-bar" id="ekaBar"></div>
@@ -1659,7 +1701,7 @@ function portalView(){
   var paidTarget=Math.round(Number(k.paid)||0), pendTarget=Math.round(Number(k.pend)||0);
   var completion=k.done?'<div class="completion-card"><div class="completion-icon">🎉</div><div><b>'+pt("completed")+'</b><div style="font-size:12px;color:var(--muted);margin-top:2px">'+(portalLang==="te"?"అభినందనలు! ఈ లోన్‌లో అన్ని వారాలు పూర్తయ్యాయి.":"Congratulations! All payable weeks are completed.")+'</div></div></div>':'';
   return '<div class="portal-page">'+
-  '<div class="hero portal-hero"><div class="row"><div>'+
+  '<div class="hero portal-hero"><div class="hero-brand" aria-hidden="true"><svg viewBox="0 0 100 100"><use href="#ekSym"/></svg><div><b>EKADHARA</b><small>FINANCIAL SERVICES</small></div></div><div class="row"><div>'+
   '<div class="portal-welcome">'+pt("welcome")+' 👋</div>'+
   '<h1 class="portal-name">'+esc(c.name)+'</h1>'+
   '<div class="portal-subtitle">'+pt("subtitle")+'</div>'+
@@ -1682,7 +1724,7 @@ function portalView(){
   '<div class="row" style="margin:14px 0"><button class="btn" id="installBtn" style="display:none" onclick="installApp()">Install CollectPro</button><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button></div>'+
   '</div>';
  }
- return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="row" style="justify-content:space-between"><span class="ek-portal-logo" aria-label="EKADHARA logo"><svg viewBox="0 0 100 100" role="img" aria-label="EKADHARA emblem" focusable="false"><defs><linearGradient id="ekGoldPortal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4BD"/><stop offset=".26" stop-color="#FFD65C"/><stop offset=".58" stop-color="#C98218"/><stop offset=".82" stop-color="#F6C84D"/><stop offset="1" stop-color="#FFF1AE"/></linearGradient><linearGradient id="ekGoldPortalShine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8D9"/><stop offset="1" stop-color="#D99520"/></linearGradient></defs><path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekGoldPortal)" stroke-width="4.2" stroke-linecap="round"/><path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekGoldPortal)" stroke="#FFE8A4" stroke-width="1.1" stroke-linejoin="round"/><path d="M17 70C34 59 50 47 72 25L78 20L75 34" fill="none" stroke="url(#ekGoldPortal)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="52" y="58" width="5" height="10" rx="1" fill="#FFF0A6"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFF0A6"/><path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="url(#ekGoldPortalShine)" stroke="#68400D" stroke-width="1.5" stroke-linejoin="round"/><path d="M46 69l5 5m2-1l5 4m2-5l5 4" fill="none" stroke="#68400D" stroke-width="1.6" stroke-linecap="round"/></svg></span><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid",portalLang==="te"?"మీ పేరు":"Your Name","text","",'autocomplete="name"')+F("portal_pin",portalLang==="te"?"4-Digit PIN":"4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="current-password"')+'</div><div class="portal-remember-row"><label class="portal-check"><input id="portal_remember" type="checkbox" '+(portalRemember?"checked":"")+'><span>'+(portalLang==="te"?"ఈ పరికరంలో నన్ను గుర్తుంచుకో":"Remember me on this device")+'</span></label></div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
+ return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="ek-plate"><svg class="ek-pl-logo" viewBox="0 0 100 100" aria-hidden="true"><use href="#ekSym"/></svg><div class="ek-pl-txt"><b>EKADHARA</b><small>FINANCIAL SERVICES</small></div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid",portalLang==="te"?"మీ పేరు":"Your Name","text","",'autocomplete="name"')+F("portal_pin",portalLang==="te"?"4-Digit PIN":"4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="current-password"')+'</div><div class="portal-remember-row"><label class="portal-check"><input id="portal_remember" type="checkbox" '+(portalRemember?"checked":"")+'><span>'+(portalLang==="te"?"ఈ పరికరంలో నన్ను గుర్తుంచుకో":"Remember me on this device")+'</span></label></div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
 }
 function animateCustomerPortal(){
   if(!portalData)return;
@@ -1797,7 +1839,7 @@ function ekaCur(){return DB.filter(function(c){return c.isActive!==false})}
 function ekaSearch(v){q=String(v||"").toLowerCase();if(location.hash==="#customers"&&$("lst"))list();else location.hash="#customers"}
 function ekaRemind(){var c=ekaCur().filter(function(c){return overdueSummary(c).count>0&&String(c.phone||"").replace(/\D/g,"").length>=10})[0];if(!c){alert("No overdue customers with a phone number.");return}window.open(wa(c,calc(c)),"_blank")}
 function ekaShell(){
- ekaSprite();var on=ekaAdm();document.body.classList.toggle("adm",on);if(!on)return;
+ ekaSprite();document.body.classList.toggle("portal",!!(CUSTOMER_MODE||location.hash==="#portal"));var on=ekaAdm();document.body.classList.toggle("adm",on);if(!on)return;
  var nav=$("ekaNav");
  if(nav&&!nav.innerHTML){
   nav.innerHTML=[["home","home","Dashboard","ekaGo('')"],["cust","users","Customers","ekaGo('#customers')"],["coll","layers","Collections","ekaGo('#collections')"],["rep","chart","Reports","ekaGo('#dashboard')"],["done","check","Completed","ekaGo('#completed')"],["set","gear","Settings","backup();ekaClose()"]].map(function(x){return '<a data-k="'+x[0]+'" onclick="'+x[3]+'">'+ekaIc(x[1],22)+'<span>'+x[2]+'</span></a>'}).join("");
@@ -2048,7 +2090,7 @@ async function saveNewLoan(cid){
  if(!(loan>0)||!(pw>0)||!(weeks>0)||!date){$('err').textContent='Enter loan amount, weekly amount, weeks and loan date.';return}
  archiveCurrentLoan(c);
  c.loan=loan;c.cutting=cut;c.perWeek=pw;c.weeks=weeks;c.date=date;c.collectionWeekday=day;c.hPaid=0;c.hMiss=0;c.hAmt="";c.pays=[];
- if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await cloudLoad()}else save();close_();go(c.id);
+ if(sb){var ok=await cloudSaveCustomer(c,null);if(!ok)return;await cloudLoad();c=DB.filter(function(x){return x.id===cid})[0]||c}else save();close_();go(c.id);showLoanSummary(c);
 }
 
 function paymentRows(c){
@@ -2114,6 +2156,7 @@ function custForm(id){
  '<div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="saveC(\''+(id||"")+'\')">Save customer</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
 }
 async function saveC(id){
+ var isNewCustomer=!id;
  var g=function(i){return $(i).value.trim()};
  var o={name:g("f_name"),customerId:g("f_cid"),phone:g("f_phone"),loan:+g("f_loan"),cutting:+g("f_cut")||0,perWeek:+g("f_pw"),weeks:+g("f_wk"),date:g("f_date"),collectionWeekday:+g("f_day"),hPaid:+g("f_hp")||0,hMiss:+g("f_hm")||0,hAmt:g("f_ha")};
  var pin=g("f_pin");
@@ -2129,6 +2172,7 @@ async function saveC(id){
      return;
    }
    if(dup.data){
+     isNewCustomer=false;
      id=dup.data.id;
      var local=DB.filter(function(x){return x.id===id})[0];
      if(!local){local=mapRow(dup.data);DB.push(local)}
@@ -2155,7 +2199,7 @@ async function saveC(id){
    var match=DB.filter(function(x){return x.customerId.toLowerCase()===o.customerId.toLowerCase()})[0];
    if(match)id=match.id;
  }
- save();close_();go(id||"");
+ save();close_();go(id||"");if(isNewCustomer&&c&&c.loan>0)showLoanSummary(c);
 }
 function payForm(cid,pid){
  var c=DB.filter(function(x){return x.id===cid})[0],p=pid?c.pays.filter(function(x){return x.id===pid})[0]:null;
@@ -2258,6 +2302,38 @@ function receiptCanvas(c,p,balance){
  x.restore();
  return cv;
 }
+
+function loanSummaryCanvas(c){
+ var k=calc(c),wd=c.collectionWeekday==null?4:+c.collectionWeekday,first=nextWeekDate(c.date,1,wd),last=nextWeekDate(c.date,c.weeks,wd);
+ var W=1080,H=1760,S=Math.min(3,Math.sqrt(14e6/(W*H))),cv=document.createElement("canvas");cv.width=Math.round(W*S);cv.height=Math.round(H*S);var x=cv.getContext("2d");x.scale(S,S);
+ var SERIF="Georgia,'Times New Roman','Noto Serif Telugu',serif",SANS="'Segoe UI',Roboto,'Noto Sans Telugu','Nirmala UI','Gautami',sans-serif",GS=[[0,"#FFF4BD"],[.28,"#FFD65C"],[.6,"#C98218"],[.85,"#F6C84D"],[1,"#FFF0A6"]];
+ function T(t,px,py,size,col,wt,al,fam,ls,it){x.font=(it?"italic ":"")+(wt||400)+" "+size+"px "+(fam||SANS);x.fillStyle=col;x.textAlign=al||"left";try{x.letterSpacing=(ls||0)+"px"}catch(e){}x.fillText(String(t==null?"":t),px,py);try{x.letterSpacing="0px"}catch(e){}}
+ function RP(a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
+ function RR(a,b,w,h,r,fill,stroke,lw){RP(a,b,w,h,r);if(fill){x.fillStyle=fill;x.fill()}if(stroke){x.strokeStyle=stroke;x.lineWidth=lw||1.5;x.stroke()}}
+ function LG(a,b,c,d,st){var g=x.createLinearGradient(a,b,c,d);st.forEach(function(v){g.addColorStop(v[0],v[1])});return g}
+ function logo(px,py,z){x.save();x.translate(px,py);x.scale(z/100,z/100);var g=LG(0,0,100,100,GS);x.lineCap="round";x.lineJoin="round";x.strokeStyle=g;x.lineWidth=4.2;x.stroke(new Path2D("M74 15C59 5 34 9 20 25 8 39 10 59 24 70"));var e=new Path2D("M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z");x.fillStyle=g;x.fill(e);x.strokeStyle="#FFE8A4";x.lineWidth=1.1;x.stroke(e);x.strokeStyle=g;x.lineWidth=5;x.stroke(new Path2D("M17 70C34 59 50 47 72 25L78 20L75 34"));[[52,58,5,10,"#FFF0A6"],[60,52,5,16,"#F5C34D"],[68,45,5,23,"#FFF0A6"]].forEach(function(b){x.fillStyle=b[4];x.fillRect(b[0],b[1],b[2],b[3])});var h=new Path2D("M39 76l8-7 7 5 7-5 7 5-8 8H48z");x.fillStyle="#F7D77C";x.fill(h);x.strokeStyle="#68400D";x.lineWidth=1.5;x.stroke(h);x.restore()}
+ function row(label,value,y,highlight){RR(92,y,896,66,14,highlight?"#FFF2C9":(y%2?"#F7F8FC":"#FFFFFF"));T(label,120,y+42,24,highlight?"#72500E":"#46516B",highlight?700:500);T(value,958,y+42,27,highlight?"#9A6810":"#101A40",700,"right")}
+ x.fillStyle=LG(0,0,0,H,[[0,"#E9ECF4"],[1,"#DCE1EE"]]);x.fillRect(0,0,W,H);x.shadowColor="rgba(14,25,50,.2)";x.shadowBlur=44;x.shadowOffsetY=16;RR(36,36,W-72,H-72,36,"#fff");x.shadowColor="transparent";x.shadowBlur=0;x.shadowOffsetY=0;x.save();RP(36,36,W-72,H-72,36);x.clip();
+ x.globalAlpha=.035;logo(220,500,650);x.globalAlpha=1;
+ x.fillStyle=LG(0,36,W,310,[[0,"#13204F"],[1,"#050B22"]]);x.fillRect(36,36,W-72,274);var rg=x.createRadialGradient(150,300,0,150,300,440);rg.addColorStop(0,"rgba(242,185,59,.35)");rg.addColorStop(1,"rgba(242,185,59,0)");x.fillStyle=rg;x.fillRect(36,36,W-72,274);
+ RR(84,76,136,136,30,"rgba(255,255,255,.08)","rgba(242,185,59,.55)",2);logo(98,90,108);T("EKADHARA",248,145,54,"#F8F2E2",700,"left",SERIF,5);T("FINANCIAL SERVICES",250,182,16,"#F2B93B",700,"left",SANS,4);T("ఒక నమ్మకమైన ఆర్థిక ప్రయాణం",250,218,22,"#F3EBD3",400,"left",SANS,0,true);
+ RR(740,78,248,48,24,LG(740,78,988,126,[[0,"#E9B949"],[1,"#A96C12"]]));T("లోన్ ధృవీకరణ పత్రం",864,110,20,"#171326",700,"center");T("లోన్ సంఖ్య: "+String(c.loanId||c.customerId||"EK-LOAN"),988,166,17,"#fff",600,"right");T("కస్టమర్ కోసం లోన్ వివరాలు",84,270,23,"#F2B93B",700);x.fillStyle=LG(36,0,W,0,GS);x.fillRect(36,310,W-72,5);
+ T("లోన్ మొత్తం",92,390,22,"#6F7890",600);T(inr(c.loan),92,485,88,"#101A40",700,"left",SERIF);T("మీ లోన్ వివరాలు మరియు తిరిగి చెల్లింపు షెడ్యూల్",92,530,23,"#4A5570",500);
+ RR(92,570,896,178,24,"#F6F8FC","#E1E7F2",2);T("కస్టమర్ వివరాలు",120,610,22,"#B07A12",700);T("కస్టమర్ పేరు",120,650,17,"#6F7890",600);T(c.name||"—",120,686,26,"#101A40",700);T("కస్టమర్ ఐడి",500,650,17,"#6F7890",600);T(c.customerId||"—",500,686,25,"#101A40",700);T("ఫోన్ నంబర్",760,650,17,"#6F7890",600);T(c.phone||"—",760,686,23,"#101A40",700);
+ T("లోన్ సారాంశం",92,800,23,"#B07A12",700);var ys=820;row("లోన్ మొత్తం",inr(c.loan),ys,false);row("ప్రారంభ కటింగ్ మొత్తం",inr(c.cutting||0),ys+72,false);row("కస్టమర్‌కు అందించిన నికర మొత్తం",inr(Math.max((+c.loan||0)-(+c.cutting||0),0)),ys+144,false);row("వారానికి చెల్లించాల్సిన మొత్తం",inr(c.perWeek),ys+216,false);row("మొత్తం వాయిదాలు",String(c.weeks)+" వారాలు",ys+288,false);row("మొత్తం చెల్లించాల్సిన మొత్తం",inr(k.payable),ys+360,true);
+ var sy=ys+456;RR(92,sy,896,174,22,"#F6F8FC","#E1E7F2",2);T("తిరిగి చెల్లింపు షెడ్యూల్",120,sy+42,22,"#B07A12",700);T("చెల్లింపు రోజు",120,sy+84,17,"#6F7890",600);T("ప్రతి "+weekdayNameLocalized(wd,"te"),120,sy+122,24,"#101A40",700);T("మొదటి వాయిదా తేదీ",500,sy+84,17,"#6F7890",600);T(teDateStr(first),500,sy+122,23,"#101A40",700);T("చివరి వాయిదా తేదీ",760,sy+84,17,"#6F7890",600);T(teDateStr(last),760,sy+122,22,"#101A40",700);
+ T("గమనిక: ప్రతి "+weekdayNameLocalized(wd,"te")+" రోజున "+inr(c.perWeek)+" చొప్పున మొత్తం "+c.weeks+" వారాలు చెల్లించాలి.",92,sy+220,20,"#4A5570",500);
+ var fy=H-36-150;x.fillStyle=LG(0,fy,W,fy+150,[[0,"#13204F"],[1,"#050B22"]]);x.fillRect(36,fy,W-72,150);x.fillStyle=LG(36,0,W-36,0,GS);x.fillRect(36,fy,W-72,4);logo(80,fy+25,94);T("EKADHARA",196,fy+70,34,"#F8F2E2",700,"left",SERIF,4);T("FINANCIAL SERVICES",198,fy+99,14,"#F2B93B",700,"left",SANS,4);T("మమ్మల్ని ఎంచుకున్నందుకు ధన్యవాదాలు",988,fy+72,25,"#F3EBD3",600,"right");T("ఇది కంప్యూటర్ ద్వారా రూపొందించిన లోన్ సారాంశ పత్రం.",988,fy+108,17,"#AAB3CE",400,"right");T("ఏకధార · ఒక నమ్మకమైన ఆర్థిక ప్రయాణం",W/2,fy+134,17,"#F2B93B",500,"center");x.restore();return cv;
+}
+var loanSummaryDraft=null;
+function showLoanSummary(c){
+ var cv=loanSummaryCanvas(c),png=cv.toDataURL("image/png"),name="Ekadhara-Loan-Summary-"+String(c.customerId||c.name||"Customer").replace(/[^A-Za-z0-9_-]/g,"-")+".png";loanSummaryDraft={customer:Object.assign({},c),file:null,name:name};
+ var phone=(c.phone||"").replace(/\D/g,"");if(phone.length===10)phone="91"+phone;var msg="నమస్కారం "+c.name+" గారు, మీ ఏకధార లోన్ వివరాలు మరియు చెల్లింపు షెడ్యూల్ ఈ పత్రంలో ఉన్నాయి. దయచేసి పరిశీలించండి. ధన్యవాదాలు!";var link="https://wa.me/"+phone+"?text="+encodeURIComponent(msg);
+ open_('<div class="row"><div><h2>లోన్ సారాంశ పత్రం</h2><p style="color:var(--muted);font-size:13px">'+esc(c.name)+' · '+esc(c.customerId||"")+'</p></div><button class="btn sm sp" onclick="close_()">మూసివేయి</button></div><img alt="ఏకధార లోన్ సారాంశ పత్రం" src="'+png+'" style="display:block;width:100%;height:auto;max-height:min(620px,68vh);object-fit:contain;background:#e9ecf4;border-radius:12px;margin:12px auto"><div class="row" style="justify-content:flex-end;margin-top:12px"><a class="btn" href="'+png+'" download="'+esc(name)+'">↓ PNG డౌన్‌లోడ్</a><button class="btn pri" id="loanSummaryShareBtn" disabled onclick="shareLoanSummary()">సిద్ధమవుతోంది…</button><a class="btn" id="loanSummaryWhatsAppFallback" style="display:none" target="_blank" rel="noopener" href="'+link+'">WhatsApp తెరవండి</a></div><small id="loanSummaryStatus" style="display:block;color:var(--muted);margin-top:9px">లోన్ ధృవీకరణ పత్రం — కస్టమర్‌కు పంపించడానికి సిద్ధంగా ఉంది.</small>');
+ cv.toBlob(function(blob){var b=$("loanSummaryShareBtn"),f=$("loanSummaryWhatsAppFallback"),st=$("loanSummaryStatus");if(!blob){if(b)b.textContent="చిత్రం సిద్ధం కాలేదు";if(f)f.style.display="inline-block";return}try{loanSummaryDraft.file=new File([blob],name,{type:"image/png"})}catch(e){}if(b){b.disabled=false;b.textContent="పత్రం షేర్ చేయండి"}var ok=!!(navigator.share&&navigator.canShare&&loanSummaryDraft.file&&navigator.canShare({files:[loanSummaryDraft.file]}));if(st)st.textContent=ok?"షేర్ నొక్కి WhatsApp లేదా ఇతర యాప్ ఎంచుకోండి.":"PNG డౌన్‌లోడ్ చేసి WhatsApp లో జతచేయండి.";if(f)f.style.display=ok?"none":"inline-block"},"image/png");
+}
+function shareLoanSummary(){if(!loanSummaryDraft||!loanSummaryDraft.file)return;var d={files:[loanSummaryDraft.file],title:"ఏకధార లోన్ సారాంశ పత్రం",text:loanSummaryDraft.customer.name+" గారికి లోన్ వివరాలు"};if(!navigator.share||!navigator.canShare||!navigator.canShare({files:d.files})){var s=$("loanSummaryStatus");if(s)s.textContent="PNG డౌన్‌లోడ్ చేసి WhatsApp లో జతచేయండి.";return}navigator.share(d).catch(function(e){if(e&&e.name!=="AbortError"){var s=$("loanSummaryStatus");if(s)s.textContent="షేర్ తెరవలేకపోయాం. PNG డౌన్‌లోడ్ చేసి WhatsApp నుండి పంపండి."}})}
+
 var receiptDraft=null;
 function showPaymentReceipt(c,p){
  var balance=calc(c).pend,cv=receiptCanvas(c,p,balance),png=cv.toDataURL("image/png"),name="Ekadhara-Receipt-W"+p.week+"-"+String(p.date||"").replace(/[^0-9]/g,"")+".png";
@@ -2310,4 +2386,101 @@ window.addEventListener("DOMContentLoaded",function(){
  new MutationObserver(function(){[].forEach.call(app.querySelectorAll(".stat .v,.dashboard-card .v,.portal-stat .v"),cu)}).observe(app,{childList:true,subtree:true});
 });
 </script>
+
+
+<style id="ekadhara-customer-login-viewport-fit">
+/* Customer login: fit the complete card inside the phone viewport without page scrolling.
+   Only the login screen is affected; the customer dashboard and admin screens are unchanged. */
+html:has(body.portal .portal-page > .sec > .ek-plate),
+html:has(body.portal .portal-page > .sec > .ek-plate) body {
+  height: 100%;
+  min-height: 0;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) {
+  height: 100vh;
+  height: 100svh;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .wrap {
+  width: 100%;
+  max-width: none;
+  height: 100vh;
+  height: 100svh;
+  min-height: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: max(12px, env(safe-area-inset-top)) 14px max(12px, env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec {
+  width: 100%;
+  max-width: 520px !important;
+  box-sizing: border-box;
+  margin: 0 auto !important;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec h1 {
+  margin-top: clamp(10px, 2.2vh, 18px) !important;
+  font-size: clamp(27px, 7vw, 34px) !important;
+  line-height: 1.12;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec > p {
+  margin-top: 7px !important;
+  font-size: clamp(12px, 3.4vw, 15px) !important;
+  line-height: 1.4;
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .fg {
+  margin-top: clamp(12px, 2.5vh, 24px) !important;
+  gap: clamp(8px, 1.6vh, 13px);
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .portal-remember-row {
+  margin-top: clamp(8px, 1.7vh, 14px);
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .row {
+  margin-top: clamp(8px, 1.7vh, 14px);
+}
+body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .note {
+  margin-top: clamp(8px, 1.7vh, 16px) !important;
+  line-height: 1.4;
+}
+@media (max-height: 700px) {
+  body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec {
+    padding: 11px !important;
+  }
+  body.portal:has(.portal-page > .sec > .ek-plate) .ek-plate {
+    padding: 8px 10px !important;
+    margin-bottom: 2px;
+  }
+  body.portal:has(.portal-page > .sec > .ek-plate) .ek-pl-logo {
+    width: 34px !important;
+    height: 34px !important;
+  }
+  body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .fg {
+    margin-top: 9px !important;
+    gap: 7px;
+  }
+  body.portal:has(.portal-page > .sec > .ek-plate) .portal-page > .sec .note {
+    margin-top: 7px !important;
+  }
+}
+/* When the iPhone keyboard opens, allow the focused field to remain reachable. */
+body.portal:has(.portal-page > .sec > .ek-plate):has(#portal_cid:focus, #portal_pin:focus) {
+  height: 100dvh;
+  overflow: auto !important;
+}
+body.portal:has(.portal-page > .sec > .ek-plate):has(#portal_cid:focus, #portal_pin:focus) .wrap {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow-y: auto;
+  place-items: start center;
+}
+</style>
+
 </body></html>

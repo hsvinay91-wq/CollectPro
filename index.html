@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Ekadhara Premium Mode Selector",
+  "schemaVersion": 1,
+  "description": "EKADHARA portal with premium role selector - remembers Admin or Customer preference via localStorage and auto-loads on subsequent launches."
+}
+</script>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#060A1B">
@@ -1077,7 +1084,7 @@ body{-webkit-tap-highlight-color:transparent}
 </div>
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <script>
-var KEY="collectpro_v19",HIST=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en",portalRemember=false,CUSTOMER_MODE=false;
+var KEY="collectpro_v19",HIST=[],view="",adminSession=null,cloudReady=false,portalData=null,portalError="",portalLang="en",portalRemember=false,CUSTOMER_MODE=false,userMode=null;
 var SUPABASE_URL="https://haqjtrcwhuoqwqpoanij.supabase.co";
 var SUPABASE_PUBLISHABLE_KEY="sb_publishable_ASbs_DhL_rRfPWd1grUq6Q_7-I87djF";
 var sb=null;
@@ -1230,8 +1237,17 @@ async function startApp(){
 }
 
 async function initCloud(){
+  // Check for stored user mode
+  var storedMode=localStorage.getItem("ekadhara_user_mode");
+  if(storedMode){userMode=storedMode;CUSTOMER_MODE=userMode==="customer"}
   if(!cloudConfigured()||!window.supabase){route();return}
   sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);cloudReady=true;
+
+  // If user mode not set, show premium selector
+  if(!userMode){
+    showUserModeSelector();
+  }
+
   var onAuth=function(){sb.auth.onAuthStateChange(function(_e,session){adminSession=session;if(session)cloudLoad();else if(!CUSTOMER_MODE&&location.hash!=="#portal")render()})};
   var toPortal=function(){try{history.replaceState(null,"","#portal")}catch(e){location.hash="#portal"}};
   var portalUrl=CUSTOMER_MODE||location.hash==="#portal"||/[?&]app=customer\b/.test(location.search),tried=false;
@@ -1776,6 +1792,24 @@ function animateCustomerPortal(){
   if(bar)setTimeout(function(){bar.style.width=bar.getAttribute("data-progress")||"0%"},120);
 }
 function route(){var m=location.hash.match(/^#customer\/(.+)$/);view=m?m[1]:"";armed=null;if(CUSTOMER_MODE||location.hash==="#portal"){view="";render();return}render();window.scrollTo(0,0)}
+function showUserModeSelector(){
+  var html='<div id="modeSelector" style="position:fixed;inset:0;background:radial-gradient(circle at center, rgba(13, 24, 58, 0.95), rgba(7, 12, 34, 0.98));z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:\'Manrope\',sans-serif"><div style="background:linear-gradient(135deg,rgba(18,25,60,0.8),rgba(12,18,47,0.9));border:1px solid rgba(242,185,59,0.3);border-radius:28px;padding:48px 36px;max-width:440px;width:100%;text-align:center;color:#F5F1E6;box-shadow:0 30px 60px rgba(0,0,0,0.5);animation:ekPop .4s cubic-bezier(.2,.8,.2,1.2)"><h2 style="font:400 32px \'Instrument Serif\',serif;margin-bottom:8px;color:#FFC84A;">EKADHARA</h2><p style="font-size:15px;margin-bottom:40px;opacity:0.8;letter-spacing:0.5px;">SELECT PORTAL ACCESS</p><div style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px"><button onclick="selectMode(\'admin\')" style="background:linear-gradient(135deg,#FFD96A,#FFB82E);color:#1A1204;border:none;padding:18px;border-radius:16px;font-weight:800;font-size:16px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s">Admin Portal</button><button onclick="selectMode(\'customer\')" style="background:rgba(255,255,255,0.05);color:#F5F1E6;border:1px solid rgba(255,255,255,0.1);padding:18px;border-radius:16px;font-weight:600;font-size:16px;cursor:pointer;transition:transform 0.2s,background 0.2s">Customer Portal</button></div><p style="font-size:12px;opacity:0.5;line-height:1.5;">Access is restricted based on your role.</p></div></div>';
+  document.body.insertAdjacentHTML('afterEnd',html);
+  // Add premium animation keyframes if not exists
+  if(!document.getElementById('modeSelectorStyles')){var style=document.createElement('style');style.id='modeSelectorStyles';style.textContent='@keyframes ekPop{from{opacity:0;transform:translateY(20px) scale(0.98)}to{opacity:1;transform:none}}';document.head.appendChild(style)}
+}
+function selectMode(mode){
+  userMode=mode;
+  CUSTOMER_MODE=mode==='customer';
+  localStorage.setItem('ekadhara_user_mode',mode);
+  closeModeSelector();
+  // Rerun init to proceed
+  if(window.initCloud){window.initCloud()}else{initCloud()}
+}
+function closeModeSelector(){
+  var selector=document.getElementById('modeSelector');
+  if(selector){selector.remove()}
+}
 function go(v){var h=v?"#customer/"+v:"";if(location.hash===h||(!v&&(location.hash===""||location.hash==="#")))route();else location.hash=h||"#"}
 window.addEventListener("hashchange",route);
 var q="",flt="all";

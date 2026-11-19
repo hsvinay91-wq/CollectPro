@@ -1062,6 +1062,23 @@ body{-webkit-tap-highlight-color:transparent}
  body.portal .wrap{padding-bottom:max(24px,env(safe-area-inset-bottom))}
 }
 </style>
+<style>
+/* ===== Perfect screen fit (iPhone + Android, browser + installed app) ===== */
+html{min-height:100%;background:radial-gradient(circle at 8% 12%,rgba(61,94,190,.18),transparent 27%),radial-gradient(circle at 88% 22%,rgba(211,168,63,.10),transparent 25%),linear-gradient(145deg,#050918 0%,#090F27 48%,#0A1030 100%) fixed #050918}
+body{background:transparent!important;box-sizing:border-box;min-height:100vh;min-height:100dvh}
+@media (display-mode:standalone){
+ html,body{overscroll-behavior-y:none}
+ body{padding-top:0!important}                                   /* top bar / page handle the notch inset themselves (no double gap) */
+ body.adm .eka-bar{padding-top:max(10px,env(safe-area-inset-top))}
+}
+body.portal .wrap{min-height:100vh;min-height:100dvh;box-sizing:border-box;display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom))}
+body.portal #app{flex:1;display:flex;flex-direction:column;min-height:0}
+body.portal #app>*{width:100%;box-sizing:border-box}
+body.portal #app:has(.ek-plate){justify-content:center}
+body.portal #app:has(.ek-plate)>*{margin-block:auto!important;margin-inline:auto!important;max-width:560px}
+body.portal #app:not(:has(.ek-plate))>*{margin-top:0!important}
+@media(max-height:720px){body.portal .ek-plate{padding:10px 12px}body.portal .ek-pl-logo{width:44px;height:44px}}
+</style>
 </head><body>
 <aside class="eka-side"><div class="eka-sb"><svg class="eka-big" viewBox="0 0 100 100" aria-hidden="true"><use href="#ekSym"/></svg><div class="eka-name">EKADHARA</div><div class="eka-sub"><i></i>FINANCIAL SERVICES<i></i></div><div class="eka-tag">One Trusted Financial Journey.</div></div><nav class="eka-nav" id="ekaNav"></nav><div class="eka-foot" id="ekaFoot"></div></aside><div class="eka-ov" onclick="ekaClose()"></div><nav class="eka-tabs" id="ekaTabs"></nav>
 <div class="wrap"><div class="eka-bar" id="ekaBar"></div>
@@ -1241,10 +1258,16 @@ var ADMIN_CREDS_KEY="ekadhara_admin_creds_v1";
 var authListenerBound=false;
 
 function getSavedMode(){
-  try{
-    var m=localStorage.getItem(MODE_KEY);
-    return (m==="admin"||m==="customer")?m:null;
-  }catch(e){return null}
+  var m=null;
+  try{m=localStorage.getItem(MODE_KEY)}catch(e){}
+  if(m!=="admin"&&m!=="customer"){
+    try{var c=document.cookie.match(/(?:^|;\s*)ek_mode=(admin|customer)/);m=c?c[1]:null}catch(e){m=null}
+  }
+  return (m==="admin"||m==="customer")?m:null;
+}
+function hasAdminToken(){
+  try{for(var i=0;i<localStorage.length;i++){if(/^sb-.*-auth-token$/.test(localStorage.key(i)||""))return true}}catch(e){}
+  return false;
 }
 function setSavedMode(mode){
   userMode=mode;
@@ -1253,6 +1276,8 @@ function setSavedMode(mode){
     if(mode)localStorage.setItem(MODE_KEY,mode);
     else localStorage.removeItem(MODE_KEY);
   }catch(e){}
+  try{document.cookie="ek_mode="+(mode||"")+";path=/;max-age="+(mode?31536000:0)+";SameSite=Lax"}catch(e){}
+  try{if(mode==="admin"&&/[?&]app=customer\b/.test(location.search))history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 }
 function saveAdminCreds(email,pass){
   try{localStorage.setItem(ADMIN_CREDS_KEY,JSON.stringify({email:email,pass:pass,savedAt:Date.now()}))}catch(e){}
@@ -1297,6 +1322,7 @@ function bindAuthListener(){
 
 async function initCloud(){
   var storedMode=getSavedMode();
+  if(!storedMode&&hasAdminToken()&&!getPortalSession())storedMode="admin";   /* admin device: never fall back to the customer login */
   if(storedMode){
     setSavedMode(storedMode);
   }else if(/[?&]app=customer\b/.test(location.search)||location.hash==="#portal"){

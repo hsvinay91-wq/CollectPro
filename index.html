@@ -2707,7 +2707,37 @@ body.portal:has(.portal-page > .sec > .ek-plate):has(#portal_cid:focus, #portal_
   place-items: start center;
 }
 </style>
-
+<style id="ekadhara-scroll-fix">
+html,
+body,
+body.portal,
+body.adm,
+body.portal .wrap,
+body.portal #app,
+body.portal .portal-page {
+  height: auto !important;
+  min-height: 100dvh;
+  overflow-x: clip !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+body.portal .wrap,
+body.portal #app {
+  display: block !important;
+}
+body.portal:has(.ek-plate) #app {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  min-height: calc(100dvh - 36px) !important;
+}
+body.portal:has(.ek-plate) .portal-page > .sec {
+  width: 100%;
+  max-width: 520px !important;
+  margin: auto !important;
+}
+</style>
 <script>
 (function(){
  function hint(){
@@ -2725,33 +2755,4 @@ body.portal:has(.portal-page > .sec > .ek-plate):has(#portal_cid:focus, #portal_
  window.addEventListener("DOMContentLoaded",hint);
 })();
 </script>
-<style id="ekadhara-android-dashboard-scroll-fix">
-@media (max-width: 700px) {
-  body.portal:has(.portal-page > .sec > .ek-plate) {
-    height: auto !important;
-    min-height: 100dvh !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-  }
-
-  body.portal:has(.portal-page > .sec > .ek-plate) .wrap {
-    height: auto !important;
-    min-height: 100dvh !important;
-    max-height: none !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
-    place-items: start center !important;
-    padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
-    touch-action: pan-y;
-  }
-
-  body.portal:has(.portal-page > .sec > .ek-plate) #app {
-    min-height: 0;
-    overflow: visible !important;
-    touch-action: pan-y;
-  }
-}
-</style>
 </body></html>

@@ -1,25 +1,42 @@
 {
-  "id": "/",
-  "name": "CollectPro Admin",
-  "short_name": "CollectPro Admin",
-  "start_url": "./index.html",
+  "id": "./?app=customer",
+  "name": "Ekadhara Financial Services",
+  "short_name": "Ekadhara",
+  "description": "Ekadhara customer portal — view your weekly collection, payment progress and remaining balance.",
+  "start_url": "./?app=customer",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#070C20",
-  "theme_color": "#070C20",
-  "description": "CollectPro weekly collections management",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait",
+  "background_color": "#060A1B",
+  "theme_color": "#060A1B",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "finance",
+    "business"
+  ],
   "icons": [
     {
-      "src": "./collectpro-icon-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./collectpro-icon-512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

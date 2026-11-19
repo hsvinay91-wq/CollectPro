@@ -6,6 +6,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="EKADHARA">
 <link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="48x48" href="./favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
 <title>EKADHARA Financial Services — Weekly Collections</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1037,6 +1042,19 @@ body .portal-hero::before{content:none!important;display:none!important}
 }
 </style>
 
+<style>
+/* ===== Installed app (PWA) feel ===== */
+html{background:#060A1B}
+body{-webkit-tap-highlight-color:transparent}
+.ios-hint{margin:2px 0 12px;padding:10px 12px;border-radius:14px;border:1px dashed rgba(242,185,59,.5);background:rgba(242,185,59,.08);color:#F3EBD3;font-size:12.5px;line-height:1.5}
+@media (display-mode:standalone){
+ body{padding-top:env(safe-area-inset-top);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+ input,textarea,select{-webkit-user-select:text;user-select:text}
+ #installBtn,.ios-hint{display:none!important}
+ body.portal .top{display:none!important}
+ body.portal .wrap{padding-bottom:max(24px,env(safe-area-inset-bottom))}
+}
+</style>
 </head><body>
 <aside class="eka-side"><div class="eka-sb"><svg class="eka-big" viewBox="0 0 100 100" aria-hidden="true"><use href="#ekSym"/></svg><div class="eka-name">EKADHARA</div><div class="eka-sub"><i></i>FINANCIAL SERVICES<i></i></div><div class="eka-tag">One Trusted Financial Journey.</div></div><nav class="eka-nav" id="ekaNav"></nav><div class="eka-foot" id="ekaFoot"></div></aside><div class="eka-ov" onclick="ekaClose()"></div><nav class="eka-tabs" id="ekaTabs"></nav>
 <div class="wrap"><div class="eka-bar" id="ekaBar"></div>
@@ -1199,7 +1217,7 @@ async function cloudDelete(id){if(!sb)return true;var q=await sb.from("collectpr
 async function startApp(){
   if(window.supabase){initCloud();return}
   var msg=document.getElementById("app");
-  if(msg)msg.innerHTML='<div class="sec" style="max-width:560px;margin:40px auto;text-align:center"><h1 style="font-size:32px">CollectPro</h1><p>Connecting to the cloud service…</p></div>';
+  if(msg)msg.innerHTML='<div class="sec" style="max-width:560px;margin:40px auto;text-align:center"><h1 style="font-size:32px">Ekadhara</h1><p>Connecting to the cloud service…</p></div>';
   await new Promise(function(resolve){
     var s=document.createElement("script");
     s.src="https://unpkg.com/@supabase/supabase-js@2";
@@ -1208,10 +1226,25 @@ async function startApp(){
     document.head.appendChild(s);
   });
   if(window.supabase){initCloud();return}
-  if(msg)msg.innerHTML='<div class="sec" style="max-width:560px;margin:40px auto;text-align:center"><h1 style="font-size:32px">CollectPro</h1><p style="color:var(--miss);font-weight:700">Cloud library could not be loaded.</p><p>Please refresh the page or check your internet connection.</p><button class="btn pri" onclick="location.reload()">Refresh</button></div>';
+  if(msg)msg.innerHTML='<div class="sec" style="max-width:560px;margin:40px auto;text-align:center"><h1 style="font-size:32px">Ekadhara</h1><p style="color:var(--miss);font-weight:700">Cloud library could not be loaded.</p><p>Please refresh the page or check your internet connection.</p><button class="btn pri" onclick="location.reload()">Refresh</button></div>';
 }
 
-async function initCloud(){if(!cloudConfigured()){route();return}if(!window.supabase){route();return}sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);cloudReady=true;if((CUSTOMER_MODE||location.hash==="#portal")&&getPortalSession()){if(await restorePortalSession()){render();return}}var g=await sb.auth.getSession();adminSession=g.data.session;if(CUSTOMER_MODE){await cloudLoad();return}if(adminSession)await cloudLoad();else render();sb.auth.onAuthStateChange(function(_e,session){adminSession=session;if(session)cloudLoad();else render()})}
+async function initCloud(){
+  if(!cloudConfigured()||!window.supabase){route();return}
+  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);cloudReady=true;
+  var onAuth=function(){sb.auth.onAuthStateChange(function(_e,session){adminSession=session;if(session)cloudLoad();else if(!CUSTOMER_MODE&&location.hash!=="#portal")render()})};
+  var toPortal=function(){try{history.replaceState(null,"","#portal")}catch(e){location.hash="#portal"}};
+  var portalUrl=CUSTOMER_MODE||location.hash==="#portal"||/[?&]app=customer\b/.test(location.search),tried=false;
+  if(portalUrl&&location.hash!=="#portal")toPortal();                       /* installed app / customer link always opens the portal, never the admin gate */
+  if(portalUrl&&getPortalSession()){tried=true;if(await restorePortalSession()){onAuth();render();return}}
+  var g=await sb.auth.getSession();adminSession=g.data.session;
+  if(!adminSession&&!tried&&getPortalSession()){                            /* remember-me customer opened the plain URL or refreshed */
+    toPortal();tried=true;if(await restorePortalSession()){onAuth();render();return}
+  }
+  if(CUSTOMER_MODE){await cloudLoad();return}
+  if(adminSession)await cloudLoad();else render();
+  onAuth();
+}
 function adminLogin(){open_('<h2>Admin Login</h2><p style="color:var(--muted);font-size:13px">Sign in with the Admin email/password created in Supabase Authentication.</p><div class="fg">'+F("a_email","Admin email","email","")+F("a_pass","Password","password","")+'</div><div class="row"><button class="btn pri sp" onclick="doAdminLogin()">Login</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>')}
 async function doAdminLogin(){var e=$("a_email").value.trim(),p=$("a_pass").value;if(!e||!p){$("err").textContent="Enter email and password.";return}var r=await sb.auth.signInWithPassword({email:e,password:p});if(r.error)$("err").textContent=r.error.message;else close_()}
 async function adminLogout(){if(sb)await sb.auth.signOut();}
@@ -1346,6 +1379,7 @@ var PORTAL_SESSION_KEY="collectpro_portal_session_v2";
 function savePortalSession(token){
   if(!portalRemember||!token)return;
   try{localStorage.setItem(PORTAL_SESSION_KEY,JSON.stringify({token:token,savedAt:Date.now()}))}catch(e){}
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 }
 function getPortalSession(){
   try{
@@ -1362,7 +1396,7 @@ async function restorePortalSession(){
   try{
     var r=await sb.rpc("collectpro_customer_resume",{p_token:s.token});
     if(r.error||!r.data||!r.data.length){clearPortalSession();return false}
-    portalData=mapRow(r.data[0]);portalRemember=true;return true;
+    portalData=mapRow(r.data[0]);portalRemember=true;try{localStorage.setItem(PORTAL_SESSION_KEY,JSON.stringify({token:s.token,savedAt:Date.now()}))}catch(e){}return true;
   }catch(e){return false}
 }
 async function forgetPortalDevice(){
@@ -1721,7 +1755,7 @@ function portalView(){
   ].map(function(x){return '<div class="stat portal-stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
   '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+
   paymentHistoryHtml(c,false)+helpHtml()+
-  '<div class="row" style="margin:14px 0"><button class="btn" id="installBtn" style="display:none" onclick="installApp()">Install CollectPro</button><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button></div>'+
+  '<div class="row" style="margin:14px 0"><button class="btn" id="installBtn" style="display:none" onclick="installApp()">Install Ekadhara App</button><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button></div>'+
   '</div>';
  }
  return '<div class="portal-page"><div class="sec" style="max-width:520px;margin:30px auto"><div class="ek-plate"><svg class="ek-pl-logo" viewBox="0 0 100 100" aria-hidden="true"><use href="#ekSym"/></svg><div class="ek-pl-txt"><b>EKADHARA</b><small>FINANCIAL SERVICES</small></div><button class="btn" onclick="togglePortalLang()">'+pt("language")+'</button></div><h1 style="font-size:34px;margin-top:18px">'+pt("loginTitle")+'</h1><p style="font-size:15px;margin-top:10px">'+pt("loginSub")+'</p><div class="fg" style="margin-top:24px">'+F("portal_cid",portalLang==="te"?"మీ పేరు":"Your Name","text","",'autocomplete="name"')+F("portal_pin",portalLang==="te"?"4-Digit PIN":"4-Digit PIN","password","",'inputmode="numeric" maxlength="4" minlength="4" pattern="[0-9]{4}" autocomplete="current-password"')+'</div><div class="portal-remember-row"><label class="portal-check"><input id="portal_remember" type="checkbox" '+(portalRemember?"checked":"")+'><span>'+(portalLang==="te"?"ఈ పరికరంలో నన్ను గుర్తుంచుకో":"Remember me on this device")+'</span></label></div><div class="row"><button class="btn pri sp" onclick="portalLogin()">'+pt("login")+'</button></div><div id="perr" style="color:var(--miss);margin-top:10px">'+esc(portalError)+'</div><div class="note" style="margin-top:18px">'+pt("loginHint")+'</div></div></div>';
@@ -1876,7 +1910,7 @@ function render(){
  var a=$("app");
  if(CUSTOMER_MODE){a.innerHTML=portalView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
- if(cloudConfigured() && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><span class="ek-portal-logo ek-admin-gate-logo" aria-label="EKADHARA logo"><svg viewBox="0 0 100 100" role="img" aria-label="EKADHARA emblem" focusable="false"><defs><linearGradient id="ekGoldAdmin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4BD"/><stop offset=".26" stop-color="#FFD65C"/><stop offset=".58" stop-color="#C98218"/><stop offset=".82" stop-color="#F6C84D"/><stop offset="1" stop-color="#FFF1AE"/></linearGradient><linearGradient id="ekGoldAdminShine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8D9"/><stop offset="1" stop-color="#D99520"/></linearGradient></defs><path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekGoldAdmin)" stroke-width="4.2" stroke-linecap="round"/><path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekGoldAdmin)" stroke="#FFE8A4" stroke-width="1.1" stroke-linejoin="round"/><path d="M17 70C34 59 50 47 72 25L78 20L75 34" fill="none" stroke="url(#ekGoldAdmin)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="52" y="58" width="5" height="10" rx="1" fill="#FFF0A6"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFF0A6"/><path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="url(#ekGoldAdminShine)" stroke="#68400D" stroke-width="1.5" stroke-linejoin="round"/><path d="M46 69l5 5m2-1l5 4m2-5l5 4" fill="none" stroke="#68400D" stroke-width="1.6" stroke-linecap="round"/></svg></span><h1 style="font-size:34px">CollectPro Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
+ if(cloudConfigured() && !adminSession){a.innerHTML='<div class="sec" style="max-width:520px;margin:40px auto;text-align:center"><span class="ek-portal-logo ek-admin-gate-logo" aria-label="EKADHARA logo"><svg viewBox="0 0 100 100" role="img" aria-label="EKADHARA emblem" focusable="false"><defs><linearGradient id="ekGoldAdmin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4BD"/><stop offset=".26" stop-color="#FFD65C"/><stop offset=".58" stop-color="#C98218"/><stop offset=".82" stop-color="#F6C84D"/><stop offset="1" stop-color="#FFF1AE"/></linearGradient><linearGradient id="ekGoldAdminShine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8D9"/><stop offset="1" stop-color="#D99520"/></linearGradient></defs><path d="M74 15C59 5 34 9 20 25 8 39 10 59 24 70" fill="none" stroke="url(#ekGoldAdmin)" stroke-width="4.2" stroke-linecap="round"/><path d="M28 25H68L61 34H43V45H61L55 54H43V66H69L62 76H28V25Z" fill="url(#ekGoldAdmin)" stroke="#FFE8A4" stroke-width="1.1" stroke-linejoin="round"/><path d="M17 70C34 59 50 47 72 25L78 20L75 34" fill="none" stroke="url(#ekGoldAdmin)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="52" y="58" width="5" height="10" rx="1" fill="#FFF0A6"/><rect x="60" y="52" width="5" height="16" rx="1" fill="#F5C34D"/><rect x="68" y="45" width="5" height="23" rx="1" fill="#FFF0A6"/><path d="M39 76l8-7 7 5 7-5 7 5-8 8H48z" fill="url(#ekGoldAdminShine)" stroke="#68400D" stroke-width="1.5" stroke-linejoin="round"/><path d="M46 69l5 5m2-1l5 4m2-5l5 4" fill="none" stroke="#68400D" stroke-width="1.6" stroke-linecap="round"/></svg></span><h1 style="font-size:34px">Ekadhara Admin</h1><p>Admin access is protected. Customers should use Customer Portal.</p><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" onclick="adminLogin()">Admin Login</button><button class="btn" onclick="portal()">Customer Portal</button></div></div>';return}
  if(location.hash==="#dashboard"){a.innerHTML=dashboardView();return}
  if(location.hash==="#completed"||location.hash.indexOf("#completed/")===0){a.innerHTML=completedView();return}
  if(location.hash==="#portal"){a.innerHTML=portalView();return}
@@ -1967,7 +2001,7 @@ function reactivateHistoricalCustomer(customerId){
 }
 function completedCustomerView(g){
  var t=historyGroupTotals(g);
- return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>'+esc(g.name)+'</h1><p>All completed/old loans for this customer are stored separately from the current customer account.</p></div><div class="row"><button class="btn" onclick="completedPage()">← Completed customers</button><button class="btn" onclick="reactivateHistoricalCustomer(this.dataset.cid)" data-cid="'+esc(g.customerId)+'">＋ New Loan for Customer</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+
+ return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">Ekadhara Records</div><h1>'+esc(g.name)+'</h1><p>All completed/old loans for this customer are stored separately from the current customer account.</p></div><div class="row"><button class="btn" onclick="completedPage()">← Completed customers</button><button class="btn" onclick="reactivateHistoricalCustomer(this.dataset.cid)" data-cid="'+esc(g.customerId)+'">＋ New Loan for Customer</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+
  '<div class="hero"><div class="row"><div><h1>'+esc(g.name)+'</h1><small>'+esc(g.customerId||"Old customer")+' · '+esc(g.phone||"No contact")+'</small></div><span class="badge o">Completed history</span></div>'+
  '<div class="big"><div><div class="n">'+inr(t.collected)+'</div><div class="l">Historical collected</div></div><div><div class="n g">'+inr(t.profit)+'</div><div class="l">Historical profit</div></div></div>'+
  '<div class="l" style="margin-top:12px;font-size:12.5px;color:#B9B6C8">'+t.loans+' completed loan'+(t.loans===1?'':'s')+' · Total principal '+inr(t.loan)+'</div></div>'+
@@ -2015,7 +2049,7 @@ function completedView(){
  var totalLoans=records.length,totalCollected=0,totalProfit=0;
  records.forEach(function(x){var k=loanRecordCalc(x.h);totalCollected+=k.paid;totalProfit+=loanProfit(x.h,k)});
  var unique={};records.forEach(function(x){var h=x.h,c=x.c||{};var key=historyCustomerKey({customerId:h.customerId||c.customerId,name:h.name||c.name,phone:h.phone||c.phone});unique[key]=1});
- return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">CollectPro Records</div><h1>Completed Customers</h1><p>Every completed/old loan is shown as a separate record. If the same customer had 2 past loans, they appear as 2 separate records. Editing or deleting an old record never changes the current customer account.</p></div><div class="row"><button class="btn" onclick="go(\'\')">← Current Customers</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+ 
+ return '<div class="dashboard-page"><div class="dashboard-head"><div><div class="dash-kicker">Ekadhara Records</div><h1>Completed Customers</h1><p>Every completed/old loan is shown as a separate record. If the same customer had 2 past loans, they appear as 2 separate records. Editing or deleting an old record never changes the current customer account.</p></div><div class="row"><button class="btn" onclick="go(\'\')">← Current Customers</button><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div></div>'+ 
  '<div class="grid dashboard-cards"><div class="stat dashboard-card"><div class="l">Completed records</div><div class="v">'+totalLoans+'</div><div class="s">One card per completed loan</div></div><div class="stat dashboard-card"><div class="l">Historical customers</div><div class="v">'+Object.keys(unique).length+'</div><div class="s">A customer can have multiple records</div></div><div class="stat dashboard-card"><div class="l">Historical collected</div><div class="v">'+inr(totalCollected)+'</div><div class="s">Completed/old loan collections</div></div><div class="stat dashboard-card"><div class="l">Historical profit</div><div class="v">'+inr(totalProfit)+'</div><div class="s">Business analytics</div></div></div>'+ 
  '<div class="sec"><div class="ph-head"><div><h2>Completed / Old Loan Records</h2><p style="margin-bottom:0">Each past loan stays independent. Same customer name or ID does not merge these records.</p></div><span class="loan-history-badge">'+totalLoans+' records</span></div>'+ 
  (records.length?'<div id="completedCustomerList">'+records.map(completedRecordCard).join("")+'</div>':'<div class="empty">No completed/old loans yet.<br><br><button class="btn pri" onclick="historicalLoanForm()">＋ Add Old Loan</button></div>')+ 
@@ -2351,7 +2385,7 @@ var deferredInstallPrompt=null;
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferredInstallPrompt=e;var b=$("installBtn");if(b)b.style.display="inline-block"});
 async function installApp(){if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;var b=$("installBtn");if(b)b.style.display="none"}
 window.addEventListener("appinstalled",function(){var b=$("installBtn");if(b)b.style.display="none"});
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js",{scope:"./"}).catch(function(e){console.warn("CollectPro offline shell registration failed",e)})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js",{scope:"./"}).catch(function(e){console.warn("Ekadhara app shell registration failed",e)})})}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")close_()});
 
 (function(){
@@ -2483,4 +2517,21 @@ body.portal:has(.portal-page > .sec > .ek-plate):has(#portal_cid:focus, #portal_
 }
 </style>
 
+<script>
+(function(){
+ function hint(){
+  var b=document.getElementById("installBtn");if(!b)return;
+  var st=navigator.standalone||(window.matchMedia&&matchMedia("(display-mode:standalone)").matches);if(st)return;
+  if(typeof deferredInstallPrompt!=="undefined"&&deferredInstallPrompt)b.style.display="inline-block";
+  if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!document.getElementById("iosHint")){
+   var d=document.createElement("div");d.id="iosHint";d.className="ios-hint";
+   d.innerHTML="<b>Install app:</b> Safari lo Share (⬆) &rarr; <b>Add to Home Screen</b> &middot; యాప్‌గా ఇన్‌స్టాల్ చేయడానికి Share &rarr; Add to Home Screen నొక్కండి.";
+   b.parentNode.parentNode.insertBefore(d,b.parentNode.nextSibling);
+  }
+ }
+ var app=document.getElementById("app");if(app)new MutationObserver(hint).observe(app,{childList:true});
+ window.addEventListener("beforeinstallprompt",function(){setTimeout(hint,50)});
+ window.addEventListener("DOMContentLoaded",hint);
+})();
+</script>
 </body></html>

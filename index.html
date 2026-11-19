@@ -2810,5 +2810,71 @@ body.portal:has(.ek-plate) .portal-page > .sec {
   }
 }
 </style>
+<style id="ekadhara-android-webview-scroll-fix">
+/* Single-root vertical scrolling for Android App / WebView / PWA & desktop/mobile browsers */
+html {
+  height: auto !important;
+  min-height: 100% !important;
+  max-height: none !important;
+  overflow-x: clip !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: auto;
+}
 
+body,
+body.portal,
+body.adm {
+  position: static !important;
+  height: auto !important;
+  min-height: 100% !important;
+  max-height: none !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+  touch-action: pan-y;
+}
+
+/* Keep intermediate layout wrappers non-scrolling so Android WebView never traps touch drags */
+body .wrap,
+body #app,
+body .portal-page,
+body .dashboard-page,
+body .et,
+body .tw {
+  overflow-y: visible !important;
+  max-height: none !important;
+}
+
+body .wrap,
+body #app,
+body .portal-page {
+  height: auto !important;
+  min-height: 0 !important;
+  flex: none !important;
+  touch-action: pan-y;
+}
+
+/* Horizontal table scroll only when needed, while letting vertical swipes pass through */
+body .et,
+body .tw {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+}
+
+/* Allow long modals/overlays to scroll cleanly on Android WebView */
+html body #ov,
+html body .ov {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+html body #ov .modal,
+html body .ov .modal {
+  max-height: none !important;
+  overflow: visible !important;
+}
+</style>
 </body></html>

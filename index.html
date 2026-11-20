@@ -1467,9 +1467,9 @@ function calc(c){
  var hAmt=c.hAmt!==""&&c.hAmt!=null?Math.max(0,Number(c.hAmt)||0):hp*pw;
  var paid=hAmt+live.reduce(function(s,p){return s+Math.max(0,Number(p.amt)||0)},0),payable=pw*weeks;
  var full={},missed={};live.forEach(function(p){var w=Number(p.week);full[w]=(full[w]||0)+Math.max(0,Number(p.amt)||0)});
- var paidW=Math.min(weeks,hp+Object.keys(full).filter(function(w){return Number(w)>hp&&full[w]+.005>=pw}).length);
+ var tk=trackerItems(c),paidW=Math.min(weeks,Math.max(hp,tk.filter(function(x){return x.status==="paid"}).length));
  pays.forEach(function(p){if(p.type==="unpaid"&&!(full[p.week]+.005>=pw))missed[p.week]=true});
- var miss=Math.max(0,Number(c.hMiss)||0)+Object.keys(missed).length,pend=Math.max(payable-paid,0);
+ var pend=Math.max(payable-paid,0),miss=Math.min(tk.filter(function(x){return x.status==="unpaid"}).length,pw?Math.ceil(Math.max(0,pend-.005)/pw):0);
  return {paidW:paidW,paid:paid,hAmt:hAmt,miss:miss,payable:payable,pend:pend,pendW:pw?Math.ceil(Math.max(0,pend-.005)/pw):0,done:payable>0&&pend<.005,pct:payable?Math.min(100,Math.round(paid/payable*100)):0};
 }
 
@@ -1493,28 +1493,37 @@ function nextWeekDate(loanDate,weekNo,weekday){
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
 function trackerItems(c,asOf){
- var terms=businessTerms(c),base=[],amounts={},i,pw=terms.perWeek;
- for(i=1;i<=Math.min(terms.weeks,520);i++)base.push({week:i,status:"upcoming"});
+ var terms=businessTerms(c),base=[],amounts={},i,pw=terms.perWeek,n=Math.min(terms.weeks,520),pays=c.pays||[],maxW=n,paidSum=0;
+ /* The payable amount is always weeks x weekly amount. If weeks are missed, collection simply continues in the next
+    weeks (n+1, n+2 ...) until everything is collected - each week is entered as Paid or Unpaid. */
+ pays.forEach(function(p){var w=Number(p.week);if(w>maxW&&w<=n+104&&(p.type==="paid"||p.type==="hist"||p.type==="unpaid"))maxW=w});
+ for(i=1;i<=maxW;i++)base.push({week:i,status:"upcoming",ext:i>n});
  /* Historical missed weeks are explicit admin-entered records, so they remain orange. */
- var opening=calc(c).hAmt,hp=Math.min(base.length,Math.max(0,Number(c.hPaid)||0));
+ var hp0=Math.max(0,Number(c.hPaid)||0),opening=(c.hAmt!==""&&c.hAmt!=null)?Math.max(0,Number(c.hAmt)||0):hp0*pw,hp=Math.min(n,hp0);
+ paidSum=opening;
  for(i=1;i<=hp;i++)amounts[i]=Math.min(pw,Math.max(0,opening-(i-1)*pw));
- var hm=Math.min(base.length-hp,Math.max(0,Number(c.hMiss)||0));
+ var hm=Math.min(n-hp,Math.max(0,Number(c.hMiss)||0));
  for(i=hp+1;i<=hp+hm;i++)base[i-1].status="unpaid";
- (c.pays||[]).forEach(function(p){
+ pays.forEach(function(p){
    var w=Number(p.week);if(w<1||w>base.length)return;
-   if(p.type==="paid"||p.type==="hist")amounts[w]=(amounts[w]||0)+Math.max(0,Number(p.amt)||0);
+   if(p.type==="paid"||p.type==="hist"){var a=Math.max(0,Number(p.amt)||0);amounts[w]=(amounts[w]||0)+a;paidSum+=a}
    else if(p.type==="unpaid")base[w-1].status="unpaid";
  });
  base.forEach(function(x){
    if(pw>0&&(amounts[x.week]||0)+.005>=pw)x.status="paid";
    else if(x.status!=="unpaid")x.status="upcoming";
  });
- /* No date-based auto-missed or carry-over colouring. Only an explicit payment
-    or unpaid entry changes a week's status. */
+ /* Remaining weeks still to be collected are shown as grey "upcoming" weeks. */
+ var pend=Math.max(pw*terms.weeks-paidSum,0),pendW=pw?Math.ceil(Math.max(0,pend-.005)/pw):0,upc=base.filter(function(x){return x.status==="upcoming"}).length;
+ for(i=1;i<=Math.max(0,pendW-upc)&&base.length<n+104;i++)base.push({week:base.length+1,status:"upcoming",ext:true});
  return base;
 }
-function overdueSummary(c,asOf){var today=asOf?new Date(asOf):new Date();today.setHours(0,0,0,0);var ages=trackerItems(c,today).reduce(function(a,x){if(x.status!=="unpaid"&&x.status!=="carry")return a;var due=nextWeekDate(c.date,x.week,c.collectionWeekday),dt=due?new Date(due+"T00:00:00"):null;if(dt&&dt<today)a.push(Math.ceil((today-dt)/604800000));return a},[]);return {count:ages.length,oldest:ages.length?Math.max.apply(null,ages):0}}
+function overdueSummary(c,asOf){var today=asOf?new Date(asOf):new Date();today.setHours(0,0,0,0);var ages=trackerItems(c,today).reduce(function(a,x){if(x.status!=="unpaid"&&x.status!=="carry")return a;var due=nextWeekDate(c.date,x.week,c.collectionWeekday),dt=due?new Date(due+"T00:00:00"):null;if(dt&&dt<today)a.push(Math.ceil((today-dt)/604800000));return a},[]);ages.sort(function(a,b){return a-b});ages=ages.slice(0,calc(c).miss);return {count:ages.length,oldest:ages.length?Math.max.apply(null,ages):0}}
 
+function stripHtml(c){
+ var cls=function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""};
+ return '<div class="strip">'+trackerItems(c).map(function(x){return '<div class="w '+cls(x)+'">'+x.week+'</div>'}).join("")+'</div>';
+}
 function strip(c){return trackerItems(c).map(function(x){return x.status==="paid"?"p":(x.status==="unpaid"||x.status==="carry")?"m":""});}
 function portal(){selectMode("customer")}
 function portalAdmin(){selectMode("admin")}
@@ -1898,7 +1907,7 @@ function portalView(){
    [pt("totalPayable"),inr(k.payable),pt("perWeekWeeks")],
    [pt("weeksRemaining"),k.pendW,pt("remainingWord")]
   ].map(function(x){return '<div class="stat portal-stat"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="s">'+x[2]+'</div></div>'}).join("")+'</div>'+
-  '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+
+  '<div class="sec portal-section"><h2>'+pt("tracker")+'</h2><p>'+pt("trackerSub")+'</p>'+stripHtml(c)+'<div class="leg"><span style="--c:var(--paid)">'+pt("paid")+'</span><span style="--c:var(--miss)">'+pt("pendingCarry")+'</span><span style="--c:var(--pend)">'+pt("upcoming")+'</span></div></div>'+
   paymentHistoryHtml(c,false)+helpHtml()+
   '<div class="row" style="margin:14px 0"><button class="btn" id="installBtn" style="display:none" onclick="installApp()">Install Ekadhara App</button><button class="btn" onclick="portalLogout()">'+pt("logout")+'</button><button class="btn" onclick="forgetPortalDevice()">'+(portalLang==="te"?"ఖాతా మార్చండి":"Switch Account")+'</button><button class="btn" onclick="switchPortalMode()">'+(portalLang==="te"?"Admin / Portal మార్చండి":"Switch Portal")+'</button></div>'+
   '</div>';
@@ -2125,7 +2134,7 @@ function render(){
  '<div class="bar"><b style="width:'+k.pct+'%"></b></div><div class="row" style="margin-top:8px;font-size:13px;color:#C9C6D6"><span>'+k.paidW+' of '+c.weeks+' weeks paid</span><span class="sp">'+k.pct+'%</span></div></div>'+
  '<div class="row" style="margin-top:14px"><button class="btn pri" onclick="payForm(\''+c.id+'\')">+ Add payment</button><button class="btn" onclick="newLoanForm(\''+c.id+'\')">+ New Loan</button><button class="btn" onclick="custForm(\''+c.id+'\')">Edit customer</button>'+(c.phone?'<a class="btn" href="tel:'+esc(c.phone)+'">Call</a><a class="btn" target="_blank" rel="noopener" href="'+wa(c,k)+'">WhatsApp reminder</a>':'')+'<button class="btn del sp" onclick="delC(\''+c.id+'\',this)">Delete customer</button></div>'+
  '<div class="grid">'+[["Loan amount",inr(c.loan),"Original principal"],["Initial cutting",inr(c.cutting),"Withheld at disbursement"],["Total payable",inr(k.payable),inr(c.perWeek)+" × "+c.weeks+" weeks"],["Missed weeks",k.miss,inr(k.miss*c.perWeek)+" overdue"],["Weeks remaining",k.pendW,"Until account closes"]].map(function(s,i){return '<div class="stat"><div class="l">'+s[0]+'</div><div class="v"'+(i===2&&k.miss?' '+R:'')+'>'+s[1]+'</div><div class="s">'+s[2]+'</div></div>'}).join("")+'</div>'+
- '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = fully paid. Orange = missed, partial or carried over.</p><div class="strip">'+st.map(function(x,i){return '<div class="w '+x+'">'+(i+1)+'</div>'}).join("")+'</div><div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
+ '<div class="sec"><h2>Week-by-week tracker</h2><p>Green = fully paid. Orange = missed, partial or carried over.</p>'+stripHtml(c)+'<div class="leg"><span style="--c:var(--paid)">Paid</span><span style="--c:var(--miss)">Unpaid</span><span style="--c:var(--pend)">Upcoming</span></div></div>'+
 
  paymentHistoryHtml(c,true)+((+c.hPaid||0)?'<div class="note" style="margin-top:14px">Includes '+c.hPaid+' historical paid weeks from setup ('+inr(k.hAmt)+'). Use Edit customer to change them.</div>':'');
 }
@@ -2429,20 +2438,21 @@ async function saveC(id){
 function payForm(cid,pid){
  var c=DB.filter(function(x){return x.id===cid})[0],p=pid?c.pays.filter(function(x){return x.id===pid})[0]:null;
  var nx=c.pays.length?Math.max.apply(null,c.pays.map(function(x){return x.week}))+1:(+c.hPaid||0)+(+c.hMiss||0)+1;
- p=p||{date:nextWeekDate(c.date,Math.min(nx,c.weeks),c.collectionWeekday==null?4:+c.collectionWeekday)||new Date().toISOString().slice(0,10),amt:c.perWeek,mode:"Cash",week:Math.min(nx,c.weeks),type:"paid"};
+ var defW=Math.min(nx,businessTerms(c).weeks+104);
+ p=p||{date:nextWeekDate(c.date,defW,c.collectionWeekday==null?4:+c.collectionWeekday)||new Date().toISOString().slice(0,10),amt:c.perWeek,mode:"Cash",week:defW,type:"paid"};
  var sel=function(id,l,opts,v){return '<div><label>'+l+'<select id="'+id+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===v?" selected":"")+'>'+o[1]+'</option>'}).join("")+'</select></label></div>'};
  open_('<h2>'+(pid?"Edit payment":"Add payment")+'</h2><div class="fg">'+
  F("p_date","Payment date","date",p.date)+F("p_amt","Amount paid (₹)","number",p.amt,'min="0"')+
- sel("p_mode","Payment mode",["Cash","UPI","Online","Bank Transfer"].map(function(m){return[m,m]}),p.mode)+F("p_wk","Week no.","number",p.week,'min="1" max="'+trackerItems(c).length+'"')+
+ sel("p_mode","Payment mode",["Cash","UPI","Online","Bank Transfer"].map(function(m){return[m,m]}),p.mode)+F("p_wk","Week no.","number",p.week,'min="1" max="'+(businessTerms(c).weeks+104)+'"')+
  '<div class="full">'+sel("p_type","Payment type",[["paid","Paid week"],["unpaid","Unpaid (missed week)"],["hist","Historical paid week"]],p.type)+'</div>'+
- '<div class="note full">Unpaid weeks are saved as ₹0 and shown in red. Historical rows add dates to weeks already counted in setup, so they are not counted twice.</div></div>'+
+ '</div>'+
  '<div class="row"><button class="btn" onclick="close_()">Cancel</button><button class="btn pri sp" onclick="saveP(\''+cid+'\',\''+(pid||"")+'\')">Save payment</button></div><div id="err" style="color:var(--miss);margin-top:8px"></div>');
  var tp=function(){var u=$("p_type").value==="unpaid";$("p_amt").disabled=u;if(u)$("p_amt").value=0;else if(+$("p_amt").value===0)$("p_amt").value=c.perWeek};$("p_type").onchange=tp;tp();
 }
 async function saveP(cid,pid){
  var c=DB.filter(function(x){return x.id===cid})[0];
  var o={date:$("p_date").value,amt:+$("p_amt").value,mode:$("p_mode").value,week:+$("p_wk").value,type:$("p_type").value};
- var maxWeek=trackerItems(c).length;if(!o.date||!(o.amt>=0)||!(o.week>=1&&o.week<=maxWeek)){$("err").textContent="Enter a date, amount and a week between 1 and "+maxWeek+".";return}
+ var nW=businessTerms(c).weeks,maxWeek=nW+104;if(!o.date||!(o.amt>=0)||!(o.week>=1&&o.week<=maxWeek)){$("err").textContent="Enter a date, amount and a week between 1 and "+maxWeek+".";return}
  if(!Number.isInteger(o.week)||!Number.isFinite(o.amt)||((o.type==="paid"||o.type==="hist")&&o.amt<=0)){$("err").textContent="Enter a whole week number and a positive payment amount.";return}
  if((o.type==="paid"||o.type==="hist")&&c.pays.some(function(p){return p.id!==pid&&+p.week===o.week&&(p.type==="paid"||p.type==="hist")})){$("err").textContent="This week already has a payment. Edit the existing payment instead.";return}
  var previousPays=JSON.parse(JSON.stringify(c.pays));
@@ -2496,7 +2506,7 @@ function receiptCanvas(c,p,balance){
  T("అందుకున్న మొత్తం",92,358,22,"#6F7890",600);
  T(inr(p.amt),92,446,88,NAVY,"700","left",SERIF);
  x.fillStyle=LG(92,0,232,0,GS);x.fillRect(92,466,140,6);
- T("వారం "+p.week+(weeks?" / "+weeks:"")+"  ·  "+teDateStr(p.date)+" న చెల్లించారు",92,516,24,"#4A5570",500);
+ T("వారం "+p.week+(weeks&&p.week<=weeks?" / "+weeks:" (బాకీ చెల్లింపు)")+"  ·  "+teDateStr(p.date)+" న చెల్లించారు",92,516,24,"#4A5570",500);
  x.beginPath();x.arc(934,410,46,0,7);x.fillStyle=LG(888,364,980,456,[[0,"#25C48F"],[1,"#0E8F63"]]);x.fill();
  x.strokeStyle="#fff";x.lineWidth=8;x.lineCap="round";x.lineJoin="round";x.beginPath();x.moveTo(913,412);x.lineTo(929,429);x.lineTo(957,393);x.stroke();
  /* customer + payment info */
